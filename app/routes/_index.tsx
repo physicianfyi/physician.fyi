@@ -141,9 +141,22 @@ export default function Index() {
         />
 
         <div className="flex flex-col gap-1">
-          <Ariakit.SelectLabel className="text-sm font-medium" store={select}>
-            Type of action
-          </Ariakit.SelectLabel>
+          <div className="flex items-end justify-between">
+            <Ariakit.SelectLabel className="text-sm font-medium" store={select}>
+              Type of action
+            </Ariakit.SelectLabel>
+            {typeValues.length > 0 && (
+              <button
+                type="button"
+                className="text-xs"
+                onClick={() => {
+                  select.setValue([]);
+                }}
+              >
+                Clear
+              </button>
+            )}
+          </div>
           <Ariakit.Select
             store={select}
             className="flex justify-between items-center py-2.5 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
@@ -177,7 +190,7 @@ export default function Index() {
                   key={`action-${value}`}
                   // @ts-ignore TODO File ticket with ariakit to allow number
                   value={index}
-                  className="flex items-center gap-2 cursor-pointer hover:bg-blue-500 hover:text-white aria-selected:bg-blue-200 aria-selected:text-white"
+                  className="rounded flex items-center gap-2 cursor-pointer hover:bg-blue-500 hover:text-white aria-selected:bg-blue-200 aria-selected:text-white"
                 >
                   <Ariakit.SelectItemCheck />
                   {value}
@@ -188,12 +201,25 @@ export default function Index() {
         </div>
 
         <div className="flex flex-col gap-1">
-          <Ariakit.SelectLabel
-            className="text-sm font-medium"
-            store={licenseTypeSelect}
-          >
-            Type of license
-          </Ariakit.SelectLabel>
+          <div className="flex items-end justify-between">
+            <Ariakit.SelectLabel
+              className="text-sm font-medium"
+              store={licenseTypeSelect}
+            >
+              Type of license
+            </Ariakit.SelectLabel>
+            {licenseTypeValues.length > 0 && (
+              <button
+                type="button"
+                className="text-xs"
+                onClick={() => {
+                  licenseTypeSelect.setValue([]);
+                }}
+              >
+                Clear
+              </button>
+            )}
+          </div>
           <Ariakit.Select
             store={licenseTypeSelect}
             className="flex justify-between items-center py-2.5 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
@@ -227,7 +253,7 @@ export default function Index() {
                   key={`license-${value}`}
                   // @ts-ignore TODO File ticket with ariakit to allow number
                   value={index}
-                  className="flex items-center gap-2 cursor-pointer hover:bg-blue-500 hover:text-white aria-selected:bg-blue-200 aria-selected:text-white"
+                  className="rounded flex items-center gap-2 cursor-pointer hover:bg-blue-500 hover:text-white aria-selected:bg-blue-200 aria-selected:text-white"
                 >
                   <Ariakit.SelectItemCheck />
                   {value ?? "Unlicensed"}
