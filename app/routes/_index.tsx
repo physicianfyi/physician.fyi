@@ -97,7 +97,7 @@ export default function Index() {
   const queryRef = useRef<HTMLFormElement>(null);
 
   return (
-    <div className="p-8 flex flex-col gap-4">
+    <div className="p-4 sm:p-8 md:p-16 flex flex-col gap-4">
       <div className="">Find physicians' disciplinary history</div>
 
       <div
@@ -321,15 +321,110 @@ export default function Index() {
         <span className="font-medium">{data.numResults} physicians</span> found
       </div>
 
-      <ul>
+      <ul className="flex flex-col gap-2">
         {results.map(({ license, data }) => {
           return (
-            <li key={license} className="flex items-center gap-2">
-              <Link to={`/ca/${license}`}>
-                {data[0]["Last Name"]}, {data[0]["First Name"]}{" "}
-                {data[0]["Middle Name"]}
+            <li key={license}>
+              <Link to={`/ca/${license}`} className="group">
+                <div className="group-hover:bg-gray-100 group-focus-visible:bg-gray-100 py-1 rounded">
+                  <div className="px-1 flex items-center gap-2 group-hover:font-medium group-focus-visible:font-medium">
+                    <div>
+                      {data[0]["Last Name"]}, {data[0]["First Name"]}{" "}
+                      {data[0]["Middle Name"]}{" "}
+                      {data.length > 1 && `(${data.length} items)`}
+                    </div>
+                  </div>
+                  <div className="flex items-start sm:items-end gap-1 sm:gap-0 justify-between flex-col sm:flex-row">
+                    <div className="px-1 font-medium flex items-center gap-1 text-xs text-gray-600">
+                      <svg
+                        className="w-4 h-4"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 256 256"
+                      >
+                        <circle
+                          cx="128"
+                          cy="136"
+                          r="32"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="24"
+                        />
+                        <rect
+                          x="32"
+                          y="48"
+                          width="192"
+                          height="160"
+                          rx="8"
+                          transform="translate(256) rotate(90)"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="24"
+                        />
+                        <line
+                          x1="96"
+                          y1="68"
+                          x2="160"
+                          y2="68"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="24"
+                        />
+                        <path
+                          d="M84,187.21a60,60,0,0,1,88,0"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="24"
+                        />
+                      </svg>
+                      {license}
+                    </div>
+                    <div className="flex items-center gap-1 bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-1 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">
+                      <svg
+                        className="w-4 h-4"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 256 256"
+                      >
+                        <polyline
+                          points="128 80 128 128 168 152"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="24"
+                        />
+                        <polyline
+                          points="184 104 224 104 224 64"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="24"
+                        />
+                        <path
+                          d="M188.4,192a88,88,0,1,1,1.83-126.23C202,77.69,211.72,88.93,224,104"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="24"
+                        />
+                      </svg>
+                      {data.at(-1).Date}{" "}
+                      {data.length > 1 && `- ${data.at(0).Date}`}
+                    </div>
+                  </div>
+                </div>
               </Link>
-              {data.length > 1 && <div>({data.length} items)</div>}
+
+              <hr className="h-px mt-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
             </li>
           );
         })}

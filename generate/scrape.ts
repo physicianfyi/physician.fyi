@@ -67,6 +67,8 @@ const downloadFile = async (url: string, folder = ".") => {
 
   const columns = await getColumns(page);
 
+  // TODO Make new runs read existing file and only read until first existing one, which also lets us keep ald ones that get taken down
+
   let results: any[] = [];
   const json: any = {
     lastRun: new Date(),
