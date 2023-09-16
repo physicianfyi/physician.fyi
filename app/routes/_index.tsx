@@ -28,13 +28,12 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
   const page = Number(url.searchParams.get("p") ?? 0);
   const query = url.searchParams.get("q") ?? "";
   const types = JSON.parse(url.searchParams.get("t") ?? "[]");
-  const availableTypes = JSON.parse(
+  const { results: availableTypes, counts: availableTypeCounts } = JSON.parse(
     fs.readFileSync("data/types.json", "utf8")
-  ).results;
+  );
   const licenseTypes = JSON.parse(url.searchParams.get("l") ?? "[]");
-  const availableLicenseTypes = JSON.parse(
-    fs.readFileSync("data/license-types.json", "utf8")
-  ).results;
+  const { results: availableLicenseTypes, counts: availableLicenseTypeCounts } =
+    JSON.parse(fs.readFileSync("data/license-types.json", "utf8"));
   const data = await selectPhysicians({
     page,
     query,
@@ -42,7 +41,13 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
     licenseTypes: licenseTypes.map((t: number) => availableLicenseTypes[t]),
   });
 
-  return { data, availableTypes, availableLicenseTypes };
+  return {
+    data,
+    availableTypes,
+    availableTypeCounts,
+    availableLicenseTypes,
+    availableLicenseTypeCounts,
+  };
 };
 
 export default function Index() {
@@ -59,8 +64,13 @@ export default function Index() {
     [params]
   );
 
-  const { data, availableTypes, availableLicenseTypes } =
-    useLoaderData<typeof loader>();
+  const {
+    data,
+    availableTypes,
+    availableTypeCounts,
+    availableLicenseTypes,
+    availableLicenseTypeCounts,
+  } = useLoaderData<typeof loader>();
   const results = data.results;
 
   const select = Ariakit.useSelectStore({
@@ -148,7 +158,7 @@ export default function Index() {
             {typeValues.length > 0 && (
               <button
                 type="button"
-                className="text-xs"
+                className="text-xs hover:underline"
                 onClick={() => {
                   select.setValue([]);
                 }}
@@ -166,9 +176,12 @@ export default function Index() {
               {typeValues.map((v) => (
                 <div
                   key={v}
-                  className="bg-blue-100 whitespace-nowrap text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"
+                  className="flex items-center gap-1 bg-blue-100 whitespace-nowrap text-blue-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"
                 >
-                  {availableTypes[v]}
+                  <div>{availableTypes[v]}</div>
+                  <div className="bg-white rounded-full px-1">
+                    {availableTypeCounts[availableTypes[v]]}
+                  </div>
                 </div>
               ))}
             </div>
@@ -194,6 +207,9 @@ export default function Index() {
                 >
                   <Ariakit.SelectItemCheck />
                   {value}
+                  <div className="bg-white rounded-full px-1 text-black text-xs">
+                    {availableTypeCounts[value]}
+                  </div>
                 </Ariakit.SelectItem>
               ))}
             </Ariakit.SelectPopover>
@@ -211,7 +227,7 @@ export default function Index() {
             {licenseTypeValues.length > 0 && (
               <button
                 type="button"
-                className="text-xs"
+                className="text-xs hover:underline"
                 onClick={() => {
                   licenseTypeSelect.setValue([]);
                 }}
@@ -229,9 +245,12 @@ export default function Index() {
               {licenseTypeValues.map((v) => (
                 <div
                   key={v}
-                  className="bg-blue-100 whitespace-nowrap text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"
+                  className="flex items-center gap-1 bg-blue-100 whitespace-nowrap text-blue-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"
                 >
-                  {availableLicenseTypes[v] ?? "Unlicensed"}
+                  <div>{availableLicenseTypes[v] ?? "Unlicensed"}</div>
+                  <div className="bg-white rounded-full px-1">
+                    {availableLicenseTypeCounts[availableLicenseTypes[v]]}
+                  </div>
                 </div>
               ))}
             </div>
@@ -257,6 +276,9 @@ export default function Index() {
                 >
                   <Ariakit.SelectItemCheck />
                   {value ?? "Unlicensed"}
+                  <div className="bg-white rounded-full px-1 text-black text-xs">
+                    {availableLicenseTypeCounts[value]}
+                  </div>
                 </Ariakit.SelectItem>
               ))}
             </Ariakit.SelectPopover>

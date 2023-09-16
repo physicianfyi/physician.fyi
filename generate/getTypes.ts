@@ -11,10 +11,16 @@ import fs from "fs";
   const existingTypes = JSON.parse(fs.readFileSync("data/types.json", "utf8"));
 
   const types = existingTypes.results;
+  // Store counts separately just to make sure ordering doesn't get changed during serialization...
+  const counts: any = {};
   for (let r of data.results) {
     // Some don't have Type
     if (r["Type"] && !types.includes(r["Type"])) {
       types.push(r["Type"]);
+    }
+
+    if (r["Type"]) {
+      counts[r["Type"]] = (counts[r["Type"]] ?? 0) + 1;
     }
   }
 
@@ -22,6 +28,7 @@ import fs from "fs";
     lastRun: new Date(),
     numResults: types.length,
     results: types,
+    counts,
   };
   fs.writeFile("data/types.json", JSON.stringify(json), (error) => {
     if (error) throw error;

@@ -13,6 +13,8 @@ import fs from "fs";
   );
 
   const types = existingTypes.results;
+  // Store counts separately just to make sure ordering doesn't get changed during serialization...
+  const counts: any = {};
   for (let r of data.results) {
     // Some don't have Type, but still want to select disciplined without license
     const type =
@@ -24,12 +26,15 @@ import fs from "fs";
     if (!types.includes(type)) {
       types.push(type);
     }
+
+    counts[type] = (counts[type] ?? 0) + 1;
   }
 
   const json = {
     lastRun: new Date(),
     numResults: types.length,
     results: types,
+    counts,
   };
   fs.writeFile("data/license-types.json", JSON.stringify(json), (error) => {
     if (error) throw error;
