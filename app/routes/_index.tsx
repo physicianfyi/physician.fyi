@@ -57,22 +57,24 @@ export default function Index() {
   const mounted = select.useState("mounted");
 
   const submit = useSubmit();
-  const ref = useRef(null);
+  const filterRef = useRef<HTMLFormElement>(null);
   useEffect(() => {
     if (
       types.length !== values.length ||
       // @ts-ignore ariakit TS issue
       types.some((value, index) => value !== values[index])
     ) {
-      submit(ref.current);
+      submit(filterRef.current);
     }
   }, [submit, query, values, types]);
+
+  const queryRef = useRef<HTMLFormElement>(null);
 
   return (
     <div className="p-8 flex flex-col gap-4">
       <div className="">Find physicians' disciplinary history</div>
 
-      <Form method="GET" className="flex flex-col gap-1" ref={ref}>
+      <Form method="GET" className="flex flex-col gap-1" ref={filterRef}>
         <input name="q" value={query} hidden readOnly />
         <input
           name="t"
@@ -94,6 +96,7 @@ export default function Index() {
           className="flex justify-between items-center py-2.5 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
         >
           <div className="flex items-center gap-2 flex-wrap">
+            {/* @ts-ignore */}
             {values.map((v) => (
               <div
                 key={v}
@@ -131,7 +134,7 @@ export default function Index() {
         )}
       </Form>
 
-      <Form method="GET">
+      <Form method="GET" ref={queryRef}>
         {/* When changing query, want to go back to page 0 so don't include page field */}
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium" htmlFor="query">
@@ -160,6 +163,9 @@ export default function Index() {
                   // type="reset"
                   to="/"
                   prefetch="intent"
+                  onClick={(event) => {
+                    queryRef.current?.reset();
+                  }}
                   // grid place-items-center to center svg like button did
                   className="grid place-items-center p-2.5 h-full text-sm font-medium text-white bg-gray-400 rounded-l-lg border border-gray-400 hover:bg-gray-800 focus:ring-4 focus:z-10 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 >
