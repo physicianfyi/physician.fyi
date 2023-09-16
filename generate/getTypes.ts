@@ -1,5 +1,5 @@
 /**
- * Get types of disciplines
+ * Get types of disciplinary actions
  * Maps type to number to shorten URL via index and doesn't remap existing ones on subsequent runs
  */
 

@@ -27,13 +27,18 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
   const availableTypes = JSON.parse(
     fs.readFileSync("data/types.json", "utf8")
   ).results;
+  const licenseTypes = JSON.parse(url.searchParams.get("l") ?? "[]");
+  const availableLicenseTypes = JSON.parse(
+    fs.readFileSync("data/license-types.json", "utf8")
+  ).results;
   const data = await selectPhysicians({
     page,
     query,
     types: types.map((t: number) => availableTypes[t]),
+    licenseTypes: licenseTypes.map((t: number) => availableLicenseTypes[t]),
   });
 
-  return { data, availableTypes };
+  return { data, availableTypes, availableLicenseTypes };
 };
 
 export default function Index() {
@@ -45,28 +50,49 @@ export default function Index() {
     () => JSON.parse(params.get("t") ?? "[]"),
     [params]
   );
+  let licenseTypes: number[] = useMemo(
+    () => JSON.parse(params.get("l") ?? "[]"),
+    [params]
+  );
 
-  const { data, availableTypes } = useLoaderData<typeof loader>();
+  const { data, availableTypes, availableLicenseTypes } =
+    useLoaderData<typeof loader>();
   const results = data.results;
 
   const select = Ariakit.useSelectStore({
     // @ts-ignore ariakit TS issue
     defaultValue: types,
   });
-  const values = select.useState("value");
+  const typeValues = select.useState("value");
   const mounted = select.useState("mounted");
+
+  const licenseTypeSelect = Ariakit.useSelectStore({
+    // @ts-ignore ariakit TS issue
+    defaultValue: licenseTypes,
+  });
+  const licenseTypeValues = licenseTypeSelect.useState("value");
+  const licenseTypeMounted = licenseTypeSelect.useState("mounted");
 
   const submit = useSubmit();
   const filterRef = useRef<HTMLFormElement>(null);
   useEffect(() => {
     if (
-      types.length !== values.length ||
+      types.length !== typeValues.length ||
       // @ts-ignore ariakit TS issue
-      types.some((value, index) => value !== values[index])
+      types.some((value, index) => value !== typeValues[index])
     ) {
       submit(filterRef.current);
     }
-  }, [submit, query, values, types]);
+  }, [submit, typeValues, types]);
+  useEffect(() => {
+    if (
+      licenseTypes.length !== licenseTypeValues.length ||
+      // @ts-ignore ariakit TS issue
+      licenseTypes.some((value, index) => value !== licenseTypeValues[index])
+    ) {
+      submit(filterRef.current);
+    }
+  }, [submit, licenseTypeValues, licenseTypes]);
 
   const queryRef = useRef<HTMLFormElement>(null);
 
@@ -79,7 +105,7 @@ export default function Index() {
         <input
           name="t"
           // TODO Figure out if can natively submit string[]
-          value={JSON.stringify(values)}
+          value={JSON.stringify(typeValues)}
           readOnly
           // https://github.com/facebook/react/issues/13424
           // onChange={(event) => {
@@ -87,51 +113,109 @@ export default function Index() {
           // }}
           hidden
         />
+        <input
+          name="l"
+          value={JSON.stringify(licenseTypeValues)}
+          readOnly
+          hidden
+        />
 
-        <Ariakit.SelectLabel className="text-sm font-medium" store={select}>
-          Type of action
-        </Ariakit.SelectLabel>
-        <Ariakit.Select
-          store={select}
-          className="flex justify-between items-center py-2.5 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-        >
-          <div className="flex items-center gap-2 flex-wrap">
-            {/* @ts-ignore */}
-            {values.map((v) => (
-              <div
-                key={v}
-                className="bg-blue-100 whitespace-nowrap text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"
-              >
-                {availableTypes[v]}
-              </div>
-            ))}
-          </div>
-          <Ariakit.SelectArrow />
-        </Ariakit.Select>
-        {mounted && (
-          <Ariakit.SelectPopover
+        <>
+          <Ariakit.SelectLabel className="text-sm font-medium" store={select}>
+            Type of action
+          </Ariakit.SelectLabel>
+          <Ariakit.Select
             store={select}
-            gutter={4}
-            sameWidth
-            className="z-50 flex flex-col bg-white border-gray-200 border rounded p-2 overflow-auto overscroll-contain"
-            style={{
-              maxHeight: "min(var(--popover-available-height, 300px), 300px)",
-              maxWidth: "max(var(--popover-available-width, 300px), 300px)",
-            }}
+            className="flex justify-between items-center py-2.5 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
           >
-            {availableTypes.map((value: string, index: number) => (
-              <Ariakit.SelectItem
-                key={value}
-                // @ts-ignore TODO File ticket with ariakit to allow number
-                value={index}
-                className="flex items-center gap-2 cursor-pointer hover:bg-blue-500 hover:text-white aria-selected:bg-blue-200 aria-selected:text-white"
-              >
-                <Ariakit.SelectItemCheck />
-                {value}
-              </Ariakit.SelectItem>
-            ))}
-          </Ariakit.SelectPopover>
-        )}
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* @ts-ignore */}
+              {typeValues.map((v) => (
+                <div
+                  key={v}
+                  className="bg-blue-100 whitespace-nowrap text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"
+                >
+                  {availableTypes[v]}
+                </div>
+              ))}
+            </div>
+            <Ariakit.SelectArrow />
+          </Ariakit.Select>
+          {mounted && (
+            <Ariakit.SelectPopover
+              store={select}
+              gutter={4}
+              sameWidth
+              className="z-50 flex flex-col bg-white border-gray-200 border rounded p-2 overflow-auto overscroll-contain"
+              style={{
+                maxHeight: "min(var(--popover-available-height, 300px), 300px)",
+                maxWidth: "max(var(--popover-available-width, 300px), 300px)",
+              }}
+            >
+              {availableTypes.map((value: string, index: number) => (
+                <Ariakit.SelectItem
+                  key={`action-${value}`}
+                  // @ts-ignore TODO File ticket with ariakit to allow number
+                  value={index}
+                  className="flex items-center gap-2 cursor-pointer hover:bg-blue-500 hover:text-white aria-selected:bg-blue-200 aria-selected:text-white"
+                >
+                  <Ariakit.SelectItemCheck />
+                  {value}
+                </Ariakit.SelectItem>
+              ))}
+            </Ariakit.SelectPopover>
+          )}
+        </>
+
+        <>
+          <Ariakit.SelectLabel
+            className="text-sm font-medium"
+            store={licenseTypeSelect}
+          >
+            Type of license
+          </Ariakit.SelectLabel>
+          <Ariakit.Select
+            store={licenseTypeSelect}
+            className="flex justify-between items-center py-2.5 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+          >
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* @ts-ignore */}
+              {licenseTypeValues.map((v) => (
+                <div
+                  key={v}
+                  className="bg-blue-100 whitespace-nowrap text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"
+                >
+                  {availableLicenseTypes[v] ?? "Unlicensed"}
+                </div>
+              ))}
+            </div>
+            <Ariakit.SelectArrow />
+          </Ariakit.Select>
+          {licenseTypeMounted && (
+            <Ariakit.SelectPopover
+              store={licenseTypeSelect}
+              gutter={4}
+              sameWidth
+              className="z-50 flex flex-col bg-white border-gray-200 border rounded p-2 overflow-auto overscroll-contain"
+              style={{
+                maxHeight: "min(var(--popover-available-height, 300px), 300px)",
+                maxWidth: "max(var(--popover-available-width, 300px), 300px)",
+              }}
+            >
+              {availableLicenseTypes.map((value: string, index: number) => (
+                <Ariakit.SelectItem
+                  key={`license-${value}`}
+                  // @ts-ignore TODO File ticket with ariakit to allow number
+                  value={index}
+                  className="flex items-center gap-2 cursor-pointer hover:bg-blue-500 hover:text-white aria-selected:bg-blue-200 aria-selected:text-white"
+                >
+                  <Ariakit.SelectItemCheck />
+                  {value ?? "Unlicensed"}
+                </Ariakit.SelectItem>
+              ))}
+            </Ariakit.SelectPopover>
+          )}
+        </>
       </Form>
 
       <Form method="GET" ref={queryRef}>
@@ -152,7 +236,18 @@ export default function Index() {
               id="query"
               autoComplete="off"
             />
-            <input name="t" value={JSON.stringify(values)} readOnly hidden />
+            <input
+              name="t"
+              value={JSON.stringify(typeValues)}
+              readOnly
+              hidden
+            />
+            <input
+              name="l"
+              value={JSON.stringify(licenseTypeValues)}
+              readOnly
+              hidden
+            />
 
             <div
               className="inline-flex absolute top-0 right-0 rounded-md shadow-sm h-full"
@@ -254,7 +349,13 @@ export default function Index() {
         <Form method="GET" className="inline-flex mt-2 xs:mt-0">
           {/* Want to maintain query when paginating */}
           <input name="q" value={query} hidden readOnly />
-          <input name="t" value={JSON.stringify(values)} readOnly hidden />
+          <input name="t" value={JSON.stringify(typeValues)} readOnly hidden />
+          <input
+            name="l"
+            value={JSON.stringify(licenseTypeValues)}
+            readOnly
+            hidden
+          />
           <button
             name="p"
             value={page - 1}

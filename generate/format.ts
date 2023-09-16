@@ -7,6 +7,7 @@ import fs from "fs";
 const group = function (xs: any) {
   return xs.reduce(function (rv: any, x: any) {
     // TODO Figure out how to handle unlicensed ones like trainees
+    // Don't want to list them as same doctor in results
     if (
       !x["License Number"] ||
       x["License Number"] === "00" ||
