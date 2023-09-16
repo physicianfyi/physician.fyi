@@ -100,7 +100,14 @@ export default function Index() {
     <div className="p-8 flex flex-col gap-4">
       <div className="">Find physicians' disciplinary history</div>
 
-      <Form method="GET" className="flex flex-col gap-1" ref={filterRef}>
+      <div
+        className="p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300"
+        role="alert"
+      >
+        Just California for now—more states coming soon
+      </div>
+
+      <Form method="GET" className="flex flex-col gap-4" ref={filterRef}>
         <input name="q" value={query} hidden readOnly />
         <input
           name="t"
@@ -120,7 +127,7 @@ export default function Index() {
           hidden
         />
 
-        <>
+        <div className="flex flex-col gap-1">
           <Ariakit.SelectLabel className="text-sm font-medium" store={select}>
             Type of action
           </Ariakit.SelectLabel>
@@ -165,9 +172,9 @@ export default function Index() {
               ))}
             </Ariakit.SelectPopover>
           )}
-        </>
+        </div>
 
-        <>
+        <div className="flex flex-col gap-1">
           <Ariakit.SelectLabel
             className="text-sm font-medium"
             store={licenseTypeSelect}
@@ -215,7 +222,7 @@ export default function Index() {
               ))}
             </Ariakit.SelectPopover>
           )}
-        </>
+        </div>
       </Form>
 
       <Form method="GET" ref={queryRef}>

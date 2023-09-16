@@ -37,7 +37,7 @@ export default function Route() {
               {r["Last Name"]}, {r["First Name"]} {r["Middle Name"]}
             </div>
             <div>{r["Type"]}</div>
-            <a href="/pdfs/AAAGL170727212446216.DID.pdf" target="_blank">
+            <a href={`/pdfs/${r["\xa0"]}.pdf`} target="_blank" rel="noreferrer">
               View PDF
             </a>
           </li>
