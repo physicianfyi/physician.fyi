@@ -1,5 +1,6 @@
-import { DataFunctionArgs, json } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
+import type { DataFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 import fs from "fs";
 
 export const loader = async ({
@@ -16,14 +17,10 @@ export const loader = async ({
       }
     );
   }
-  const [licenseType, licenseNumber] = license.split(" ");
 
-  const data = JSON.parse(fs.readFileSync("data/ca.json", "utf8"));
+  const data = JSON.parse(fs.readFileSync("data/ca-grouped.json", "utf8"));
 
-  const results = data.results.filter(
-    (r) =>
-      r["License Type"] === licenseType && r["License Number"] === licenseNumber
-  );
+  const results = data.results[license];
 
   return { results };
 };
@@ -33,9 +30,12 @@ export default function Route() {
 
   return (
     <ul className="p-8">
-      {results.map((r) => {
+      {results.map((r: any) => {
         return (
           <li key={r["\xa0"]}>
+            <div>
+              {r["Last Name"]}, {r["First Name"]} {r["Middle Name"]}
+            </div>
             <div>{r["Type"]}</div>
             <a href="/pdfs/AAAGL170727212446216.DID.pdf" target="_blank">
               View PDF

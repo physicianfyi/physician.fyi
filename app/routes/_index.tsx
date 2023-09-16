@@ -1,6 +1,7 @@
-import type { MetaFunction } from "@remix-run/node";
-import { Link, useFetcher, useLoaderData } from "@remix-run/react";
-import fs from "fs";
+import type { DataFunctionArgs, MetaFunction } from "@remix-run/node";
+import { Form, Link, useLoaderData, useLocation } from "@remix-run/react";
+import { PAGE_SIZE } from "~/services/constants";
+import { selectPhysicians } from "~/services/physicians.server";
 
 export const meta: MetaFunction = () => {
   return [
@@ -9,57 +10,155 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-const groupBy = function (xs, key) {
-  return xs.reduce(function (rv, x) {
-    (rv[x[key]] = rv[x[key]] || []).push(x);
-    return rv;
-  }, {});
-};
-
-export const loader = () => {
-  const data = JSON.parse(fs.readFileSync("data/ca.json", "utf8"));
+export const loader = async ({ request, params }: DataFunctionArgs) => {
+  const url = new URL(request.url);
+  const page = Number(url.searchParams.get("p") ?? 0);
+  const query = url.searchParams.get("q") ?? "";
+  const data = await selectPhysicians({ page, query });
 
   return { data };
 };
 
 export default function Index() {
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const page = Number(params.get("p") ?? 0);
+  const query = params.get("q") ?? "";
+
   const { data } = useLoaderData<typeof loader>();
-  const fetcher = useFetcher();
+  const results = data.results;
 
-  const results = fetcher.data ? fetcher.data.results ?? [] : data.results;
-
-  // Can group by here or in build step
-  const groupedResults = groupBy(results, "License Number");
   return (
     <div className="p-8 flex flex-col gap-4">
       <div>Find physicians' disciplinary history</div>
-      <fetcher.Form action="/search" method="GET">
+      <Form method="GET">
+        {/* When changing query, want to go back to page 0 so don't include page field */}
         <div className="flex items-center gap-4">
-          <input
-            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="John"
-            name="query"
-          />
-          <button className="text-white text-sm bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-            Search
-          </button>
+          <div className="relative w-full">
+            <input
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="John"
+              name="q"
+              // TODO defaultValue doesn't get reset when clearing query, expected but weird
+              defaultValue={query}
+              // Can't detect clicking native clear
+              // type="search"
+            />
+            <div
+              className="inline-flex absolute top-0 right-0 rounded-md shadow-sm h-full"
+              role="group"
+            >
+              {query && (
+                <Link
+                  // type="reset"
+                  to={location.pathname}
+                  prefetch="intent"
+                  // grid place-items-center to center svg like button did
+                  className="grid place-items-center p-2.5 h-full text-sm font-medium text-white bg-gray-400 rounded-l-lg border border-gray-400 hover:bg-gray-800 focus:ring-4 focus:z-10 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    aria-hidden="true"
+                    className="w-4 h-4"
+                    fill="currentColor"
+                    viewBox="0 0 256 256"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M208.49,191.51a12,12,0,0,1-17,17L128,145,64.49,208.49a12,12,0,0,1-17-17L111,128,47.51,64.49a12,12,0,0,1,17-17L128,111l63.51-63.52a12,12,0,0,1,17,17L145,128Z"
+                    ></path>
+                  </svg>
+                </Link>
+              )}
+
+              <button
+                type="submit"
+                className="p-2.5 h-full text-sm font-medium text-white focus:z-10 bg-blue-700 rounded-r-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              >
+                <svg
+                  className="w-4 h-4"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
-      </fetcher.Form>
+      </Form>
+
+      <div
+        className="p-4 text-sm text-gray-800 rounded-lg bg-gray-50 dark:bg-gray-800 dark:text-gray-300"
+        role="alert"
+      >
+        <span className="font-medium">{data.numResults} physicians</span> found
+      </div>
 
       <ul>
-        {Object.entries(groupedResults).map(([k, v]) => {
+        {results.map(({ license, data }) => {
           return (
-            <li key={k} className="flex items-center gap-2">
-              <Link
-                to={`/ca/${v[0]["License Type"]}%20${v[0]["License Number"]}`}
-              >
-                {v[0]["Last Name"]}, {v[0]["First Name"]} {v[0]["Middle Name"]}
+            <li key={license} className="flex items-center gap-2">
+              <Link to={`/ca/${license}`}>
+                {data[0]["Last Name"]}, {data[0]["First Name"]}{" "}
+                {data[0]["Middle Name"]}
               </Link>
-              {v.length > 1 && <div>({v.length} items)</div>}
+              {data.length > 1 && <div>({data.length} items)</div>}
             </li>
           );
         })}
       </ul>
+
+      <div className="flex flex-col items-center">
+        <span className="text-sm text-gray-700 dark:text-gray-400">
+          Showing{" "}
+          <span className="font-semibold text-gray-900 dark:text-white">
+            {page * PAGE_SIZE + 1}
+          </span>{" "}
+          to{" "}
+          <span className="font-semibold text-gray-900 dark:text-white">
+            {Math.min(page * PAGE_SIZE + PAGE_SIZE, data.numResults)}
+          </span>{" "}
+          of{" "}
+          <span className="font-semibold text-gray-900 dark:text-white">
+            {data.numResults}
+          </span>{" "}
+          physicians
+        </span>
+        <Form method="GET" className="inline-flex mt-2 xs:mt-0">
+          {/* Want to maintain query when paginating */}
+          <input name="q" value={query} hidden readOnly />
+          {page > 0 && (
+            <button
+              name="p"
+              value={page - 1}
+              className="flex items-center justify-center px-4 h-10 text-base font-medium text-white bg-gray-800 rounded-l hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+            >
+              Prev
+            </button>
+          )}
+          {page < Math.floor(data.numResults / PAGE_SIZE) && (
+            <button
+              name="p"
+              value={page + 1}
+              className="flex items-center justify-center px-4 h-10 text-base font-medium text-white bg-gray-800 border-0 border-l border-gray-700 rounded-r hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+            >
+              Next
+            </button>
+          )}
+        </Form>
+      </div>
     </div>
   );
 }
