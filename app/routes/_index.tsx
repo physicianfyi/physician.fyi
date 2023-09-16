@@ -24,11 +24,14 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
   const page = Number(url.searchParams.get("p") ?? 0);
   const query = url.searchParams.get("q") ?? "";
   const types = JSON.parse(url.searchParams.get("t") ?? "[]");
-  const data = await selectPhysicians({ page, query, types });
-
   const availableTypes = JSON.parse(
     fs.readFileSync("data/types.json", "utf8")
   ).results;
+  const data = await selectPhysicians({
+    page,
+    query,
+    types: types.map((t: number) => availableTypes[t]),
+  });
 
   return { data, availableTypes };
 };
@@ -38,7 +41,7 @@ export default function Index() {
   const page = Number(params.get("p") ?? 0);
   const query = params.get("q") ?? "";
   // TODO Figure out why plain object makes condition in effect run infinitely
-  let types: string[] = useMemo(
+  let types: number[] = useMemo(
     () => JSON.parse(params.get("t") ?? "[]"),
     [params]
   );
@@ -47,6 +50,7 @@ export default function Index() {
   const results = data.results;
 
   const select = Ariakit.useSelectStore({
+    // @ts-ignore ariakit TS issue
     defaultValue: types,
   });
   const values = select.useState("value");
@@ -57,6 +61,7 @@ export default function Index() {
   useEffect(() => {
     if (
       types.length !== values.length ||
+      // @ts-ignore ariakit TS issue
       types.some((value, index) => value !== values[index])
     ) {
       submit(ref.current);
@@ -65,7 +70,7 @@ export default function Index() {
 
   return (
     <div className="p-8 flex flex-col gap-4">
-      <div>Find physicians' disciplinary history</div>
+      <div className="">Find physicians' disciplinary history</div>
 
       <Form method="GET" className="flex flex-col gap-1" ref={ref}>
         <input name="q" value={query} hidden readOnly />
@@ -94,7 +99,7 @@ export default function Index() {
                 key={v}
                 className="bg-blue-100 whitespace-nowrap text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"
               >
-                {v}
+                {availableTypes[v]}
               </div>
             ))}
           </div>
@@ -111,10 +116,11 @@ export default function Index() {
               maxWidth: "max(var(--popover-available-width, 300px), 300px)",
             }}
           >
-            {availableTypes.map((value: any) => (
+            {availableTypes.map((value: string, index: number) => (
               <Ariakit.SelectItem
                 key={value}
-                value={value}
+                // @ts-ignore TODO File ticket with ariakit to allow number
+                value={index}
                 className="flex items-center gap-2 cursor-pointer hover:bg-blue-500 hover:text-white aria-selected:bg-blue-200 aria-selected:text-white"
               >
                 <Ariakit.SelectItemCheck />
