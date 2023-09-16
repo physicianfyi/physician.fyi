@@ -1,4 +1,8 @@
-import type { DataFunctionArgs, MetaFunction } from "@remix-run/node";
+import {
+  redirect,
+  type DataFunctionArgs,
+  type MetaFunction,
+} from "@remix-run/node";
 import {
   Form,
   Link,
@@ -90,7 +94,10 @@ export default function Index() {
       // @ts-ignore ariakit TS issue
       licenseTypes.some((value, index) => value !== licenseTypeValues[index])
     ) {
-      submit(filterRef.current);
+      submit(filterRef.current, {
+        // TODO For some reason not working here or as Form prop
+        preventScrollReset: true,
+      });
     }
   }, [submit, licenseTypeValues, licenseTypes]);
 
@@ -107,7 +114,13 @@ export default function Index() {
         Just California for now—more states coming soon
       </div>
 
-      <Form method="GET" className="flex flex-col gap-4" ref={filterRef}>
+      <Form
+        method="GET"
+        className="flex flex-col gap-4"
+        ref={filterRef}
+        // TODO not working here or as submit prop
+        preventScrollReset
+      >
         <input name="q" value={query} hidden readOnly />
         <input
           name="t"
@@ -225,7 +238,7 @@ export default function Index() {
         </div>
       </Form>
 
-      <Form method="GET" ref={queryRef}>
+      <Form method="GET" ref={queryRef} preventScrollReset>
         {/* When changing query, want to go back to page 0 so don't include page field */}
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium" htmlFor="query">
@@ -268,6 +281,7 @@ export default function Index() {
                   onClick={(event) => {
                     queryRef.current?.reset();
                   }}
+                  preventScrollReset
                   // grid place-items-center to center svg like button did
                   className="grid place-items-center p-2.5 h-full text-sm font-medium text-white bg-gray-400 rounded-l-lg border border-gray-400 hover:bg-gray-800 focus:ring-4 focus:z-10 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 >
@@ -317,6 +331,7 @@ export default function Index() {
       <div
         className="p-4 text-sm text-gray-800 rounded-lg bg-gray-50 dark:bg-gray-800 dark:text-gray-300"
         role="alert"
+        id="results"
       >
         <span className="font-medium">{data.numResults} physicians</span> found
       </div>
@@ -447,6 +462,7 @@ export default function Index() {
           physicians
         </span>
 
+        {/* TODO Add hash to route to scroll to #results not top of window */}
         {/* Pagination needs to be separate or else page change field will be submitted */}
         <Form method="GET" className="inline-flex mt-2 xs:mt-0">
           {/* Want to maintain query when paginating */}
