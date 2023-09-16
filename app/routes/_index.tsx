@@ -1,7 +1,16 @@
 import type { DataFunctionArgs, MetaFunction } from "@remix-run/node";
-import { Form, Link, useLoaderData, useLocation } from "@remix-run/react";
+import {
+  Form,
+  Link,
+  useLoaderData,
+  useSearchParams,
+  useSubmit,
+} from "@remix-run/react";
 import { PAGE_SIZE } from "~/services/constants";
 import { selectPhysicians } from "~/services/physicians.server";
+import fs from "fs";
+import * as Ariakit from "@ariakit/react";
+import { useEffect, useMemo, useRef } from "react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -14,36 +23,128 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
   const url = new URL(request.url);
   const page = Number(url.searchParams.get("p") ?? 0);
   const query = url.searchParams.get("q") ?? "";
-  const data = await selectPhysicians({ page, query });
+  const types = JSON.parse(url.searchParams.get("t") ?? "[]");
+  const data = await selectPhysicians({ page, query, types });
 
-  return { data };
+  const availableTypes = JSON.parse(
+    fs.readFileSync("data/types.json", "utf8")
+  ).results;
+
+  return { data, availableTypes };
 };
 
 export default function Index() {
-  const location = useLocation();
-  const params = new URLSearchParams(location.search);
+  const [params] = useSearchParams();
   const page = Number(params.get("p") ?? 0);
   const query = params.get("q") ?? "";
+  // TODO Figure out why plain object makes condition in effect run infinitely
+  let types: string[] = useMemo(
+    () => JSON.parse(params.get("t") ?? "[]"),
+    [params]
+  );
 
-  const { data } = useLoaderData<typeof loader>();
+  const { data, availableTypes } = useLoaderData<typeof loader>();
   const results = data.results;
+
+  const select = Ariakit.useSelectStore({
+    defaultValue: types,
+  });
+  const values = select.useState("value");
+  const mounted = select.useState("mounted");
+
+  const submit = useSubmit();
+  const ref = useRef(null);
+  useEffect(() => {
+    if (
+      types.length !== values.length ||
+      types.some((value, index) => value !== values[index])
+    ) {
+      submit(ref.current);
+    }
+  }, [submit, query, values, types]);
 
   return (
     <div className="p-8 flex flex-col gap-4">
       <div>Find physicians' disciplinary history</div>
+
+      <Form method="GET" className="flex flex-col gap-1" ref={ref}>
+        <input name="q" value={query} hidden readOnly />
+        <input
+          name="t"
+          // TODO Figure out if can natively submit string[]
+          value={JSON.stringify(values)}
+          readOnly
+          // https://github.com/facebook/react/issues/13424
+          // onChange={(event) => {
+          //   console.log(event);
+          // }}
+          hidden
+        />
+
+        <Ariakit.SelectLabel className="text-sm font-medium" store={select}>
+          Type of action
+        </Ariakit.SelectLabel>
+        <Ariakit.Select
+          store={select}
+          className="flex justify-between items-center py-2.5 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+        >
+          <div className="flex items-center gap-2 flex-wrap">
+            {values.map((v) => (
+              <div
+                key={v}
+                className="bg-blue-100 whitespace-nowrap text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"
+              >
+                {v}
+              </div>
+            ))}
+          </div>
+          <Ariakit.SelectArrow />
+        </Ariakit.Select>
+        {mounted && (
+          <Ariakit.SelectPopover
+            store={select}
+            gutter={4}
+            sameWidth
+            className="z-50 flex flex-col bg-white border-gray-200 border rounded p-2 overflow-auto overscroll-contain"
+            style={{
+              maxHeight: "min(var(--popover-available-height, 300px), 300px)",
+              maxWidth: "max(var(--popover-available-width, 300px), 300px)",
+            }}
+          >
+            {availableTypes.map((value: any) => (
+              <Ariakit.SelectItem
+                key={value}
+                value={value}
+                className="flex items-center gap-2 cursor-pointer hover:bg-blue-500 hover:text-white aria-selected:bg-blue-200 aria-selected:text-white"
+              >
+                <Ariakit.SelectItemCheck />
+                {value}
+              </Ariakit.SelectItem>
+            ))}
+          </Ariakit.SelectPopover>
+        )}
+      </Form>
+
       <Form method="GET">
         {/* When changing query, want to go back to page 0 so don't include page field */}
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col gap-1">
+          <label className="text-sm font-medium" htmlFor="query">
+            Name or license number
+          </label>
           <div className="relative w-full">
             <input
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="John"
+              placeholder="e.g., John or G-12345"
               name="q"
               // TODO defaultValue doesn't get reset when clearing query, expected but weird
               defaultValue={query}
               // Can't detect clicking native clear
               // type="search"
+              id="query"
+              autoComplete="off"
             />
+            <input name="t" value={JSON.stringify(values)} readOnly hidden />
+
             <div
               className="inline-flex absolute top-0 right-0 rounded-md shadow-sm h-full"
               role="group"
@@ -51,7 +152,7 @@ export default function Index() {
               {query && (
                 <Link
                   // type="reset"
-                  to={location.pathname}
+                  to="/"
                   prefetch="intent"
                   // grid place-items-center to center svg like button did
                   className="grid place-items-center p-2.5 h-full text-sm font-medium text-white bg-gray-400 rounded-l-lg border border-gray-400 hover:bg-gray-800 focus:ring-4 focus:z-10 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
@@ -136,27 +237,28 @@ export default function Index() {
           </span>{" "}
           physicians
         </span>
+
+        {/* Pagination needs to be separate or else page change field will be submitted */}
         <Form method="GET" className="inline-flex mt-2 xs:mt-0">
           {/* Want to maintain query when paginating */}
           <input name="q" value={query} hidden readOnly />
-          {page > 0 && (
-            <button
-              name="p"
-              value={page - 1}
-              className="flex items-center justify-center px-4 h-10 text-base font-medium text-white bg-gray-800 rounded-l hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-            >
-              Prev
-            </button>
-          )}
-          {page < Math.floor(data.numResults / PAGE_SIZE) && (
-            <button
-              name="p"
-              value={page + 1}
-              className="flex items-center justify-center px-4 h-10 text-base font-medium text-white bg-gray-800 border-0 border-l border-gray-700 rounded-r hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-            >
-              Next
-            </button>
-          )}
+          <input name="t" value={JSON.stringify(values)} readOnly hidden />
+          <button
+            name="p"
+            value={page - 1}
+            disabled={page <= 0}
+            className="flex items-center justify-center px-4 h-10 text-base font-medium text-white bg-gray-800 rounded-l hover:enabled:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+          >
+            Prev
+          </button>
+          <button
+            name="p"
+            value={page + 1}
+            disabled={page >= Math.floor(data.numResults / PAGE_SIZE)}
+            className="flex items-center justify-center px-4 h-10 text-base font-medium text-white bg-gray-800 border-0 border-l border-gray-700 rounded-r hover:enabled:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+          >
+            Next
+          </button>
         </Form>
       </div>
     </div>

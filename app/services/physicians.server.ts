@@ -8,9 +8,11 @@ import { PAGE_SIZE } from "./constants";
 export const selectPhysicians = async ({
   page = 0,
   query = "",
+  types = [],
 }: {
   page?: number;
   query?: string;
+  types?: string[];
 }) => {
   const data = JSON.parse(fs.readFileSync("data/ca-grouped.json", "utf8"));
 
@@ -19,6 +21,17 @@ export const selectPhysicians = async ({
     license: key,
     data: data.results[key],
   }));
+
+  if (types.length) {
+    results = results.filter((result) => {
+      for (let d of result.data) {
+        if (types.includes(d["Type"])) {
+          return true;
+        }
+      }
+      return false;
+    });
+  }
 
   if (query) {
     const options = {
