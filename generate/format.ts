@@ -6,17 +6,22 @@ import fs from "fs";
 
 const group = function (xs: any) {
   return xs.reduce(function (rv: any, x: any) {
-    // TODO Figure out how to handle unlicensed ones like trainees
-    // Don't want to list them as same doctor in results
+    let key;
     if (
       !x["License Number"] ||
       x["License Number"] === "00" ||
       x["License Number"] === " "
     ) {
-      return rv;
+      // There are 9 records with no names at all
+      if (!x["Last Name"]) {
+        return rv;
+      }
+      // Don't want to list unlicensed ones as same doctor in results
+      key = `UNLICENSED-${x["First Name"]}-${x["Middle Name"]}-${x["Last Name"]}`;
+    } else {
+      key = `${x["License Type"]}-${x["License Number"]}`;
     }
 
-    const key = `${x["License Type"]}-${x["License Number"]}`;
     (rv[key] = rv[key] ?? []).push(x);
     return rv;
   }, {});

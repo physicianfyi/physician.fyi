@@ -13,12 +13,8 @@ import { mkdir } from "fs/promises";
 const SOURCE_DIR = "public/pdfs/";
 const DEST_DIR = "public/pngs/";
 
-(async () => {
-  const errors: any = {};
-
-  const files = fs.readdirSync(SOURCE_DIR);
-
-  await Promise.all(
+const process = (files: any[], errors: any) =>
+  Promise.all(
     files.map(async (file) => {
       if (!file.endsWith(".pdf")) {
         return;
@@ -65,6 +61,17 @@ const DEST_DIR = "public/pngs/";
       console.log(`Converted ${path.resolve(file)}`);
     })
   );
+
+(async () => {
+  const files = fs.readdirSync(SOURCE_DIR);
+  const errors: any = {};
+
+  // For some reason running all at once ends up with size 0 files and empty dirs still, so trying batching instead so it can free memory after each batch
+  while (files.length) {
+    const batch = files.splice(0, 20);
+    await process(batch, errors);
+    console.log(`Processed batch`);
+  }
 
   fs.writeFile(
     "data/png.json",

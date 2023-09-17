@@ -457,7 +457,7 @@ export default function Index() {
                           strokeWidth="24"
                         />
                       </svg>
-                      {license}
+                      {license.startsWith("UNLICENSED-") ? "N/A" : license}
                     </div>
                     <div className="flex items-center gap-1 bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-1 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">
                       <svg
