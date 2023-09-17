@@ -38,7 +38,15 @@ export const selectPhysicians = async ({
   if (licenseTypes.length) {
     results = results.filter((result) => {
       for (let d of result.data) {
-        if (licenseTypes.includes(d["License Type"])) {
+        // TODO ca-grouped does not currently have unlicensed ones
+        // Fall back to find unlicensed case
+        const type =
+          d["License Type"] === "\u00A0"
+            ? null
+            : !d["License Type"]
+            ? null
+            : d["License Type"];
+        if (licenseTypes.includes(type)) {
           return true;
         }
       }
@@ -74,5 +82,6 @@ export const selectPhysicians = async ({
     // Recalculated since this is for filtered results
     numResults: results.length,
     results: results.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE),
+    lastUpdated: data.lastRun,
   };
 };

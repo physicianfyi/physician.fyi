@@ -203,12 +203,14 @@ export default function Index() {
                   key={`action-${value}`}
                   // @ts-ignore TODO File ticket with ariakit to allow number
                   value={index}
-                  className="rounded flex items-center gap-2 cursor-pointer hover:bg-blue-500 hover:text-white aria-selected:bg-blue-200 aria-selected:text-white"
+                  className="px-1 rounded flex items-center gap-2 cursor-pointer hover:bg-blue-500 hover:text-white aria-selected:bg-blue-200 aria-selected:text-white"
                 >
                   <Ariakit.SelectItemCheck />
-                  {value}
-                  <div className="bg-white rounded-full px-1 text-black text-xs">
-                    {availableTypeCounts[value]}
+                  <div className="[&>*]:align-middle">
+                    <span>{value} </span>
+                    <span className="bg-white rounded-full px-1 text-black text-xs">
+                      {availableTypeCounts[value]}
+                    </span>
                   </div>
                 </Ariakit.SelectItem>
               ))}
@@ -272,12 +274,14 @@ export default function Index() {
                   key={`license-${value}`}
                   // @ts-ignore TODO File ticket with ariakit to allow number
                   value={index}
-                  className="rounded flex items-center gap-2 cursor-pointer hover:bg-blue-500 hover:text-white aria-selected:bg-blue-200 aria-selected:text-white"
+                  className="px-1 rounded flex items-center gap-2 cursor-pointer hover:bg-blue-500 hover:text-white aria-selected:bg-blue-200 aria-selected:text-white"
                 >
                   <Ariakit.SelectItemCheck />
-                  {value ?? "Unlicensed"}
-                  <div className="bg-white rounded-full px-1 text-black text-xs">
-                    {availableLicenseTypeCounts[value]}
+                  <div className="[&>*]:align-middle">
+                    <span>{value ?? "Unlicensed"} </span>
+                    <span className="bg-white rounded-full px-1 text-black text-xs">
+                      {availableLicenseTypeCounts[value]}
+                    </span>
                   </div>
                 </Ariakit.SelectItem>
               ))}
@@ -377,11 +381,17 @@ export default function Index() {
       </Form>
 
       <div
-        className="p-4 text-sm text-gray-800 rounded-lg bg-gray-50 dark:bg-gray-800 dark:text-gray-300"
+        className="flex items-center flex-wrap justify-between p-4 text-sm text-gray-800 rounded-lg bg-gray-50 dark:bg-gray-800 dark:text-gray-300"
         role="alert"
         id="results"
       >
-        <span className="font-medium">{data.numResults} physicians</span> found
+        <div>
+          <span className="font-medium">{data.numResults} physicians</span>{" "}
+          found
+        </div>
+        <div className="text-xs">
+          Last updated {data.lastUpdated.split("T")[0]}
+        </div>
       </div>
 
       <ul className="flex flex-col gap-2">
