@@ -522,7 +522,11 @@ export default function Index() {
 
         {/* TODO Add hash to route to scroll to #results not top of window */}
         {/* Pagination needs to be separate or else page change field will be submitted */}
-        <Form method="GET" className="inline-flex mt-2 xs:mt-0">
+        <Form
+          method="GET"
+          action="/#results"
+          className="inline-flex mt-2 xs:mt-0"
+        >
           {/* Want to maintain query when paginating */}
           <input name="q" value={query} hidden readOnly />
           <input name="t" value={JSON.stringify(typeValues)} readOnly hidden />
