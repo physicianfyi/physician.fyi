@@ -28,7 +28,7 @@ export default function App() {
       <body>
         <nav className="flex items-center justify-between p-4">
           <Link to="/" className="text-lg font-bold font-serif">
-            👨‍⚕️🔍 physician.fyi
+            👨‍⚕️ physician.fyi 🔍
           </Link>
         </nav>
 

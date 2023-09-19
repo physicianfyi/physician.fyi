@@ -9,6 +9,18 @@ import path from "path";
 const SOURCE_DIR = "public/pngs/";
 const DEST_DIR = "public/txts/";
 
+const scheduler = Tesseract.createScheduler();
+
+// Creates worker and adds to scheduler
+const workerGen = async () => {
+  const worker = await Tesseract.createWorker();
+  await worker.loadLanguage("eng");
+  await worker.initialize("eng");
+  scheduler.addWorker(worker);
+};
+
+const workerN = 10;
+
 const process = (dirs: any[], errors: any) =>
   Promise.all(
     dirs.map(async (dir) => {
@@ -24,15 +36,15 @@ const process = (dirs: any[], errors: any) =>
             return "";
           }
 
-          const { data } = await Tesseract.recognize(
-            `${SOURCE_DIR}${dir}/${file}`,
-            "eng",
-            {
-              // logger: (m) => console.log(m),
-            }
-          );
+          const result = await scheduler
+            .addJob("recognize", `${SOURCE_DIR}${dir}/${file}`)
+            .catch((error) => {
+              errors[`${dir}/${file}`] = error.toString();
+            });
 
-          return data.text;
+          if (!result) return "";
+
+          return result.data.text;
         })
       );
 
@@ -50,12 +62,20 @@ const process = (dirs: any[], errors: any) =>
   const dirs = fs.readdirSync(SOURCE_DIR);
   const errors: any = {};
 
+  const resArr = Array(workerN);
+  for (let i = 0; i < workerN; i++) {
+    resArr[i] = workerGen();
+  }
+  await Promise.all(resArr);
+
   // For some reason running all at once ends up with size 0 files and empty dirs still, so trying batching instead so it can free memory after each batch
   while (dirs.length) {
     const batch = dirs.splice(0, 20);
     await process(batch, errors);
     console.log(`Processed batch`);
   }
+
+  await scheduler.terminate();
 
   fs.writeFile(
     "data/ocr.json",

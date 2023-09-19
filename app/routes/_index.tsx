@@ -115,7 +115,7 @@ export default function Index() {
 
   return (
     <div className="p-4 sm:p-8 md:p-16 flex flex-col gap-4">
-      <div className="">Find physicians' disciplinary history</div>
+      <div className="">Find doctors' disciplinary history</div>
 
       <div
         className="p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300"

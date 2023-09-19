@@ -23,6 +23,7 @@ const SOURCE_DIR = "public/txts/";
         r[1].split("(").at(-1)
       );
       console.log(causes);
+      // TODO Write to copy of ca.json then run format on that
     })
   );
 
