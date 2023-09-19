@@ -1,2 +1,4 @@
 data/ca.json filter=lfs diff=lfs merge=lfs -text
 data/ca-grouped.json filter=lfs diff=lfs merge=lfs -text
+data/ca-with-offenses.json filter=lfs diff=lfs merge=lfs -text
+data/read.json filter=lfs diff=lfs merge=lfs -text

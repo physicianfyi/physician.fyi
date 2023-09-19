@@ -28,7 +28,9 @@ const group = function (xs: any) {
 };
 
 (async () => {
-  const data = JSON.parse(fs.readFileSync("data/ca.json", "utf8"));
+  const data = JSON.parse(
+    fs.readFileSync("data/ca-with-offenses.json", "utf8")
+  );
 
   const groupedData = group(data.results);
   const json = {

@@ -34,11 +34,15 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
   const licenseTypes = JSON.parse(url.searchParams.get("l") ?? "[]");
   const { results: availableLicenseTypes, counts: availableLicenseTypeCounts } =
     JSON.parse(fs.readFileSync("data/license-types.json", "utf8"));
+  const offenses = JSON.parse(url.searchParams.get("o") ?? "[]");
+  const { results: availableOffenses, counts: availableOffenseCounts } =
+    JSON.parse(fs.readFileSync("data/offenses.json", "utf8"));
   const data = await selectPhysicians({
     page,
     query,
     types: types.map((t: number) => availableTypes[t]),
     licenseTypes: licenseTypes.map((t: number) => availableLicenseTypes[t]),
+    offenses: offenses.map((o: number) => availableOffenses[o]),
   });
 
   return {
@@ -47,6 +51,8 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
     availableTypeCounts,
     availableLicenseTypes,
     availableLicenseTypeCounts,
+    availableOffenses,
+    availableOffenseCounts,
   };
 };
 
@@ -63,6 +69,10 @@ export default function Index() {
     () => JSON.parse(params.get("l") ?? "[]"),
     [params]
   );
+  let offenses: number[] = useMemo(
+    () => JSON.parse(params.get("o") ?? "[]"),
+    [params]
+  );
 
   const {
     data,
@@ -70,6 +80,8 @@ export default function Index() {
     availableTypeCounts,
     availableLicenseTypes,
     availableLicenseTypeCounts,
+    availableOffenses,
+    availableOffenseCounts,
   } = useLoaderData<typeof loader>();
   const results = data.results;
 
@@ -86,6 +98,13 @@ export default function Index() {
   });
   const licenseTypeValues = licenseTypeSelect.useState("value");
   const licenseTypeMounted = licenseTypeSelect.useState("mounted");
+
+  const offenseSelect = Ariakit.useSelectStore({
+    // @ts-ignore ariakit TS issue
+    defaultValue: offenses,
+  });
+  const offenseValues = offenseSelect.useState("value");
+  const offenseMounted = offenseSelect.useState("mounted");
 
   const submit = useSubmit();
   const filterRef = useRef<HTMLFormElement>(null);
@@ -110,6 +129,17 @@ export default function Index() {
       });
     }
   }, [submit, licenseTypeValues, licenseTypes]);
+  useEffect(() => {
+    if (
+      offenses.length !== offenseValues.length ||
+      // @ts-ignore ariakit TS issue
+      offenses.some((value, index) => value !== offenseValues[index])
+    ) {
+      submit(filterRef.current, {
+        preventScrollReset: true,
+      });
+    }
+  }, [submit, offenseValues, offenses]);
 
   const queryRef = useRef<HTMLFormElement>(null);
 
@@ -149,6 +179,7 @@ export default function Index() {
           readOnly
           hidden
         />
+        <input name="o" value={JSON.stringify(offenseValues)} readOnly hidden />
 
         <div className="flex flex-col gap-1">
           <div className="flex items-end justify-between">
@@ -288,6 +319,77 @@ export default function Index() {
             </Ariakit.SelectPopover>
           )}
         </div>
+
+        <div className="flex flex-col gap-1">
+          <div className="flex items-end justify-between">
+            <Ariakit.SelectLabel
+              className="text-sm font-medium"
+              store={offenseSelect}
+            >
+              Offense
+            </Ariakit.SelectLabel>
+            {offenseValues.length > 0 && (
+              <button
+                type="button"
+                className="text-xs hover:underline"
+                onClick={() => {
+                  offenseSelect.setValue([]);
+                }}
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          <Ariakit.Select
+            store={offenseSelect}
+            className="flex justify-between items-center py-2.5 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+          >
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* @ts-ignore */}
+              {offenseValues.map((v) => (
+                <div
+                  key={v}
+                  className="flex items-center gap-1 bg-blue-100 whitespace-nowrap text-blue-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"
+                >
+                  <div>{availableOffenses[v]}</div>
+                  <div className="bg-white rounded-full px-1">
+                    {availableOffenseCounts[availableOffenses[v]]}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <Ariakit.SelectArrow />
+          </Ariakit.Select>
+          {offenseMounted && (
+            <Ariakit.SelectPopover
+              store={offenseSelect}
+              gutter={4}
+              sameWidth
+              className="z-50 flex flex-col bg-white border-gray-200 border rounded p-2 overflow-auto overscroll-contain"
+              style={{
+                maxHeight: "min(var(--popover-available-height, 300px), 300px)",
+                maxWidth: "max(var(--popover-available-width, 300px), 300px)",
+              }}
+            >
+              {availableOffenses.map((value: string, index: number) => (
+                <Ariakit.SelectItem
+                  key={`license-${value}`}
+                  // @ts-ignore TODO File ticket with ariakit to allow number
+                  value={index}
+                  className="px-1 rounded flex items-center gap-2 cursor-pointer hover:bg-blue-500 hover:text-white aria-selected:bg-blue-200 aria-selected:text-white"
+                >
+                  <Ariakit.SelectItemCheck />
+                  <div className="[&>*]:align-middle">
+                    <span>{value} </span>
+                    <span className="bg-white rounded-full px-1 text-black text-xs">
+                      {availableOffenseCounts[value]}
+                    </span>
+                  </div>
+                </Ariakit.SelectItem>
+              ))}
+            </Ariakit.SelectPopover>
+          )}
+        </div>
       </Form>
 
       <Form method="GET" ref={queryRef} preventScrollReset>
@@ -317,6 +419,12 @@ export default function Index() {
             <input
               name="l"
               value={JSON.stringify(licenseTypeValues)}
+              readOnly
+              hidden
+            />
+            <input
+              name="o"
+              value={JSON.stringify(offenseValues)}
               readOnly
               hidden
             />
@@ -533,6 +641,12 @@ export default function Index() {
           <input
             name="l"
             value={JSON.stringify(licenseTypeValues)}
+            readOnly
+            hidden
+          />
+          <input
+            name="o"
+            value={JSON.stringify(offenseValues)}
             readOnly
             hidden
           />

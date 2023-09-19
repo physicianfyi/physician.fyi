@@ -62,6 +62,18 @@ const SOURCE_DIR = "public/txts/";
             .replaceAll("addiée", "addict")
             .replace(/ aci:s$/, " acts")
             .replaceAll("self use", "self-use")
+            .replaceAll(" of;cn'me", " of a crime")
+            .replace(/^ncompetence/, "incompetence")
+            .replace(/ act\(s$/, " acts")
+            .replace(/ prescribin 2$/, " prescribing")
+            .replaceAll(" drué ", " drug ")
+            .replaceAll("inéompetence", "incompetence")
+            .replaceAll("negliéence", "negligence")
+            .replace(/^ncompeience$/, "incompetence")
+            .replaceAll("lncompeience", "incompetence")
+            .replaceAll("dishon'esucorrupt acts", "dishonest/corrupt acts")
+            .replace(/ practic<$/, " practice")
+            .replace(/ étate$/, " state")
             .trim()
         );
       // Length greater than 3 handles cases where parentheses around offense were not there like in A1FERUOB—these will be gotten in next step where we look for known offenses in all documents
@@ -87,4 +99,17 @@ const SOURCE_DIR = "public/txts/";
       if (error) throw error;
     }
   );
+
+  const data = JSON.parse(fs.readFileSync("data/ca.json", "utf8"));
+
+  for (let i = 0; i < data.results.length; i++) {
+    const offenses = results[`${data.results[i][" "]}.pdf.txt`];
+    if (offenses) {
+      data.results[i]["Offenses"] = offenses;
+    }
+  }
+
+  fs.writeFile("data/ca-with-offenses.json", JSON.stringify(data), (error) => {
+    if (error) throw error;
+  });
 })();

@@ -10,11 +10,13 @@ export const selectPhysicians = async ({
   query = "",
   types = [],
   licenseTypes = [],
+  offenses = [],
 }: {
   page?: number;
   query?: string;
   types?: string[];
   licenseTypes?: string[];
+  offenses?: string[];
 }) => {
   const data = JSON.parse(fs.readFileSync("data/ca-grouped.json", "utf8"));
 
@@ -48,6 +50,19 @@ export const selectPhysicians = async ({
             : d["License Type"];
         if (licenseTypes.includes(type)) {
           return true;
+        }
+      }
+      return false;
+    });
+  }
+
+  if (offenses.length) {
+    results = results.filter((result) => {
+      for (let d of result.data) {
+        for (let o of offenses) {
+          if (d["Offenses"]?.includes(o)) {
+            return true;
+          }
         }
       }
       return false;
