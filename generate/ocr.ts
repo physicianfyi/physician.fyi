@@ -1,5 +1,6 @@
 /**
  * Run OCR and save text files
+ * Memory fills up since it loads the pngs and never seems to garbage collect them
  */
 
 import fs from "fs";

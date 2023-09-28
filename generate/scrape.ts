@@ -9,10 +9,7 @@ import path from "path";
 import { mkdir } from "fs/promises";
 import { Readable } from "stream";
 import { finished } from "stream/promises";
-
-function delay(time: number) {
-  return new Promise((resolve) => setTimeout(resolve, time));
-}
+import { delay } from "./util";
 
 const downloadFile = async (url: string, folder = ".") => {
   const res = await fetch(url);

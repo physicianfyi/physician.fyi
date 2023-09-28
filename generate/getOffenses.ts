@@ -8,9 +8,10 @@ import fs from "fs";
 (async () => {
   const data = JSON.parse(fs.readFileSync("data/read.json", "utf8"));
 
-  const existingTypes = JSON.parse(
-    fs.readFileSync("data/offenses.json", "utf8")
-  );
+  let existingTypes = { results: [] };
+  try {
+    existingTypes = JSON.parse(fs.readFileSync("data/offenses.json", "utf8"));
+  } catch (e) {}
 
   const offenses: any = existingTypes.results;
   // Store counts separately just to make sure ordering doesn't get changed during serialization...

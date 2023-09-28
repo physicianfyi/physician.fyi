@@ -31,13 +31,20 @@ export default function Route() {
   return (
     <ul className="p-8">
       {results.map((r: any) => {
+        const url = `https://www2.mbc.ca.gov/PDL/document.aspx?path=${encodeURIComponent(
+          r.DIDOCS
+        )}&did=${r["\xa0"]}`;
         return (
           <li key={r["\xa0"]}>
             <div>
               {r["Last Name"]}, {r["First Name"]} {r["Middle Name"]}
             </div>
             <div>{r["Type"]}</div>
-            <a href={`/pdfs/${r["\xa0"]}.pdf`} target="_blank" rel="noreferrer">
+            <a
+              href={`https://web.archive.org/web/0/${url}`}
+              target="_blank"
+              rel="noreferrer"
+            >
               View PDF
             </a>
           </li>
