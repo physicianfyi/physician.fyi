@@ -12,10 +12,10 @@ export default function Route() {
         agreement) barring the victim from ever talking about it. If the victim
         is within the statute of limitations (which is very short in some
         states) and they sue, doctors carry hefty malpractice insurance that
-        coerces settlement with victims out of court, once again barring them
-        from speaking. If those methods don't work, doctors hire reputation
-        cleaners to get unfavorable reviews taken down directly by the review
-        platform or by threat of lawsuit over libel.
+        coerces settlement with victims out of court, once again stipulating
+        that they not speak. If those methods don't work, doctors hire
+        reputation cleaners to get unfavorable reviews taken down directly by
+        the review platform or by threat of lawsuit over libel.
       </p>
 
       <p>

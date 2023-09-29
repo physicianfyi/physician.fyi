@@ -13,7 +13,7 @@ import cliProgress from "cli-progress";
 // https://www2.mbc.ca.gov/PDL/document.aspx?path=%5cDIDOCS%5c20180821%5cDMRAAAGL4%5c&did=AAAGL180821160738090.DID
 // \\DIDOCS\\20180821\\DMRAAAGL4\\
 
-const START_INDEX = 0;
+const START_INDEX = 460;
 const BATCH_SIZE = 20;
 
 (async () => {

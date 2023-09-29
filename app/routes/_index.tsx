@@ -14,7 +14,16 @@ import { PAGE_SIZE } from "~/services/constants";
 import { selectPhysicians } from "~/services/physicians.server";
 import fs from "fs";
 import * as Ariakit from "@ariakit/react";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useId, useMemo, useRef } from "react";
+import {
+  LineChart,
+  Line,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+  Tooltip,
+} from "recharts";
 
 export const meta: MetaFunction = () => {
   return [
@@ -146,6 +155,7 @@ export default function Index() {
   }, [submit, offenseValues, offenses]);
 
   const queryRef = useRef<HTMLFormElement>(null);
+  const id = useId();
 
   return (
     <div className="p-4 sm:p-8 md:p-16 flex flex-col gap-4">
@@ -493,18 +503,32 @@ export default function Index() {
       </Form>
 
       <div
-        className="flex items-center flex-wrap justify-between p-4 text-sm text-gray-800 rounded-lg bg-gray-50 dark:bg-gray-800 dark:text-gray-300"
+        className="flex items-center flex-wrap justify-between gap-2 p-4 text-sm text-gray-800 rounded-lg bg-gray-50 dark:bg-gray-800 dark:text-gray-300"
         role="alert"
-        id="results"
       >
         <div>
-          <span className="font-medium">{data.numResults} physicians</span>{" "}
+          <span className="font-medium">
+            {data.numResults} physicians with{" "}
+            {data.chartData.reduce((acc, curr) => acc + curr.v, 0)} actions
+          </span>{" "}
           found
         </div>
         <div className="text-xs">
           Last updated {data.lastUpdated.split("T")[0]}
         </div>
+
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart id={id} data={data.chartData}>
+            <Line type="monotone" dataKey="v" stroke="#8884d8" />
+            {/* <CartesianGrid stroke="#ccc" /> */}
+            <XAxis dataKey="k" />
+            <YAxis />
+            <Tooltip />
+          </LineChart>
+        </ResponsiveContainer>
       </div>
+
+      <h2 id="results">Results</h2>
 
       <ul className="flex flex-col gap-2">
         {results.map(({ license, data }) => {

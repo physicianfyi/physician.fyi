@@ -1,6 +1,6 @@
 import type { DataFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData, useParams } from "@remix-run/react";
 import fs from "fs";
 
 export const loader = async ({
@@ -26,11 +26,12 @@ export const loader = async ({
 };
 
 export default function Route() {
+  // const params = useParams()
   const { results, license } = useLoaderData<typeof loader>();
 
   return (
     <div className="p-8 flex flex-col gap-4">
-      <h1>{license}</h1>
+      <h1>CA {license}</h1>
       <ul className="gap-2 flex flex-col">
         {results.map((r: any) => {
           const url = `https://www2.mbc.ca.gov/PDL/document.aspx?path=${encodeURIComponent(

@@ -93,10 +93,24 @@ export const selectPhysicians = async ({
     results = fuse.search(query).map((r) => r.item);
   }
 
+  const chartData = results.reduce<any>((acc, curr) => {
+    for (let i = 0; i < curr.data.length; i++) {
+      // For some reason some don't have date it seems
+      const year = curr.data[i].Date?.split(", ")[1];
+      if (year) {
+        acc[year] = (acc[year] ?? 0) + 1;
+      }
+    }
+    return acc;
+  }, {});
+
   return {
     // Recalculated since this is for filtered results
     numResults: results.length,
     results: results.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE),
     lastUpdated: data.lastRun,
+    chartData: Object.keys(chartData)
+      .sort()
+      .map((k) => ({ k, v: chartData[k] })),
   };
 };
