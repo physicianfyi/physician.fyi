@@ -22,40 +22,44 @@ export const loader = async ({
 
   const results = data.results[license];
 
-  return { results };
+  return { results, license };
 };
 
 export default function Route() {
-  const { results } = useLoaderData<typeof loader>();
+  const { results, license } = useLoaderData<typeof loader>();
 
   return (
-    <ul className="p-8 gap-2 flex flex-col">
-      {results.map((r: any) => {
-        const url = `https://www2.mbc.ca.gov/PDL/document.aspx?path=${encodeURIComponent(
-          r.DIDOCS
-        )}&did=${r["\xa0"]}`;
-        return (
-          <li key={r["\xa0"]} className="border-2 p-2">
-            <div>
-              {r["Last Name"]}, {r["First Name"]} {r["Middle Name"]}
-            </div>
-            <div>{r["Type"]}</div>
-            <a
-              href={`https://web.archive.org/web/0/${url}`}
-              target="_blank"
-              rel="noreferrer"
-              className="font-medium"
-            >
-              View PDF
-            </a>
-            <ul className="list-disc list-inside">
-              {r["Offenses"]?.map((o: string) => (
-                <li key={o}>{o}</li>
-              ))}
-            </ul>
-          </li>
-        );
-      })}
-    </ul>
+    <div className="p-8 flex flex-col gap-4">
+      <h1>{license}</h1>
+      <ul className="gap-2 flex flex-col">
+        {results.map((r: any) => {
+          const url = `https://www2.mbc.ca.gov/PDL/document.aspx?path=${encodeURIComponent(
+            r.DIDOCS
+          )}&did=${r["\xa0"]}`;
+          return (
+            <li key={r["\xa0"]} className="border-2 p-2">
+              <div>
+                {r["Last Name"]}, {r["First Name"]} {r["Middle Name"]}
+              </div>
+              <div>{r["Type"]}</div>
+              <a
+                href={`https://web.archive.org/web/0/${url}`}
+                target="_blank"
+                rel="noreferrer"
+                className="font-medium"
+              >
+                View PDF
+              </a>
+              <ul className="list-disc list-inside">
+                {r["Offenses"]?.map((o: string) => (
+                  <li key={o}>{o}</li>
+                ))}
+              </ul>
+              <div>{r.Date}</div>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }
