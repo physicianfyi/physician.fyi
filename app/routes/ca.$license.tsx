@@ -29,13 +29,13 @@ export default function Route() {
   const { results } = useLoaderData<typeof loader>();
 
   return (
-    <ul className="p-8">
+    <ul className="p-8 gap-2 flex flex-col">
       {results.map((r: any) => {
         const url = `https://www2.mbc.ca.gov/PDL/document.aspx?path=${encodeURIComponent(
           r.DIDOCS
         )}&did=${r["\xa0"]}`;
         return (
-          <li key={r["\xa0"]}>
+          <li key={r["\xa0"]} className="border-2 p-2">
             <div>
               {r["Last Name"]}, {r["First Name"]} {r["Middle Name"]}
             </div>
@@ -44,9 +44,15 @@ export default function Route() {
               href={`https://web.archive.org/web/0/${url}`}
               target="_blank"
               rel="noreferrer"
+              className="font-medium"
             >
               View PDF
             </a>
+            <ul className="list-disc list-inside">
+              {r["Offenses"]?.map((o: string) => (
+                <li key={o}>{o}</li>
+              ))}
+            </ul>
           </li>
         );
       })}

@@ -35,8 +35,12 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
   const { results: availableLicenseTypes, counts: availableLicenseTypeCounts } =
     JSON.parse(fs.readFileSync("data/license-types.json", "utf8"));
   const offenses = JSON.parse(url.searchParams.get("o") ?? "[]");
-  const { results: availableOffenses, counts: availableOffenseCounts } =
+  let { results: availableOffenses, counts: availableOffenseCounts } =
     JSON.parse(fs.readFileSync("data/offenses.json", "utf8"));
+  // Don't show filtering for ones with just 1 match
+  availableOffenses = availableOffenses.filter((o: string) => {
+    return availableOffenseCounts[o] >= 5;
+  });
   const data = await selectPhysicians({
     page,
     query,
@@ -145,7 +149,7 @@ export default function Index() {
 
   return (
     <div className="p-4 sm:p-8 md:p-16 flex flex-col gap-4">
-      <div className="">Find doctors' disciplinary history</div>
+      <div className="">Find your doctor's disciplinary history</div>
 
       <div
         className="p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300"
@@ -223,7 +227,7 @@ export default function Index() {
               store={select}
               gutter={4}
               sameWidth
-              className="z-50 flex flex-col bg-white border-gray-200 border rounded p-2 overflow-auto overscroll-contain"
+              className="z-50 flex flex-col bg-popover border-gray-200 border rounded p-2 overflow-auto overscroll-contain"
               style={{
                 maxHeight: "min(var(--popover-available-height, 300px), 300px)",
                 maxWidth: "max(var(--popover-available-width, 300px), 300px)",
@@ -294,7 +298,7 @@ export default function Index() {
               store={licenseTypeSelect}
               gutter={4}
               sameWidth
-              className="z-50 flex flex-col bg-white border-gray-200 border rounded p-2 overflow-auto overscroll-contain"
+              className="z-50 flex flex-col bg-popover border-gray-200 border rounded p-2 overflow-auto overscroll-contain"
               style={{
                 maxHeight: "min(var(--popover-available-height, 300px), 300px)",
                 maxWidth: "max(var(--popover-available-width, 300px), 300px)",
@@ -365,7 +369,7 @@ export default function Index() {
               store={offenseSelect}
               gutter={4}
               sameWidth
-              className="z-50 flex flex-col bg-white border-gray-200 border rounded p-2 overflow-auto overscroll-contain"
+              className="z-50 flex flex-col bg-popover border-gray-200 border rounded p-2 overflow-auto overscroll-contain"
               style={{
                 maxHeight: "min(var(--popover-available-height, 300px), 300px)",
                 maxWidth: "max(var(--popover-available-width, 300px), 300px)",
@@ -507,7 +511,7 @@ export default function Index() {
           return (
             <li key={license}>
               <Link to={`/ca/${license}`} className="group">
-                <div className="group-hover:bg-gray-100 group-focus-visible:bg-gray-100 py-1 rounded">
+                <div className="group-hover:bg-card group-focus-visible:bg-card py-1 rounded">
                   <div className="px-1 flex items-center gap-2 group-hover:font-medium group-focus-visible:font-medium">
                     <div>
                       {data[0]["Last Name"]}, {data[0]["First Name"]}{" "}
