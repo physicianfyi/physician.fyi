@@ -30,6 +30,9 @@ export default function App() {
           <Link to="/" className="text-lg font-bold font-serif">
             👨‍⚕️ physician.fyi 🔍
           </Link>
+          <Link to="/about" className="text-md font-bold">
+            About
+          </Link>
         </nav>
 
         <Outlet />
