@@ -30,9 +30,14 @@ export default function App() {
           <Link to="/" className="text-lg font-bold font-serif">
             👨‍⚕️ physician.fyi 🔍
           </Link>
-          <Link to="/about" className="text-md font-bold">
-            About
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link to="/about" className="text-md font-bold">
+              About
+            </Link>
+            <Link to="/what-to-do" className="text-md font-bold">
+              What to do
+            </Link>
+          </div>
         </nav>
 
         <Outlet />
