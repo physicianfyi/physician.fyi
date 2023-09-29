@@ -540,7 +540,7 @@ export default function Index() {
                     <div>
                       {data[0]["Last Name"]}, {data[0]["First Name"]}{" "}
                       {data[0]["Middle Name"]}{" "}
-                      {data.length > 1 && `(${data.length} items)`}
+                      {data.length > 1 && `(${data.length} actions)`}
                     </div>
                   </div>
                   <div className="flex items-start sm:items-end gap-1 sm:gap-0 justify-between flex-col sm:flex-row">

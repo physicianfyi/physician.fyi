@@ -3,6 +3,7 @@
  */
 
 import fs from "fs";
+// Doesn't have suggestions for some like 'fmpairment'
 import SpellChecker from "simple-spellchecker";
 
 const SOURCE_DIR = "public/txts/";
@@ -14,9 +15,9 @@ const SOURCE_DIR = "public/txts/";
 
   // SpellChecker.getDictionary("en-US", function (err: any, dictionary: any) {
   //   if (!err) {
-  //     var misspelled = !dictionary.spellCheck("unprcfessional");
+  //     var misspelled = !dictionary.spellCheck("fmpairment");
   //     if (misspelled) {
-  //       var suggestions = dictionary.getSuggestions("unprcfessional");
+  //       var suggestions = dictionary.getSuggestions("fmpairment");
   //       console.log(suggestions);
   //     }
   //   }
@@ -51,6 +52,7 @@ const SOURCE_DIR = "public/txts/";
             .replaceAll(/[\s\n]+/g, " ")
             .replaceAll("repea'ted", "repeated")
             .replaceAll("inéurance", "insurance")
+            .replaceAll("negligcnce", "negligence")
             .replaceAll("’", "'")
             .replaceAll("inccm:petence", "incompetence")
             .replace(/out[\s-]of[\s-]state/, "out-of-state")
@@ -59,14 +61,22 @@ const SOURCE_DIR = "public/txts/";
             .replaceAll(/\s[0-9]+\s[|]+[\s]*/g, " ")
             .replaceAll(" ox 14 ", " or ")
             .replaceAll("contxrolled", "controlled")
+            .replaceAll("failu}e ", "failure ")
             .replace("incompe[en;:e", "incompetence")
+            .replaceAll("ux;professional ", "unprofessional ")
+            .replaceAll("inaﬂcquate ", "inadequate ")
             .replaceAll("crimé", "crime")
             .replaceAll("neéligence", "negligence")
+            .replace(/^l.ucompetence$/, "incompetence")
+            .replaceAll(" negligenge", " negligence")
+            .replaceAll(" neg! 1gent ", " negligent ")
+            .replace(/^nadequaterecordkeeping$/, "inadequate recordkeeping")
             .replaceAll("fntries", "entries")
             .replaceAll("al:ex‘:ing", "altering")
             .replaceAll(" seif ", " self ")
             .replaceAll("incompetehce", "incompetence")
             .replaceAll("impaixment", "impairment")
+            .replaceAll(" fmpairment", " impairment")
             .replaceAll("insuxaru:e", "insurance")
             .replaceAll("negli_gence", "negligence")
             .replace(/^remme$/, "revocation or suspension by another state")
@@ -291,17 +301,29 @@ const SOURCE_DIR = "public/txts/";
             .replace(/^incumpetence$/, "incompetence")
             .replaceAll(" noegligent ", " negligent ")
             .replaceAll("fail-ure ", "failure ")
+            .replace(/^gross'negligence$/, "gross negligence")
             .replaceAll("genernl ", "general ")
+            .replace(/^dishone_sly$/, "dishonesty")
             .replaceAll(" cm;duct", " conduct")
-            .replaceAll(" paticnt", " patient")
+            .replaceAll("paticnt", "patient")
+            .replaceAll(" conwrolled ", " controlled ")
             .replaceAll(" patisnt ", " patient ")
+            .replaceAll("practice o medicine", "practice of medicine")
+            .replaceAll("failure o maintain", "failure to maintain")
             .replaceAll(" pat_ient ", " patient ")
+            .replaceAll("gruss ", "gross ")
             .replaceAll(" patien: ", " patient ")
             .replaceAll(" pauent ", " patient ")
+            .replaceAll(" paticut ", " patient ")
+            .replaceAll("fuilure ", "failure ")
+            .replaceAll(" pafient ", " patient ")
+            .replaceAll("tnability ", "inability ")
+            .replaceAll("dishoncsty ", "dishonesty ")
             .replaceAll("ilegal ", "illegal ")
             .replaceAll(" (o", " to")
             .replaceAll(" practicc", " practice")
             .replaceAll("preseribing ", "prescribing ")
+            .replaceAll("out -of-state ", "out-of-state ")
             .replaceAll("repeatea ", "repeated ")
             .replaceAll("insﬁrance ", "insurance ")
             .replaceAll("generavl ", "general ")
@@ -332,7 +354,7 @@ const SOURCE_DIR = "public/txts/";
             .replaceAll("bxcessive ", "excessive")
             .replaceAll(" i11 ", " ill ")
             .replaceAll(" excessive.diagnostic ", " excessive diagnostic ")
-            .replace(/^dishonefty$/, "dishonesty")
+            .replaceAll("repezted ", "repeated ")
             .replaceAll(" suﬁstantiaily ", " substantially ")
             .replaceAll("violation'of ", "violation of ")
             .replaceAll(" limih;tions ", " limitations ")
@@ -340,6 +362,7 @@ const SOURCE_DIR = "public/txts/";
             .replaceAll("fail;lre ", "failure ")
             .replaceAll("repeateq ", "repeated ")
             .replaceAll(" a.crime", " a crime")
+            .replace(/^[a-zA-Z]+ cause for discipline$/, "")
             .replaceAll(" negligpuce", " negligence")
             .replace(/^incompetwce$/, "incompetence")
             .replaceAll("violatiun ", "violation ")
@@ -372,9 +395,18 @@ const SOURCE_DIR = "public/txts/";
             .replaceAll(" inﬂucnce", " influence")
             .replaceAll("i,inprofessional ", "unprofessional ")
             .replaceAll(" represent;lions", " representations")
+            .replaceAll(" recordkecping", " recordkeeping")
             .replaceAll("viulatio.n ", "violation ")
+            .replaceAll("generﬂ ", "general ")
+            .replace(/ pay finc$/, " pay fine")
             .replaceAll(" neghigent ", " negligent ")
             .replaceAll(" in @ ", " in a ")
+            .replace(
+              /^faillire to maintain adequate and accurate medicsl recoriis$/,
+              "failure to maintain adequate and accurate medical records"
+            )
+            .replaceAll("unprorml(ml ", "unprofessional ")
+            .replaceAll(" aciver«islng", " advertising")
             .replace(
               /^dis;hcnest and corrupt-acts$/,
               "dishonest and corrupt acts"
@@ -384,7 +416,6 @@ const SOURCE_DIR = "public/txts/";
               /^discipline, restriction, or limitation lmpc.$/,
               "discipline, restriction, or limitation imposed by another state"
             )
-            .replace(/^inccmpeteace$/, "incompetence")
             .replaceAll(" neingence", " negligence")
             .replaceAll("coaviction ", "conviction ")
             .replace(/^ise /, "use ")
@@ -400,11 +431,8 @@ const SOURCE_DIR = "public/txts/";
             .replaceAll(" !\\iegligcncc", " negligence")
             .replaceAll(" negligen;:e", " negligence")
             .replaceAll("pres:cdbing ", "prescribing ")
-            .replace(/^dbrug abuse$/, "drug abuse")
             .replaceAll(" and/orrincompetence", " and/or incompetence")
-            .replace(/^dishonest.acts$/, "dishonest acts")
             .replaceAll("repea(ed ", "repeated ")
-            .replace(/^grossnegligence$/, "gross negligence")
             // Remove "unprofessional conduct" prefix; this is needed before the "patient" logic for "unprofessional conduct- patient abuse"
             // Preserve "general unprofessional conduct - patient s.c."
             .replace(
@@ -421,7 +449,21 @@ const SOURCE_DIR = "public/txts/";
               /(( re)?(:\s?| )|\s?(-|,|—|;|~)\s?| in (the )?((ca(r|s)e|treatment)|care and treatment) of | as to | for | concerning | pertaining to )((patient(s?)|pt\.|victim)(\s|\.)(?!(privacy|autonomy|records))([\dA-Za-z\-'.\s,&[\\"%$;:_\]*?]{1,})|\d patients)$/,
               ""
             )
+            // Remove patient prefix
+            // https://stackoverflow.com/a/2013172/9703201
+            .replace(/^patient(s)?(.*?)(-|:|~)/, "")
+            // After removing patient prefix and suffix, remove any standalone patients
+            .replace(
+              /^patient(?!.*(abuse|privacy|autonomy|abandonment)).*$/,
+              ""
+            )
             .trim()
+            // Any ones looking from start to end must come after removing parts of other strings
+            .replace(/^inccmpeteace$/, "incompetence")
+            .replace(/^dishonest.acts$/, "dishonest acts")
+            .replace(/^grossnegligence$/, "gross negligence")
+            .replace(/^dbrug abuse$/, "drug abuse")
+            .replace(/^dishonefty$/, "dishonesty")
             // Remaining back ticks are superfluous
             .replaceAll("‘", "")
             .replaceAll("“", "")
@@ -436,11 +478,15 @@ const SOURCE_DIR = "public/txts/";
               "unprofessional conduct"
             )
             .replace(
-              /^failure to maintain adequate and accurate (medical )?records$/,
+              /^failure to maintain adequate( and |\/)accurate (medical )?records$/,
               "inadequate and inaccurate records"
             )
             .replace(
-              /^inadequate and inaccurate medical records$/,
+              /^inadequate and( |.)inaccurate( |.)(medical )?records$/,
+              "inadequate and inaccurate records"
+            )
+            .replace(
+              /^adequate\/accurate records$/,
               "inadequate and inaccurate records"
             )
             .replace(
@@ -459,6 +505,8 @@ const SOURCE_DIR = "public/txts/";
             .replace(/^dishonest or corrupt acts$/, "dishonesty or corruption")
             .replace(/^dishonest acts$/, "dishonesty or corruption")
             .replace(/^dishonesty\. or corruption$/, "dishonesty or corruption")
+            .replaceAll("record-keeping", "recordkeeping")
+            .replaceAll("record keeping", "recordkeeping")
             .replace(
               /^((\()?discipline, restriction(s)?(,|;|\.) or limitation(s)? imposed by (another state|other states)|out-of-state discipline|restriction, or limitation imposed by (another state|other states))$/,
               "out-of-state discipline, restriction, or limitation"
@@ -487,7 +535,9 @@ const SOURCE_DIR = "public/txts/";
             )
             // Remove trailing —
             .replace(/ (—|-)$/, "")
-        );
+        )
+        // Filter out empty strings
+        .filter((c) => c && !["facts"].includes(c));
       // Length greater than 3 handles cases where parentheses around offense were not there like in A1FERUOB—these will be gotten in next step where we look for known offenses in all documents
 
       // Note "business and professions code § 2234 (e" with letter at end are missing end parentheses but no biggie
