@@ -503,7 +503,7 @@ export default function Index() {
       </Form>
 
       <div
-        className="flex items-center flex-wrap justify-between gap-2 p-4 text-sm text-gray-800 rounded-lg bg-gray-50 dark:bg-gray-800 dark:text-gray-300"
+        className="flex items-center flex-wrap justify-between gap-2 p-4 text-sm text-card-foreground rounded-lg bg-card"
         role="alert"
       >
         <div>

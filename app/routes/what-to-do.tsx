@@ -14,8 +14,15 @@ export default function Route() {
           to be compensated.
         </li>
         <li>
-          If your case involved a medical device, submit an adverse event report
-          with the FDA, which compels the manufacturer to investigate.
+          If your case involved a medical device or drug/product, submit an{" "}
+          <a
+            href="https://www.accessdata.fda.gov/scripts/medwatch/index.cfm"
+            target="_blank"
+            rel="noreferrer"
+          >
+            adverse event report with the FDA
+          </a>
+          , which compels the manufacturer to investigate.
         </li>
         <li>
           File a complaint with the medical board in the state you were harmed

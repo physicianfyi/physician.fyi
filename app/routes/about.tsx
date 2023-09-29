@@ -6,16 +6,17 @@ export default function Route() {
       <p>
         Only after experiencing medical malpractice did I begin to realize just
         how frequent it is and that most patients are not aware of how to look
-        up a doctor's history. A big part of this is because doctors and their
-        stakeholders fiercely suppress cases against them. Doctors offer refunds
-        in exchange for signing a gag clause (i.e., non-disclosure/disparagement
-        agreement) barring the victim from ever talking about it. If the victim
-        is within the statute of limitations (which is very short in some
-        states) and they sue, doctors carry hefty malpractice insurance that
-        coerces settlement with victims out of court, once again stipulating
-        that they not speak. If those methods don't work, doctors hire
-        reputation cleaners to get unfavorable reviews taken down directly by
-        the review platform or by threat of lawsuit over libel.
+        up a doctor's history or take action when victimized. A big part of this
+        is because doctors and their stakeholders fiercely suppress cases
+        against them. Doctors offer refunds in exchange for signing a gag clause
+        (i.e., non-disclosure/disparagement agreement) barring the victim from
+        ever talking about it. If the victim is within the statute of
+        limitations (which is very short in some states) and they sue, doctors
+        carry hefty malpractice insurance that coerces settlement with victims
+        out of court, once again stipulating that they not speak. If those
+        methods don't work, doctors hire reputation cleaners to get unfavorable
+        reviews taken down directly by the review platform or by threat of
+        lawsuit over libel.
       </p>
 
       <p>
@@ -64,6 +65,11 @@ export default function Route() {
         filtering on the offenses the doctor was charged with. physician.fyi
         aims to make all these cases across all states easily searchable forever
         to empower patients to be informed.
+      </p>
+
+      <p>
+        I'd like to recognize the patient advocates who have come before, such
+        as 4patientsafety.org.
       </p>
     </article>
   );
