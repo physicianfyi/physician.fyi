@@ -6,7 +6,7 @@ import puppeteer from "puppeteer";
 import fs from "fs";
 
 (async () => {
-  const data = JSON.parse(fs.readFileSync("data/ca/temp.json", "utf8"));
+  const data = JSON.parse(fs.readFileSync("data/ca/scrape.json", "utf8"));
   const profiles = data.profiles;
 
   // Launch the browser and open a new blank page
@@ -18,7 +18,7 @@ import fs from "fs";
   // Set screen size
   await page.setViewport({ width: 1080, height: 1024 });
 
-  for (let [license, profile] of Object.entries<any>(profiles)) {
+  for (let [license, profile] of Object.entries<any>(profiles).slice(0, 10)) {
     if (profile.fetch) {
       // Navigate the page to a URL
       await page.goto(`${data.baseUrl}${profile.licenseUrl}`);
@@ -48,7 +48,12 @@ import fs from "fs";
           .split("<br>");
         profile.address = address?.[0].replace(/,\s*$/, "");
         if (address?.[1] && !address[1].startsWith(baseProfile.city)) {
-          profile.address2 = address[1];
+          profile.address2 = address[1].replace(/,\s*$/, "");
+
+          // eg, https://search.dca.ca.gov/details/8002/A/49264/a8e99b012afe9a60eaad770f9df71238
+          if (address?.[2] && !address[2].startsWith(baseProfile.city)) {
+            profile.address3 = address[2].replace(/,\s*$/, "");
+          }
         }
 
         profile.probationSummary = (
@@ -57,7 +62,6 @@ import fs from "fs";
           ) as any
         )?.innerText;
 
-        // TODO Survey info
         // TODO Keep changelog
 
         const actions = [];
@@ -70,6 +74,7 @@ import fs from "fs";
           "contentAdministrativeActionTakenbyOtherStateorFederalGovernment",
           "contentAdministrativeCitationIssued",
           "contentMisdemeanorConviction",
+          // TODO court order, probationary license, hospital disciplinary action, license issued with public letter of reprimand, malpractice settlements (not judgement)
         ];
         for (let actionType of actionTypeIds) {
           let i = 1;
@@ -106,11 +111,12 @@ import fs from "fs";
                 .querySelector("#vAdministrativeDisciplinaryActionsCaseNumber")
                 ?.innerText.toLowerCase()
                 .trim();
+              // TODO Need to replace new lines with spaces due to https://search.dca.ca.gov/details/8002/G/80280/87ba922ecbb7f2f40a355f0263059fc9
               action.description = el
                 .querySelector("#vAdministrativeDisciplinaryActionsDescription")
                 ?.innerText.toLowerCase()
                 .trim();
-              action.effectiveAt = el
+              action.date = el
                 .querySelector(
                   "#vAdministrativeDisciplinaryActionsEffectiveDate"
                 )
@@ -133,7 +139,7 @@ import fs from "fs";
                 .querySelector("#vFelonyConvictionSentence")
                 ?.innerText.toLowerCase()
                 .trim();
-              action.effectiveAt = el
+              action.date = el
                 .querySelector("#vFelonyConvictionEffectiveDateofAction")
                 ?.innerText.toLowerCase()
                 .trim();
@@ -150,7 +156,7 @@ import fs from "fs";
                 .querySelector("#vMalpracticeJudgmentJudgmentAmount")
                 ?.innerText.toLowerCase()
                 .trim();
-              action.issuedAt = el
+              action.date = el
                 .querySelector("#vMalpracticeJudgmentDateIssued")
                 ?.innerText.toLowerCase()
                 .trim();
@@ -197,7 +203,7 @@ import fs from "fs";
                 .querySelector("#vAdministrativeCitationIssuedDateResolved")
                 ?.innerText.toLowerCase()
                 .trim();
-              action.issuedAt = el
+              action.date = el
                 .querySelector(
                   "#vAdministrativeCitationIssuedDateCitationIssued"
                 )
@@ -220,7 +226,8 @@ import fs from "fs";
                 .querySelector("#vMisdemeanorConvictionSentence")
                 ?.innerText.toLowerCase()
                 .trim();
-              action.effectiveAt = el
+              // Name every date the same for charting
+              action.date = el
                 .querySelector("#vMisdemeanorConvictionEffectiveDateofAction")
                 ?.innerText.toLowerCase()
                 .trim();
@@ -231,7 +238,60 @@ import fs from "fs";
           }
         }
 
+        const documents = Array.from<any>(
+          document.querySelectorAll(
+            "#PublicDocuments > nav > section > div.prabox-content > ul > li"
+          )
+        );
+        for (let i = 0; i < documents.length; i += 3) {
+          const action: any = {};
+          action.actionType = documents[i].querySelector("span > a").innerText;
+          action.url = documents[i]
+            .querySelector("span > a")
+            .getAttribute("href")
+            // Match format we already used
+            .replace("/BreezePDL/", "/PDL/");
+          action.date = documents[i + 1]
+            .querySelector("span:not(.detailHeader)")
+            .innerText.toLowerCase()
+            .trim();
+          action.numPages = Number(
+            documents[i + 2]
+              .querySelector("span:not(.detailHeader)")
+              .innerText.toLowerCase()
+              .trim()
+          );
+          actions.push(action);
+        }
+
         profile.actions = actions;
+
+        // Survey info
+        const questions = Array.from<any>(
+          document.querySelectorAll("#SurveyInformation > div.survQuestion")
+        );
+        const answers = Array.from<any>(
+          document.querySelectorAll("#SurveyInformation > div.survAnswer")
+        );
+
+        const survey: any = {};
+        for (let i = 0; i < questions.length; i++) {
+          const question = questions[i].innerText;
+          let answer = answers[i].innerText.replace(/\s*$/, "");
+          if (question === "POSTGRADUATE TRAINING YEARS") {
+            answer = Number(answer);
+          } else if (question === "LANGUAGE FLUENCY") {
+            answer = answer.split("\n");
+          } else if (question === "PRACTICE ACTIVITIES") {
+            answer = answer.split("\n").reduce((acc: any, curr: any) => {
+              const [k, v] = curr.split(" - ");
+              acc[k] = v;
+              return acc;
+            }, {});
+          }
+          survey[questions[i].innerText] = answer;
+        }
+        profile.survey = survey;
 
         return profile;
       }, profile);
@@ -240,7 +300,7 @@ import fs from "fs";
       profiles[license] = {
         ...profile,
         ...deepProfile,
-        // fetch: false
+        fetch: false,
       };
     }
   }
