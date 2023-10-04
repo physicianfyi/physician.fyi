@@ -70,7 +70,6 @@ const SOURCE_DIR = "public/txts/";
             .replace(/^l.ucompetence$/, "incompetence")
             .replaceAll(" negligenge", " negligence")
             .replaceAll(" neg! 1gent ", " negligent ")
-            .replace(/^nadequaterecordkeeping$/, "inadequate recordkeeping")
             .replaceAll("fntries", "entries")
             .replaceAll("al:ex‘:ing", "altering")
             .replaceAll(" seif ", " self ")
@@ -427,7 +426,7 @@ const SOURCE_DIR = "public/txts/";
             .replace(/^grossnegligemee$/, "gross negligence")
             .replaceAll(" neghgence", " negligence")
             .replaceAll("viclation ", "violation ")
-            .replaceAll(" anothr statc", " another state")
+            .replaceAll(" anothr statc", " another state").replace(/^failurc(e)? /, 'failure ').replaceAll(' adeguate ', ' adequate ')
             .replaceAll(" !\\iegligcncc", " negligence")
             .replaceAll(" negligen;:e", " negligence")
             .replaceAll("pres:cdbing ", "prescribing ")
@@ -464,6 +463,7 @@ const SOURCE_DIR = "public/txts/";
             .replace(/^grossnegligence$/, "gross negligence")
             .replace(/^dbrug abuse$/, "drug abuse")
             .replace(/^dishonefty$/, "dishonesty")
+
             // Remaining back ticks are superfluous
             .replaceAll("‘", "")
             .replaceAll("“", "")
@@ -507,6 +507,9 @@ const SOURCE_DIR = "public/txts/";
             .replace(/^dishonesty\. or corruption$/, "dishonesty or corruption")
             .replaceAll("record-keeping", "recordkeeping")
             .replaceAll("record keeping", "recordkeeping")
+            .replaceAll('medical recordkeeping', 'recordkeeping')
+            .replace(/^nadequaterecordkeeping$/, "inadequate recordkeeping")
+            .replace(/ of provisions of the medical practice act^/, ' of the medical practice act')
             .replace(
               /^((\()?discipline, restriction(s)?(,|;|\.) or limitation(s)? imposed by (another state|other states)|out-of-state discipline|restriction, or limitation imposed by (another state|other states))$/,
               "out-of-state discipline, restriction, or limitation"

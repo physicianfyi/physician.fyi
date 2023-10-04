@@ -6,8 +6,8 @@ export default function Route() {
       <p>
         Only after experiencing medical malpractice did I begin to realize just
         how frequent it is and that most patients are not aware of how to look
-        up a doctor's history or take action when victimized. A big part of this
-        is because doctors and their stakeholders fiercely suppress cases
+        up a doctor's history or take recourse when victimized. A big part of
+        this is because doctors and their stakeholders fiercely suppress cases
         against them. Doctors offer refunds in exchange for signing a gag clause
         (i.e., non-disclosure/disparagement agreement) barring the victim from
         ever talking about it. If the victim is within the statute of
@@ -62,9 +62,9 @@ export default function Route() {
         take action, patients often don't know they can look up these cases
         publicly. The cases are hidden across outdated government sites and the
         contents are not digitized so as to allow for even the most basic
-        filtering on the offenses the doctor was charged with. physician.fyi
-        aims to make all these cases across all states easily searchable forever
-        to empower patients to be informed.
+        filtering by the offense a doctor was charged with. physician.fyi aims
+        to make all these cases across all states easily searchable forever to
+        empower patients to be informed.
       </p>
 
       <p>
