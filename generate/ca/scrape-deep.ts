@@ -1,4 +1,5 @@
 /**
+ * Step 1b: Deep scrapes profiles marked in step 1a.
  * Deep scrape of Department of Consumer Affairs advanced search, which contains both medical board documents/actions as well as 3rd-party actions like settlements above 30k reported to the medical board
  */
 
@@ -17,7 +18,7 @@ import fs from "fs";
 // }
 
 (async () => {
-  const data = JSON.parse(fs.readFileSync("data/ca/temp.json", "utf8"));
+  const data = JSON.parse(fs.readFileSync("data/ca/scrape.json", "utf8"));
   const profiles = data.profiles;
 
   // Launch the browser and open a new blank page
@@ -29,7 +30,7 @@ import fs from "fs";
   // Set screen size
   await page.setViewport({ width: 1080, height: 1024 });
 
-  for (let [license, profile] of Object.entries<any>(profiles).slice(0, 1)) {
+  for (let [license, profile] of Object.entries<any>(profiles).slice(0, 2000)) {
     if (profile.fetch) {
       // Navigate the page to a URL
       await page.goto(`${data.baseUrl}${profile.licenseUrl}`);
@@ -37,23 +38,36 @@ import fs from "fs";
 
       // Need to pass baseActions separately due to esbuild error
       const deepProfile = await page.evaluate(
-        (baseProfile, baseActions = []) => {
+        (baseProfile, baseActions = [], baseProbationSummaries = []) => {
           const profile: any = {};
           profile.licenseIssuedAt = document
             .getElementById("issueDate")
             ?.innerText.toLowerCase()
             .trim();
+
+          // TODO https://search.dca.ca.gov/details/8002/G/86475/d4e739d6536c960e5f603f75fc9fa3fb
+          // Difficult because no id
+          // profile.voluntaryLimitations = document
+          //   .getElementById("schoolName")
+          //   ?.innerText.toLowerCase()
+          //   .trim()
+          //   .split("school name: ")[1];
+
+          // Could be interesting to save school changes but probably extremely rare
+          // TODO Could get current enrolled program too https://search.dca.ca.gov/details/8002/G/80280/648946663069eb93dac876fa148c2c47
           profile.school = document
             .getElementById("schoolName")
             ?.innerText.toLowerCase()
             .trim()
-            .split("school name: ")[1];
+            .split("school name: ")[1]
+            ?.trim();
           profile.graduationYear = Number(
             document
               .getElementById("gradYear")
               ?.innerText.toLowerCase()
               .trim()
               .split("graduation year: ")[1]
+              ?.trim()
           );
           // TODO Can just get previous names here instead of combining in shallow scrape
           const address = document
@@ -74,13 +88,21 @@ import fs from "fs";
             }
           }
 
-          profile.probationSummary = (
+          const probationSummary = (
             document.querySelector(
               ".detailContainer > p > span > string[xmlns='http://schemas.microsoft.com/2003/10/Serialization/']"
             ) as any
-          )?.innerText;
-
-          // TODO Keep changelog
+          )?.innerText.replace(/[\r\n\s\x8D\u0085\u2028\u2029]+/g, " ");
+          // Account for a doctor having multiple probation summaries over time and the previous one(s) just being removed
+          if (
+            probationSummary &&
+            !baseProbationSummaries.includes(probationSummary)
+          ) {
+            profile.probationSummaries = [
+              probationSummary,
+              ...baseProbationSummaries,
+            ];
+          }
 
           const actions = [];
           // Could rely on secondaryStatus to see which sections to look for, but want to catch inconsistent cases
@@ -92,7 +114,11 @@ import fs from "fs";
             "contentAdministrativeActionTakenbyOtherStateorFederalGovernment",
             "contentAdministrativeCitationIssued",
             "contentMisdemeanorConviction",
-            // TODO court order, probationary license, hospital disciplinary action, license issued with public letter of reprimand, malpractice settlements (not judgement)
+            "contentCourtOrder",
+            "contentProbationaryLicense",
+            "contentHospitalDisciplinaryAction",
+            "contentMalpracticeSettlements",
+            "contentLICENSEISSUEDWITHPUBLICLETTEROFREPRIMAND",
           ];
           for (let actionType of actionTypeIds) {
             let i = 1;
@@ -275,6 +301,132 @@ import fs from "fs";
                   .querySelector("#vMisdemeanorConvictionEffectiveDateofAction")
                   ?.innerText.toLowerCase()
                   .trim();
+              } else if (actionType === "contentCourtOrder") {
+                action.description = el
+                  .querySelector("#vCourtOrderDescriptionofAction")
+                  ?.innerHTML.toLowerCase()
+                  .replace(/<br>/g, " ")
+                  // https://stackoverflow.com/a/34936253/9703201
+                  .replace(/[\r\n\s\x8D\u0085\u2028\u2029]+/g, " ")
+                  .replace(/&amp;/g, "&")
+                  .trim();
+                action.date = el
+                  .querySelector("#vCourtOrderEffectiveDateofAction")
+                  ?.innerText.toLowerCase()
+                  .trim();
+              } else if (actionType === "contentProbationaryLicense") {
+                action.caseNumber = el
+                  .querySelector("#vProbationaryLicenseCaseNumber")
+                  ?.innerText.toLowerCase()
+                  .trim();
+                action.description = el
+                  .querySelector("#vProbationaryLicenseDescription")
+                  ?.innerHTML.toLowerCase()
+                  .replace(/<br>/g, " ")
+                  // https://stackoverflow.com/a/34936253/9703201
+                  .replace(/[\r\n\s\x8D\u0085\u2028\u2029]+/g, " ")
+                  .replace(/&amp;/g, "&")
+                  .trim();
+                action.date = el
+                  .querySelector("#vProbationaryLicenseEffectiveDate")
+                  ?.innerText.toLowerCase()
+                  .trim();
+              } else if (actionType === "contentHospitalDisciplinaryAction") {
+                action.healthCareFacility = el
+                  .querySelector(
+                    "#vHospitalDisciplinaryActionHealthCareFacility"
+                  )
+                  ?.innerText.toLowerCase()
+                  .trim();
+                action.description = el
+                  .querySelector(
+                    "#vHospitalDisciplinaryActionDescriptionofAction"
+                  )
+                  ?.innerHTML.toLowerCase()
+                  .replace(/<br>/g, " ")
+                  // https://stackoverflow.com/a/34936253/9703201
+                  .replace(/[\r\n\s\x8D\u0085\u2028\u2029]+/g, " ")
+                  .replace(/&amp;/g, "&")
+                  .trim();
+                action.date = el
+                  .querySelector(
+                    "#vHospitalDisciplinaryActionEffectiveDateofAction"
+                  )
+                  ?.innerText.toLowerCase()
+                  .trim();
+              } else if (actionType === "contentMalpracticeSettlements") {
+                action.numYearsLicensedInState = Number(
+                  el
+                    .querySelector(
+                      "#vMalpracticeSettlementsYearsLicensedinCalifornia"
+                    )
+                    ?.innerText.toLowerCase()
+                    .trim()
+                );
+                action.specialty = el
+                  .querySelector("#vMalpracticeSettlementsSpecialty")
+                  ?.innerText.toLowerCase()
+                  .trim();
+                action.history = el
+                  .querySelector("#vMalpracticeSettlementsSettlementHistory")
+                  ?.innerText.trim()
+                  .split("\n")
+                  .reduce((acc: any, curr: any) => {
+                    const [k, v] = curr.split(" - ");
+                    acc[k] = v;
+                    return acc;
+                  }, {});
+                action.numStateSpecialists = Number(
+                  el
+                    .querySelector(
+                      "#vMalpracticeSettlementsEstimatedNumberofCaliforniaPhysiciansinSpecialty"
+                    )
+                    ?.innerText.toLowerCase()
+                    .trim()
+                );
+                action.date = el
+                  .querySelector(
+                    "#vMalpracticeSettlementsCaliforniaPhysiciansinSpecialityEnteredinSettlementAgreementsinceJanuary12003Asof"
+                  )
+                  ?.innerText.toLowerCase()
+                  .trim();
+                action.number = Number(
+                  el
+                    .querySelector("#vMalpracticeSettlementsNumber")
+                    ?.innerText.toLowerCase()
+                    .trim()
+                );
+                action.percentage = Number(
+                  el
+                    .querySelector("#vMalpracticeSettlementsPercentage")
+                    ?.innerText.toLowerCase()
+                    .trim()
+                );
+              } else if (
+                actionType === "contentLICENSEISSUEDWITHPUBLICLETTEROFREPRIMAND"
+              ) {
+                action.caseNumber = el
+                  .querySelector(
+                    "#vLICENSEISSUEDWITHPUBLICLETTEROFREPRIMANDCaseNumber"
+                  )
+                  ?.innerText.toLowerCase()
+                  .trim();
+                action.description = el
+                  .querySelector(
+                    "#vLICENSEISSUEDWITHPUBLICLETTEROFREPRIMANDDescription"
+                  )
+                  ?.innerHTML.toLowerCase()
+                  .replace(/<br>/g, " ")
+                  // https://stackoverflow.com/a/34936253/9703201
+                  .replace(/[\r\n\s\x8D\u0085\u2028\u2029]+/g, " ")
+                  .replace(/&amp;/g, "&")
+                  .trim();
+                action.date = el
+                  .querySelector(
+                    "#vLICENSEISSUEDWITHPUBLICLETTEROFREPRIMANDEffectiveDateofAction"
+                  )
+                  ?.innerText.toLowerCase()
+                  .trim();
               }
 
               // Don't add ones already in baseProfile.actions
@@ -340,7 +492,7 @@ import fs from "fs";
           const survey: any = {};
           for (let i = 0; i < questions.length; i++) {
             const question = questions[i].innerText;
-            let answer = answers[i].innerText.replace(/\s*$/, "");
+            let answer = answers[i].innerText.trim();
             if (question === "POSTGRADUATE TRAINING YEARS") {
               // It's sometimes "9+"
               // answer = Number(answer);
@@ -374,7 +526,8 @@ import fs from "fs";
           return profile;
         },
         profile,
-        profile.actions
+        profile.actions,
+        profile.probationSummaries
       );
 
       profiles[license] = {
@@ -391,7 +544,8 @@ import fs from "fs";
     profiles,
   };
 
-  fs.writeFile("data/ca/temp.json", JSON.stringify(json), (error) => {
+  // For now write to a new file, but the point is for this be the same file as scrape-shallow
+  fs.writeFile("data/ca/scrape-deep.json", JSON.stringify(json), (error) => {
     if (error) throw error;
   });
 

@@ -178,7 +178,7 @@
   }
 
   /* Inputs must have text at least 16px to not zoom per https://stackoverflow.com/a/16255670/9703201 This applies that minimally (i.e., only when focused) */
-  @media screen and (-webkit-min-device-pixel-ratio: 0) {
+  @media screen and (max-width: 640px) and (-webkit-min-device-pixel-ratio: 0) {
     /* Select needs focus selector per https://stackoverflow.com/a/6394497/9703201 */
     select:focus,
     textarea:focus,

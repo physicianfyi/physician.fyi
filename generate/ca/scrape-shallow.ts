@@ -1,4 +1,5 @@
 /**
+ * Step 1a: Marks profiles that need to deep scraped
  * Shallow scrape of Department of Consumer Affairs advanced search, which contains both medical board documents/actions as well as 3rd-party actions like settlements above 30k reported to the medical board
  */
 
@@ -34,7 +35,7 @@ const PAGE_URL = "https://search.dca.ca.gov/advanced";
     )
   );
 
-  const startIndex = states.findIndex((e) => e === "FL_cities");
+  const startIndex = states.findIndex((e) => e === "IA_cities");
   for (let state of states.slice(startIndex)) {
     console.log({ state });
     // Need to go through cities instead of counties since LA county has > 1k results
@@ -137,10 +138,18 @@ const PAGE_URL = "https://search.dca.ca.gov/advanced";
         // Update profile fields if new one present and different
         if (profiles.hasOwnProperty(license)) {
           if (profile.name && profile.name !== profiles[license].name) {
+            // Save what is now a previous name when encountering a new name that doesn't match what we had
+            profiles[license].previousNames = Array.from(
+              new Set([
+                ...(profiles[license].previousNames ?? []),
+                profiles[license].name,
+              ])
+            );
             profiles[license].name = profile.name;
             // Indicate deep search needs to refetch this profile
             profiles[license].fetch = true;
           }
+          // Could only modify licenseUrl when not on a previous name profile, but doesn't matter since they're the same
           if (
             profile.licenseUrl &&
             profile.licenseUrl !== profiles[license].licenseUrl
