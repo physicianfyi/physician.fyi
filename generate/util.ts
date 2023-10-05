@@ -10,6 +10,7 @@ export function delay(time: number) {
 
 export const downloadFile = async (url: string, folder = ".") => {
   const res = await fetch(url);
+  if (res.status === 500) throw new Error("Invalid file");
   // if (!fs.existsSync("data")) await mkdir("data"); //Optional if you already have downloads directory
   // const destination = path.resolve("./data", folder);
   const fileStream = fs.createWriteStream(folder, { flags: "wx" });

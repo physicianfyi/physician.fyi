@@ -9,4 +9,4 @@ node_modules
 
 data/*/pdfs
 data/*/pngs
-/public/txts
+data/*/txts

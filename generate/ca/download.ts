@@ -1,5 +1,5 @@
 /**
- * Simultaneous Step 2: Download PDFs from actions
+ * Stream 2 Step 2: Download PDFs from actions
  */
 
 import fs from "fs";
@@ -20,7 +20,9 @@ import { downloadFile } from "generate/util";
 
       if (!fs.existsSync(path)) {
         console.log(path);
-        await downloadFile(url, path);
+        await downloadFile(url, path).catch((e) => {
+          console.log(e, url);
+        });
       }
     }
   }

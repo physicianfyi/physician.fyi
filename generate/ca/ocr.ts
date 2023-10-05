@@ -1,5 +1,5 @@
 /**
- * Run OCR and save text files
+ * Stream 2 Step 4: Run OCR and save text files
  * Memory fills up since it loads the pngs and never seems to garbage collect them
  */
 
@@ -7,8 +7,8 @@ import fs from "fs";
 import Tesseract from "tesseract.js";
 import path from "path";
 
-const SOURCE_DIR = "public/pngs/";
-const DEST_DIR = "public/txts/";
+const SOURCE_DIR = "data/ca/pngs/";
+const DEST_DIR = "data/ca/txts/";
 
 const scheduler = Tesseract.createScheduler();
 
@@ -40,7 +40,7 @@ const process = (dirs: any[], errors: any) =>
           const result = await scheduler
             .addJob("recognize", `${SOURCE_DIR}${dir}/${file}`)
             .catch((error) => {
-              errors[`${dir}/${file}`] = error.toString();
+              errors[`${dir}/${file}`] = error;
             });
 
           if (!result) return "";
@@ -78,14 +78,16 @@ const process = (dirs: any[], errors: any) =>
 
   await scheduler.terminate();
 
-  fs.writeFile(
-    "data/ocr.json",
-    JSON.stringify({
-      lastRun: new Date(),
-      errors,
-    }),
-    (error) => {
-      if (error) throw error;
-    }
-  );
+  console.log(errors);
+
+  // fs.writeFile(
+  //   "data/ocr.json",
+  //   JSON.stringify({
+  //     lastRun: new Date(),
+  //     errors,
+  //   }),
+  //   (error) => {
+  //     if (error) throw error;
+  //   }
+  // );
 })();

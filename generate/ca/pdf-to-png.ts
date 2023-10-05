@@ -1,5 +1,5 @@
 /**
- * Simultaneous Step 3: Convert pdfs to pngs for OCR
+ * Stream 2 Step 3: Convert pdfs to pngs for OCR
  */
 
 import fs from "fs";
