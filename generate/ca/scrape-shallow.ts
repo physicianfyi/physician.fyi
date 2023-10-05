@@ -34,7 +34,8 @@ const PAGE_URL = "https://search.dca.ca.gov/advanced";
     )
   );
 
-  for (let state of states) {
+  const startIndex = states.findIndex((e) => e === "FL_cities");
+  for (let state of states.slice(startIndex)) {
     console.log({ state });
     // Need to go through cities instead of counties since LA county has > 1k results
     const cities = await page.evaluate(
