@@ -7,6 +7,6 @@ node_modules
 
 .DS_Store
 
-/public/pdfs
+data/*/pdfs
 /public/pngs
 /public/txts

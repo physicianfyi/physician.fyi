@@ -10,8 +10,8 @@ export function delay(time: number) {
 
 export const downloadFile = async (url: string, folder = ".") => {
   const res = await fetch(url);
-  if (!fs.existsSync("public")) await mkdir("public"); //Optional if you already have downloads directory
-  const destination = path.resolve("./public", folder);
-  const fileStream = fs.createWriteStream(destination, { flags: "wx" });
+  // if (!fs.existsSync("data")) await mkdir("data"); //Optional if you already have downloads directory
+  // const destination = path.resolve("./data", folder);
+  const fileStream = fs.createWriteStream(folder, { flags: "wx" });
   await finished(Readable.fromWeb(res.body as any).pipe(fileStream));
 };
