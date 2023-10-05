@@ -8,5 +8,5 @@ node_modules
 .DS_Store
 
 data/*/pdfs
-/public/pngs
+data/*/pngs
 /public/txts

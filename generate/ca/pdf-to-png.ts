@@ -1,5 +1,5 @@
 /**
- * Convert pdfs to pngs
+ * Simultaneous Step 3: Convert pdfs to pngs for OCR
  */
 
 import fs from "fs";
@@ -10,8 +10,8 @@ import pdf2img from "pdf-img-convert";
 // Or use https://github.com/yakovmeister/pdf2image
 import { mkdir } from "fs/promises";
 
-const SOURCE_DIR = "public/pdfs/";
-const DEST_DIR = "public/pngs/";
+const SOURCE_DIR = "data/ca/pdfs/";
+const DEST_DIR = "data/ca/pngs/";
 
 const process = (files: any[], errors: any) =>
   Promise.all(
@@ -21,6 +21,7 @@ const process = (files: any[], errors: any) =>
       }
 
       // For some reason some are skipped, directory is made but empty, so proceed if directory empty
+      // TODO Could refine this check to make sure there are the number of pages of the pdf in pngs
       if (
         fs.existsSync(`${DEST_DIR}${file}/`) &&
         fs.readdirSync(`${DEST_DIR}${file}/`).filter((f) => f.endsWith(".png"))
@@ -73,14 +74,16 @@ const process = (files: any[], errors: any) =>
     console.log(`Processed batch`);
   }
 
-  fs.writeFile(
-    "data/png.json",
-    JSON.stringify({
-      lastRun: new Date(),
-      errors,
-    }),
-    (error) => {
-      if (error) throw error;
-    }
-  );
+  console.log(errors);
+
+  // fs.writeFile(
+  //   "data/ca/png.json",
+  //   JSON.stringify({
+  //     lastRun: new Date(),
+  //     errors,
+  //   }),
+  //   (error) => {
+  //     if (error) throw error;
+  //   }
+  // );
 })();
