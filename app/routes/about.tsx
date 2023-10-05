@@ -47,6 +47,8 @@ export default function Route() {
         accepting the doctor's rebuttal.
       </p>
 
+      {/* TODO Add that many MBC members are also part of CMA, a lobbying group for doctors */}
+
       <iframe
         width="100%"
         height="315"

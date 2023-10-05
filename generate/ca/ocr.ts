@@ -55,7 +55,7 @@ const process = (dirs: any[], errors: any) =>
         }
       });
 
-      console.log(`Converted ${path.resolve(dir)}`);
+      console.log(`Digitized ${path.resolve(dir)}`);
     })
   );
 

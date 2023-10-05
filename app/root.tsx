@@ -25,25 +25,64 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body>
-        <nav className="flex items-center justify-between p-4">
-          <Link to="/" className="text-lg font-bold font-serif">
-            👨‍⚕️ physician.fyi 🔍
-          </Link>
-          <div className="flex items-center gap-2">
-            <Link to="/about" className="text-md font-bold">
-              About
+      <body className="flex flex-col justify-between min-h-screen">
+        <div>
+          <nav className="flex items-center justify-between p-4">
+            <Link to="/" className="text-lg font-bold font-serif">
+              👨‍⚕️ physician.fyi 🔍
             </Link>
-            <Link to="/what-to-do" className="text-md font-bold">
-              What to do
-            </Link>
-          </div>
-        </nav>
+            <div className="flex items-center gap-2">
+              <Link to="/about" className="text-md font-bold">
+                About
+              </Link>
+              <Link to="/what-to-do" className="text-md font-bold">
+                What to do
+              </Link>
+              <Link to="/contact" className="text-md font-bold">
+                Contact
+              </Link>
+            </div>
+          </nav>
 
-        <Outlet />
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload />
+          <Outlet />
+          <ScrollRestoration />
+          <Scripts />
+          <LiveReload />
+        </div>
+
+        <footer className="bg-white rounded-lg shadow m-4 dark:bg-gray-800">
+          <div className="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between">
+            <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">
+              © 2023{" "}
+              <Link to="/" className="text-md font-medium">
+                physician.fyi
+              </Link>
+              . All rights reserved.
+            </span>
+            <ul className="flex gap-2 flex-wrap items-center mt-3 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0">
+              <li>
+                <Link to="/about" className="text-md font-medium">
+                  About
+                </Link>
+              </li>
+              <li>
+                <Link to="/what-to-do" className="text-md font-medium">
+                  What to do
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="text-md font-medium">
+                  API Access
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="text-md font-medium">
+                  Contact
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </footer>
       </body>
     </html>
   );

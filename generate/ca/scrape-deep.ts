@@ -61,14 +61,15 @@ import fs from "fs";
             .trim()
             .split("school name: ")[1]
             ?.trim();
-          profile.graduationYear = Number(
-            document
-              .getElementById("gradYear")
-              ?.innerText.toLowerCase()
-              .trim()
-              .split("graduation year: ")[1]
-              ?.trim()
-          );
+          const graduationYear = document
+            .getElementById("gradYear")
+            ?.innerText.toLowerCase()
+            .trim()
+            .split("graduation year: ")[1]
+            ?.trim();
+          if (graduationYear) {
+            profile.graduationYear = Number(graduationYear);
+          }
           // TODO Can just get previous names here instead of combining in shallow scrape
           const address = document
             .getElementById("address")

@@ -35,6 +35,7 @@ import fs from "fs";
   // Not doing geospatial ones right now because might not need
 
   for (let [, v] of Object.entries<any>(profiles)) {
+    // Only difference with using just DCA as data source is there are no unlicensed ones
     const licenseType = v.licenseType;
     if (!licenseTypes.includes(licenseType)) {
       licenseTypes.push(licenseType);
