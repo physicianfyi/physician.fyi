@@ -48,6 +48,10 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
   let { results: availableSchools, counts: availableSchoolCounts } =
     summarizedData.schools;
 
+  const specialties = JSON.parse(url.searchParams.get("a") ?? "[]");
+  let { results: availableSpecialties, counts: availableSpecialtyCounts } =
+    summarizedData.specialties;
+
   const offenses = JSON.parse(url.searchParams.get("o") ?? "[]");
   let { results: availableOffenses, counts: availableOffenseCounts } =
     summarizedData.offenses ?? { results: [], counts: {} };
@@ -67,6 +71,7 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
     actionTypes: types.map((t: number) => availableTypes[t]),
     licenseTypes: licenseTypes.map((t: number) => availableLicenseTypes[t]),
     schools: schools.map((s: number) => availableSchools[s]),
+    specialties: specialties.map((a: number) => availableSpecialties[a]),
     offenses: offenses.map((o: number) => availableOffenses[o]),
   });
 
@@ -78,6 +83,8 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
     availableLicenseTypeCounts,
     availableSchools,
     availableSchoolCounts,
+    availableSpecialties,
+    availableSpecialtyCounts,
     availableOffenses,
     availableOffenseCounts,
   };
@@ -100,6 +107,10 @@ export default function Index() {
     () => JSON.parse(params.get("s") ?? "[]"),
     [params]
   );
+  let specialties: number[] = useMemo(
+    () => JSON.parse(params.get("a") ?? "[]"),
+    [params]
+  );
   let offenses: number[] = useMemo(
     () => JSON.parse(params.get("o") ?? "[]"),
     [params]
@@ -113,6 +124,8 @@ export default function Index() {
     availableLicenseTypeCounts,
     availableSchools,
     availableSchoolCounts,
+    availableSpecialties,
+    availableSpecialtyCounts,
     availableOffenses,
     availableOffenseCounts,
   } = useLoaderData<typeof loader>();
@@ -141,6 +154,14 @@ export default function Index() {
   });
   const schoolValues = schoolSelect.useState("value");
   const schoolMounted = schoolSelect.useState("mounted");
+
+  const specialtySelect = Ariakit.useSelectStore({
+    // @ts-ignore ariakit TS issue
+    defaultValue: specialties,
+    focusLoop: true,
+  });
+  const specialtyValues = specialtySelect.useState("value");
+  const specialtyMounted = specialtySelect.useState("mounted");
 
   const offenseSelect = Ariakit.useSelectStore({
     // @ts-ignore ariakit TS issue
@@ -188,6 +209,18 @@ export default function Index() {
       });
     }
   }, [submit, schoolValues, schools]);
+  useEffect(() => {
+    if (
+      specialties.length !== specialtyValues.length ||
+      // @ts-ignore ariakit TS issue
+      specialties.some((value, index) => value !== specialtyValues[index])
+    ) {
+      submit(filterRef.current, {
+        // TODO For some reason not working here or as Form prop
+        preventScrollReset: true,
+      });
+    }
+  }, [submit, specialtyValues, specialties]);
   useEffect(() => {
     if (
       offenses.length !== offenseValues.length ||
@@ -240,6 +273,12 @@ export default function Index() {
           hidden
         />
         <input name="s" value={JSON.stringify(schoolValues)} readOnly hidden />
+        <input
+          name="a"
+          value={JSON.stringify(specialtyValues)}
+          readOnly
+          hidden
+        />
         <input name="o" value={JSON.stringify(offenseValues)} readOnly hidden />
 
         <div className="flex flex-col gap-1">
@@ -444,6 +483,73 @@ export default function Index() {
           <div className="flex items-end justify-between">
             <Ariakit.SelectLabel
               className="text-sm font-medium"
+              store={specialtySelect}
+            >
+              Specialty
+            </Ariakit.SelectLabel>
+            {specialtyValues.length > 0 && (
+              <button
+                type="button"
+                className="text-xs hover:underline"
+                onClick={() => {
+                  specialtySelect.setValue([]);
+                }}
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          <Ariakit.Select
+            store={specialtySelect}
+            className="flex justify-between items-center py-2.5 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+          >
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* @ts-ignore */}
+              {specialtyValues.map((v) => (
+                <div
+                  key={v}
+                  className="flex items-center gap-1 bg-blue-100 whitespace-nowrap text-blue-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"
+                >
+                  <div>{availableSpecialties[v]}</div>
+                  <div className="bg-white rounded-full px-1">
+                    {availableSpecialtyCounts[availableSpecialties[v]]}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <Ariakit.SelectArrow />
+          </Ariakit.Select>
+          {specialtyMounted && (
+            <Ariakit.SelectPopover
+              store={specialtySelect}
+              gutter={4}
+              sameWidth
+              className="select-popover"
+            >
+              {Object.keys(availableSpecialtyCounts).map((key: string) => (
+                <Ariakit.SelectItem
+                  key={`specialty-${key}`}
+                  // @ts-ignore TODO File ticket with ariakit to allow number
+                  value={availableSpecialties.indexOf(key)}
+                  className="select-item"
+                >
+                  <Ariakit.SelectItemCheck />
+                  <div className="[&>*]:align-middle">
+                    <span>{key === "null" ? "N/A" : key} </span>
+                    <span className="bg-white rounded-full px-1 text-black text-xs">
+                      {availableSpecialtyCounts[key]}
+                    </span>
+                  </div>
+                </Ariakit.SelectItem>
+              ))}
+            </Ariakit.SelectPopover>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <div className="flex items-end justify-between">
+            <Ariakit.SelectLabel
+              className="text-sm font-medium"
               store={offenseSelect}
             >
               Offense
@@ -627,13 +733,13 @@ export default function Index() {
         <ResponsiveContainer width="100%" height={300}>
           <LineChart id={id} data={data.chartData}>
             <Line
-              type="natural"
+              type="monotone"
               dataKey="v.actions"
               stroke="#8884d8"
               name="Actions"
             />
             <Line
-              type="natural"
+              type="monotone"
               dataKey="v.physicians"
               stroke="#82ca9d"
               animationDuration={300}
@@ -796,6 +902,12 @@ export default function Index() {
           <input
             name="s"
             value={JSON.stringify(schoolValues)}
+            readOnly
+            hidden
+          />
+          <input
+            name="a"
+            value={JSON.stringify(specialtyValues)}
             readOnly
             hidden
           />

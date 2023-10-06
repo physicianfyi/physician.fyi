@@ -36,7 +36,7 @@ const PAGE_URL = "https://search.dca.ca.gov/advanced";
   );
 
   // TODO Add state to summarize and only go through top couple states since it takes days otherwise for minimal return
-  const startIndex = states.findIndex((e) => e === "LA_cities");
+  const startIndex = states.findIndex((e) => e === "MS_cities");
   for (let state of states.slice(startIndex)) {
     console.log({ state });
     // Need to go through cities instead of counties since LA county has > 1k results

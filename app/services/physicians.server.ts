@@ -11,6 +11,7 @@ export const selectPhysicians = async ({
   actionTypes = [],
   licenseTypes = [],
   schools = [],
+  specialties = [],
   offenses = [],
 }: {
   page?: number;
@@ -18,6 +19,7 @@ export const selectPhysicians = async ({
   actionTypes?: string[];
   licenseTypes?: string[];
   schools?: string[];
+  specialties?: string[];
   offenses?: string[];
 }) => {
   const data = JSON.parse(fs.readFileSync("data/ca/clean.json", "utf8"));
@@ -52,6 +54,17 @@ export const selectPhysicians = async ({
   if (schools.length) {
     results = results.filter((result) => {
       if (schools.includes(result.data.school)) {
+        return true;
+      }
+      return false;
+    });
+  }
+
+  if (specialties.length) {
+    results = results.filter((result) => {
+      if (
+        specialties.includes(result.data.survey?.["PRIMARY AREA OF PRACTICE"])
+      ) {
         return true;
       }
       return false;

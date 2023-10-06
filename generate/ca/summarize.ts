@@ -32,6 +32,8 @@ import fs from "fs";
   const graduationYearCounts: any = {};
   const actionTypes: string[] = data.actionTypes?.results ?? [];
   const actionTypeCounts: any = {};
+  const specialties: string[] = data.specialties?.results ?? [];
+  const specialtyCounts: any = {};
   // This is more just for internal use to see what states we need to scrape shallowly to cover most
   const states: string[] = data.states?.results ?? [];
   const stateCounts: any = {};
@@ -88,6 +90,15 @@ import fs from "fs";
       }
     }
 
+    let specialty = v.survey?.["PRIMARY AREA OF PRACTICE"];
+    if (specialty === "DECLINE TO STATE" || !specialty) {
+      specialty = null;
+    }
+    if (!specialties.includes(specialty)) {
+      specialties.push(specialty);
+    }
+    specialtyCounts[specialty] = (specialtyCounts[specialty] ?? 0) + 1;
+
     let state = v.state;
     if (state === "n/a" || !state) {
       state = null;
@@ -141,6 +152,13 @@ import fs from "fs";
       results: actionTypes,
       counts: Object.fromEntries(
         Object.entries<any>(actionTypeCounts).sort(([, a], [, b]) => b - a)
+      ),
+    },
+    specialties: {
+      numResults: specialties.length,
+      results: specialties,
+      counts: Object.fromEntries(
+        Object.entries<any>(specialtyCounts).sort(([, a], [, b]) => b - a)
       ),
     },
     states: {
