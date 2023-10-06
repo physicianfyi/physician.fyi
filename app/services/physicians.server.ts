@@ -63,7 +63,12 @@ export const selectPhysicians = async ({
   if (specialties.length) {
     results = results.filter((result) => {
       if (
-        specialties.includes(result.data.survey?.["PRIMARY AREA OF PRACTICE"])
+        specialties.includes(
+          result.data.survey?.["PRIMARY AREA OF PRACTICE"]
+        ) ||
+        result.data.survey?.["SECONDARY AREA OF PRACTICE"]?.some((a: string) =>
+          specialties.includes(a)
+        )
       ) {
         return true;
       }

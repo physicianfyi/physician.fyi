@@ -99,6 +99,22 @@ import fs from "fs";
     }
     specialtyCounts[specialty] = (specialtyCounts[specialty] ?? 0) + 1;
 
+    let secondSpecialties = v.survey?.["SECONDARY AREA OF PRACTICE"] ?? [];
+    for (let secondSpecialty of secondSpecialties) {
+      if (
+        secondSpecialty === "DECLINE TO STATE" ||
+        secondSpecialty === "NOT APPLICABLE" ||
+        !secondSpecialty
+      ) {
+        secondSpecialty = null;
+      }
+      if (!specialties.includes(secondSpecialty)) {
+        specialties.push(secondSpecialty);
+      }
+      specialtyCounts[secondSpecialty] =
+        (specialtyCounts[secondSpecialty] ?? 0) + 1;
+    }
+
     let state = v.state;
     if (state === "n/a" || !state) {
       state = null;

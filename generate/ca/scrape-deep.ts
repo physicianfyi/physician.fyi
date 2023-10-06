@@ -30,11 +30,14 @@ import fs from "fs";
   // Set screen size
   await page.setViewport({ width: 1080, height: 1024 });
 
-  for (let [license, profile] of Object.entries<any>(profiles).slice(0, 2000)) {
+  for (let [license, profile] of Object.entries<any>(profiles).slice(
+    2000,
+    2250
+  )) {
     if (profile.fetch) {
       // Navigate the page to a URL
       await page.goto(`${data.baseUrl}${profile.licenseUrl}`);
-      console.log(await page.title());
+      console.log(license);
 
       // Need to pass baseActions separately due to esbuild error
       const deepProfile = await page.evaluate(
@@ -520,7 +523,10 @@ import fs from "fs";
             } else if (
               question === "PRIMARY PRACTICE LOCATION" ||
               question === "SECONDARY PRACTICE LOCATION" ||
-              question === "ABMS CERTIFICATIONS"
+              question === "ABMS CERTIFICATIONS" ||
+              question === "SECONDARY AREA OF PRACTICE" ||
+              question === "RACE" ||
+              question === "ARE YOU HISPANIC, LATINO/A, OR OF SPANISH ORIGIN?"
             ) {
               answer = answer.split("\n");
             }

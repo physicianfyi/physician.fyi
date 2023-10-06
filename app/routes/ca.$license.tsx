@@ -38,7 +38,11 @@ export default function Route() {
         {profile.graduationYear && `, class of ${profile.graduationYear}`}
       </h3>
       {profile.survey?.["PRIMARY AREA OF PRACTICE"] && (
-        <h4>Specialty: {profile.survey["PRIMARY AREA OF PRACTICE"]}</h4>
+        <h4>
+          Specialty: {profile.survey["PRIMARY AREA OF PRACTICE"]}
+          {profile.survey?.["SECONDARY AREA OF PRACTICE"] && ", "}
+          {profile.survey?.["SECONDARY AREA OF PRACTICE"]?.join(", ")}
+        </h4>
       )}
 
       <ul className="gap-2 flex flex-col">
