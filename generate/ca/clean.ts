@@ -38,7 +38,7 @@ import fs from "fs";
           contentArbitrationAward: "ARBITRATION AWARD",
           contentFelonyConviction: "FELONY",
           contentMalpracticeJudgment: "MALPRACTICE JUDGEMENT",
-          contentMisdemeanorConviction: "MIDEMEANOR",
+          contentMisdemeanorConviction: "MISDEMEANOR",
           contentAdministrativeCitationIssued: "CITATION",
           contentHospitalDisciplinaryAction: "HOSPITAL DISCIPLINE",
           contentProbationaryLicense: "PROBATION",

@@ -5,6 +5,8 @@
 import fs from "fs";
 import { delay } from "../util";
 
+// TODO Archive the license pages too and mark for rearchival when they change
+
 (async () => {
   const data = JSON.parse(fs.readFileSync("data/ca/scrape-deep.json", "utf8"));
   let archive: any = { pdfs: {} };

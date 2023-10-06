@@ -1,8 +1,15 @@
-import type { DataFunctionArgs } from "@remix-run/node";
+import type { DataFunctionArgs, LinksFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { DiscussionEmbed } from "disqus-react";
 import fs from "fs";
+
+export const links: LinksFunction = () => [
+  {
+    rel: "icon",
+    href: "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔍</text></svg>",
+  },
+];
 
 export const loader = async ({
   request,
