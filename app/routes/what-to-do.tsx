@@ -6,7 +6,9 @@ export default function Route() {
       <ol>
         <li>
           Request all medical records from the doctor. This should include all
-          consent forms you've signed.
+          consent forms you've signed. Try to do everything by email if possible
+          for a paper trail. Email again if any records are missed. The doctor
+          is allowed to charge nothing more than a small clerical fee.
         </li>
         <li>
           Consult a medical malpractice lawyer immediately. The statute of
@@ -22,7 +24,10 @@ export default function Route() {
           >
             adverse event report with the FDA
           </a>
-          , which compels the manufacturer to investigate.
+          , which compels the manufacturer to investigate and publicly respond
+          with their analysis within a month. Leave your email in that form so
+          that the manufacturer can contact you for additional data—your email
+          will not be made public.
         </li>
         <li>
           File a complaint with the medical board in the state you were harmed
@@ -49,15 +54,6 @@ export default function Route() {
           it based on the FTC Consumer Review Fairness Act, which says any NDA
           you sign prior to service is illegal and has the potential to
           invalidate the entire contract.
-        </li>
-        <li>
-          Sign our petition to make the National Practitioner Databank, a
-          federal repository of medical malpractice payments and adverse actions
-          related to doctors, public. It purports to have a mission "to improve
-          health care quality, protect the public, and reduce health care fraud
-          and abuse in the U.S.", but it explicitly excludes the very patients
-          who would benefit most from seeing doctors' malpractices from gaining
-          access.
         </li>
         {/* <li>
           If your complaint was closed without action, you are welcome to send

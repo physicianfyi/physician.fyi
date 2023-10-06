@@ -57,6 +57,23 @@ export default function App() {
           <LiveReload />
         </div>
 
+        <div className="bg-yellow-400 text-gray-900 rounded px-4 py-3 font-medium mx-4">
+          <a
+            href="https://chng.it/vKhKQKx9T9"
+            target="_blank"
+            rel="noreferrer"
+            className="hover:font-bold focus-visible:font-bold underline"
+          >
+            Sign our petition
+          </a>{" "}
+          to make the National Practitioner Databank public. It's a federal
+          repository of medical malpractice payments and adverse actions related
+          to doctors. It purports to have a mission "to improve health care
+          quality, protect the public, and reduce health care fraud and abuse in
+          the U.S.", but it explicitly excludes the very patients who would
+          benefit most from seeing findings against doctors from gaining access.
+        </div>
+
         <footer className="bg-white rounded-lg shadow m-4 dark:bg-gray-800">
           <div className="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between">
             <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">
