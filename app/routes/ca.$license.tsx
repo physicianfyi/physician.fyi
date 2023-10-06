@@ -1,6 +1,7 @@
 import type { DataFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
+import { DiscussionEmbed } from "disqus-react";
 import fs from "fs";
 
 export const loader = async ({
@@ -70,6 +71,18 @@ export default function Route() {
           );
         })}
       </ul>
+
+      <DiscussionEmbed
+        shortname="physician-fyi"
+        config={
+          {
+            // url: this.props.article.url,
+            // identifier: this.props.article.id,
+            // title: this.props.article.title,
+            // language: 'zh_TW' //e.g. for Traditional Chinese (Taiwan)
+          }
+        }
+      />
     </div>
   );
 }
