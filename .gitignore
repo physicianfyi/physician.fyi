@@ -10,3 +10,5 @@ node_modules
 data/*/pdfs
 data/*/pngs
 data/*/txts
+
+eng.traineddata
