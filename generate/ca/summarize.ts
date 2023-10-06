@@ -1,5 +1,5 @@
 /**
- * Step 3: Enumerate filterable fields and get counts of actions involving them
+ * Step 3: Enumerate filterable fields and get counts of physicians involving them
  * Maps type to number to shorten URL via index and doesn't remap existing ones on subsequent runs
  */
 
@@ -43,7 +43,6 @@ import fs from "fs";
     if (!licenseTypes.includes(licenseType)) {
       licenseTypes.push(licenseType);
     }
-    // TODO Some counts should be by number of actions once available
     licenseTypeCounts[licenseType] = (licenseTypeCounts[licenseType] ?? 0) + 1;
 
     const licenseStatus = v.licenseStatus;
@@ -75,12 +74,17 @@ import fs from "fs";
       (graduationYearCounts[graduationYear] ?? 0) + 1;
 
     const actions = v.actions ?? [];
+    // Count by number of physicians with an action type, not by number of actions with it
+    const currentActionTypes = new Set();
     for (let a of actions) {
       if (!actionTypes.includes(a.actionType)) {
         actionTypes.push(a.actionType);
       }
-      actionTypeCounts[a.actionType] =
-        (actionTypeCounts[a.actionType] ?? 0) + 1;
+      if (!currentActionTypes.has(a.actionType)) {
+        actionTypeCounts[a.actionType] =
+          (actionTypeCounts[a.actionType] ?? 0) + 1;
+        currentActionTypes.add(a.actionType);
+      }
     }
 
     const state = v.state;

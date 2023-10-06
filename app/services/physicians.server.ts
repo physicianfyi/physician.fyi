@@ -37,24 +37,15 @@ export const selectPhysicians = async ({
     });
   }
 
-  // if (licenseTypes.length) {
-  //   results = results.filter((result) => {
-  //     for (let d of result.data) {
-  //       // TODO ca-grouped does not currently have unlicensed ones
-  //       // Fall back to find unlicensed case
-  //       const type =
-  //         d["License Type"] === "\u00A0"
-  //           ? null
-  //           : !d["License Type"]
-  //           ? null
-  //           : d["License Type"];
-  //       if (licenseTypes.includes(type)) {
-  //         return true;
-  //       }
-  //     }
-  //     return false;
-  //   });
-  // }
+  if (licenseTypes.length) {
+    results = results.filter((result) => {
+      // Only have licensed ones right now, so need to fix if adding unlicensed
+      if (licenseTypes.includes(result.data.licenseType)) {
+        return true;
+      }
+      return false;
+    });
+  }
 
   // if (offenses.length) {
   //   results = results.filter((result) => {
@@ -69,29 +60,16 @@ export const selectPhysicians = async ({
   //   });
   // }
 
-  // if (query) {
-  //   const options = {
-  //     includeScore: false,
-  //     keys: [
-  //       // {
-  //       //   name: "fullName",
-  //       //   getFn: (r: any) => `${r.data["First Name"]} ${r.data["Last Name"]}`,
-  //       // },
-  //       ["data", "First Name"],
-  //       ["data", "Middle Name"],
-  //       ["data", "Last Name"],
-  //       // TODO This should not be 'full-text-searchable' because numbers being close doesn't mean anything
-  //       // {
-  //       //   name: "fullLicense",
-  //       //   getFn: (r: any) => `${r["License Type"]}${r["License Number"]}`,
-  //       // },
-  //     ],
-  //   };
+  if (query) {
+    const options = {
+      includeScore: false,
+      keys: query.match(/^[a-zA-Z] [0-9]+$/) ? ["license"] : [["data", "name"]],
+    };
 
-  //   const fuse = new Fuse(results, options);
+    const fuse = new Fuse(results, options);
 
-  //   results = fuse.search(query).map((r) => r.item);
-  // }
+    results = fuse.search(query).map((r) => r.item);
+  }
 
   const chartData = results.reduce<any>((acc, curr) => {
     for (let i = 0; i < curr.data.actions?.length; i++) {

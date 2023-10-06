@@ -39,7 +39,6 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
   const types = JSON.parse(url.searchParams.get("t") ?? "[]");
   const { results: availableTypes, counts: availableTypeCounts } =
     summarizedData.actionTypes;
-  console.log(availableTypes);
 
   const licenseTypes = JSON.parse(url.searchParams.get("l") ?? "[]");
   const { results: availableLicenseTypes, counts: availableLicenseTypeCounts } =
@@ -249,18 +248,18 @@ export default function Index() {
               sameWidth
               className="select-popover"
             >
-              {availableTypes.map((value: string, index: number) => (
+              {Object.keys(availableTypeCounts).map((key: string) => (
                 <Ariakit.SelectItem
-                  key={`action-${value}`}
+                  key={`action-${key}`}
                   // @ts-ignore TODO File ticket with ariakit to allow number
-                  value={index}
+                  value={availableTypes.indexOf(key)}
                   className="select-item"
                 >
                   <Ariakit.SelectItemCheck />
                   <div className="[&>*]:align-middle">
-                    <span>{value} </span>
+                    <span>{key} </span>
                     <span className="bg-white rounded-full px-1 text-black text-xs">
-                      {availableTypeCounts[value]}
+                      {availableTypeCounts[key]}
                     </span>
                   </div>
                 </Ariakit.SelectItem>
@@ -316,18 +315,18 @@ export default function Index() {
               sameWidth
               className="select-popover"
             >
-              {availableLicenseTypes.map((value: string, index: number) => (
+              {Object.keys(availableLicenseTypeCounts).map((key: string) => (
                 <Ariakit.SelectItem
-                  key={`license-${value}`}
+                  key={`license-${key}`}
                   // @ts-ignore TODO File ticket with ariakit to allow number
-                  value={index}
+                  value={availableLicenseTypes.indexOf(key)}
                   className="select-item"
                 >
                   <Ariakit.SelectItemCheck />
                   <div className="[&>*]:align-middle">
-                    <span>{value ?? "Unlicensed"} </span>
+                    <span>{key ?? "Unlicensed"} </span>
                     <span className="bg-white rounded-full px-1 text-black text-xs">
-                      {availableLicenseTypeCounts[value]}
+                      {availableLicenseTypeCounts[key]}
                     </span>
                   </div>
                 </Ariakit.SelectItem>
