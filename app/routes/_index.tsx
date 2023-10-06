@@ -31,24 +31,33 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
   const url = new URL(request.url);
   const page = Number(url.searchParams.get("p") ?? 0);
   const query = url.searchParams.get("q") ?? "";
-  const types = JSON.parse(url.searchParams.get("t") ?? "[]");
-  const { results: availableTypes, counts: availableTypeCounts } = JSON.parse(
-    fs.readFileSync("data/types.json", "utf8")
+
+  const summarizedData = JSON.parse(
+    fs.readFileSync("data/ca/summarize.json", "utf8")
   );
+
+  const types = JSON.parse(url.searchParams.get("t") ?? "[]");
+  const { results: availableTypes, counts: availableTypeCounts } =
+    summarizedData.actionTypes;
+  console.log(availableTypes);
+
   const licenseTypes = JSON.parse(url.searchParams.get("l") ?? "[]");
   const { results: availableLicenseTypes, counts: availableLicenseTypeCounts } =
-    JSON.parse(fs.readFileSync("data/license-types.json", "utf8"));
+    summarizedData.licenseTypes;
+
   const offenses = JSON.parse(url.searchParams.get("o") ?? "[]");
   let { results: availableOffenses, counts: availableOffenseCounts } =
-    JSON.parse(fs.readFileSync("data/offenses.json", "utf8"));
+    summarizedData.offenses ?? { results: [], counts: {} };
+
   // Don't show filtering for ones with just 1 match
   availableOffenses = availableOffenses.filter((o: string) => {
     return availableOffenseCounts[o] >= 5;
   });
+
   const data = await selectPhysicians({
     page,
     query,
-    types: types.map((t: number) => availableTypes[t]),
+    actionTypes: types.map((t: number) => availableTypes[t]),
     licenseTypes: licenseTypes.map((t: number) => availableLicenseTypes[t]),
     offenses: offenses.map((o: number) => availableOffenses[o]),
   });
@@ -527,9 +536,9 @@ export default function Index() {
                 <div className="group-hover:bg-card group-focus-visible:bg-card py-1 rounded">
                   <div className="px-1 flex items-center gap-2 group-hover:font-medium group-focus-visible:font-medium">
                     <div>
-                      {data[0]["Last Name"]}, {data[0]["First Name"]}{" "}
-                      {data[0]["Middle Name"]}{" "}
-                      {data.length > 1 && `(${data.length} actions)`}
+                      {data.name}{" "}
+                      {(data.actions?.length ?? 0) > 1 &&
+                        `(${data.actions.length} actions)`}
                     </div>
                   </div>
                   <div className="flex items-start sm:items-end gap-1 sm:gap-0 justify-between flex-col sm:flex-row">
@@ -584,40 +593,43 @@ export default function Index() {
                       </svg>
                       {license.startsWith("UNLICENSED-") ? "N/A" : license}
                     </div>
-                    <div className="flex items-center gap-1 bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-1 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">
-                      <svg
-                        className="w-4 h-4"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 256 256"
-                      >
-                        <polyline
-                          points="128 80 128 128 168 152"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="24"
-                        />
-                        <polyline
-                          points="184 104 224 104 224 64"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="24"
-                        />
-                        <path
-                          d="M188.4,192a88,88,0,1,1,1.83-126.23C202,77.69,211.72,88.93,224,104"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="24"
-                        />
-                      </svg>
-                      {data.at(-1).Date}{" "}
-                      {data.length > 1 && `- ${data.at(0).Date}`}
-                    </div>
+                    {data.actions && (
+                      <div className="flex items-center gap-1 bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-1 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">
+                        <svg
+                          className="w-4 h-4"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 256 256"
+                        >
+                          <polyline
+                            points="128 80 128 128 168 152"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="24"
+                          />
+                          <polyline
+                            points="184 104 224 104 224 64"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="24"
+                          />
+                          <path
+                            d="M188.4,192a88,88,0,1,1,1.83-126.23C202,77.69,211.72,88.93,224,104"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="24"
+                          />
+                        </svg>
+                        {data.actions.at(0).date}{" "}
+                        {data.actions.length > 1 &&
+                          `- ${data.actions.at(-1).date}`}
+                      </div>
+                    )}
                   </div>
                 </div>
               </Link>

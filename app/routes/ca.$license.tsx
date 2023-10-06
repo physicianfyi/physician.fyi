@@ -18,45 +18,42 @@ export const loader = async ({
     );
   }
 
-  const data = JSON.parse(fs.readFileSync("data/ca-grouped.json", "utf8"));
+  const data = JSON.parse(fs.readFileSync("data/ca/clean.json", "utf8"));
 
-  const results = data.results[license];
+  const profile = data.profiles[license];
 
-  return { results, license };
+  return { profile, license };
 };
 
 export default function Route() {
   // const params = useParams()
-  const { results, license } = useLoaderData<typeof loader>();
+  const { profile, license } = useLoaderData<typeof loader>();
 
   return (
     <div className="p-8 flex flex-col gap-4">
       <h1>CA {license}</h1>
+      <h2>{profile.name}</h2>
       <ul className="gap-2 flex flex-col">
-        {results.map((r: any) => {
-          const url = `https://www2.mbc.ca.gov/PDL/document.aspx?path=${encodeURIComponent(
-            r.DIDOCS
-          )}&did=${r["\xa0"]}`;
+        {profile.actions?.map((r: any) => {
           return (
-            <li key={r["\xa0"]} className="border-2 p-2">
-              <div>
-                {r["Last Name"]}, {r["First Name"]} {r["Middle Name"]}
-              </div>
-              <div>{r["Type"]}</div>
-              <a
-                href={`https://web.archive.org/web/0/${url}`}
-                target="_blank"
-                rel="noreferrer"
-                className="font-medium"
-              >
-                View PDF
-              </a>
+            <li key={`${r.actionType}${r.date}`} className="border-2 p-2">
+              <div>{r.actionType}</div>
+              {r.url && (
+                <a
+                  href={`https://web.archive.org/web/0/${r.url}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-medium"
+                >
+                  View PDF
+                </a>
+              )}
               <ul className="list-disc list-inside">
                 {r["Offenses"]?.map((o: string) => (
                   <li key={o}>{o}</li>
                 ))}
               </ul>
-              <div>{r.Date}</div>
+              <div>{r.date}</div>
             </li>
           );
         })}
