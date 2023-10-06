@@ -32,6 +32,9 @@ import fs from "fs";
   const graduationYearCounts: any = {};
   const actionTypes: string[] = data.actionTypes?.results ?? [];
   const actionTypeCounts: any = {};
+  // This is more just for internal use to see what states we need to scrape shallowly to cover most
+  const states: string[] = data.states?.results ?? [];
+  const stateCounts: any = {};
   // Not doing geospatial ones right now because might not need
 
   for (let [, v] of Object.entries<any>(profiles)) {
@@ -79,6 +82,12 @@ import fs from "fs";
       actionTypeCounts[a.actionType] =
         (actionTypeCounts[a.actionType] ?? 0) + 1;
     }
+
+    const state = v.state;
+    if (!states.includes(state)) {
+      states.push(state);
+    }
+    stateCounts[state] = (stateCounts[state] ?? 0) + 1;
   }
 
   const json = {
@@ -124,6 +133,13 @@ import fs from "fs";
       results: actionTypes,
       counts: Object.fromEntries(
         Object.entries<any>(actionTypeCounts).sort(([, a], [, b]) => b - a)
+      ),
+    },
+    states: {
+      numResults: states.length,
+      results: states,
+      counts: Object.fromEntries(
+        Object.entries<any>(stateCounts).sort(([, a], [, b]) => b - a)
       ),
     },
   };

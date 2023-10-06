@@ -187,6 +187,16 @@
       font-size: 16px;
     }
   }
+
+  .select-popover {
+    @apply z-50 flex flex-col bg-popover border-border border rounded p-2 overflow-auto overscroll-contain;
+    max-height: min(var(--popover-available-height, 300px), 300px);
+    max-width: max(var(--popover-available-width, 300px), 300px);
+  }
+
+  .select-item {
+    @apply scroll-m-2 p-1 flex items-center gap-2 cursor-pointer data-[active-item]:bg-accent rounded-sm aria-selected:bg-accent/50;
+  }
 }
 
 @layer components {

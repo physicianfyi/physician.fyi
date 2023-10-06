@@ -1,8 +1,4 @@
-import {
-  redirect,
-  type DataFunctionArgs,
-  type MetaFunction,
-} from "@remix-run/node";
+import { type DataFunctionArgs, type MetaFunction } from "@remix-run/node";
 import {
   Form,
   Link,
@@ -18,7 +14,6 @@ import { useEffect, useId, useMemo, useRef } from "react";
 import {
   LineChart,
   Line,
-  CartesianGrid,
   XAxis,
   YAxis,
   ResponsiveContainer,
@@ -101,6 +96,7 @@ export default function Index() {
   const select = Ariakit.useSelectStore({
     // @ts-ignore ariakit TS issue
     defaultValue: types,
+    focusLoop: true,
   });
   const typeValues = select.useState("value");
   const mounted = select.useState("mounted");
@@ -108,6 +104,7 @@ export default function Index() {
   const licenseTypeSelect = Ariakit.useSelectStore({
     // @ts-ignore ariakit TS issue
     defaultValue: licenseTypes,
+    focusLoop: true,
   });
   const licenseTypeValues = licenseTypeSelect.useState("value");
   const licenseTypeMounted = licenseTypeSelect.useState("mounted");
@@ -115,6 +112,7 @@ export default function Index() {
   const offenseSelect = Ariakit.useSelectStore({
     // @ts-ignore ariakit TS issue
     defaultValue: offenses,
+    focusLoop: true,
   });
   const offenseValues = offenseSelect.useState("value");
   const offenseMounted = offenseSelect.useState("mounted");
@@ -127,7 +125,10 @@ export default function Index() {
       // @ts-ignore ariakit TS issue
       types.some((value, index) => value !== typeValues[index])
     ) {
-      submit(filterRef.current);
+      submit(filterRef.current, {
+        // TODO For some reason not working here or as Form prop
+        preventScrollReset: true,
+      });
     }
   }, [submit, typeValues, types]);
   useEffect(() => {
@@ -237,18 +238,14 @@ export default function Index() {
               store={select}
               gutter={4}
               sameWidth
-              className="z-50 flex flex-col bg-popover border-gray-200 border rounded p-2 overflow-auto overscroll-contain"
-              style={{
-                maxHeight: "min(var(--popover-available-height, 300px), 300px)",
-                maxWidth: "max(var(--popover-available-width, 300px), 300px)",
-              }}
+              className="select-popover"
             >
               {availableTypes.map((value: string, index: number) => (
                 <Ariakit.SelectItem
                   key={`action-${value}`}
                   // @ts-ignore TODO File ticket with ariakit to allow number
                   value={index}
-                  className="px-1 rounded flex items-center gap-2 cursor-pointer hover:bg-blue-500 hover:text-white aria-selected:bg-blue-200 aria-selected:text-white"
+                  className="select-item"
                 >
                   <Ariakit.SelectItemCheck />
                   <div className="[&>*]:align-middle">
@@ -308,18 +305,14 @@ export default function Index() {
               store={licenseTypeSelect}
               gutter={4}
               sameWidth
-              className="z-50 flex flex-col bg-popover border-gray-200 border rounded p-2 overflow-auto overscroll-contain"
-              style={{
-                maxHeight: "min(var(--popover-available-height, 300px), 300px)",
-                maxWidth: "max(var(--popover-available-width, 300px), 300px)",
-              }}
+              className="select-popover"
             >
               {availableLicenseTypes.map((value: string, index: number) => (
                 <Ariakit.SelectItem
                   key={`license-${value}`}
                   // @ts-ignore TODO File ticket with ariakit to allow number
                   value={index}
-                  className="px-1 rounded flex items-center gap-2 cursor-pointer hover:bg-blue-500 hover:text-white aria-selected:bg-blue-200 aria-selected:text-white"
+                  className="select-item"
                 >
                   <Ariakit.SelectItemCheck />
                   <div className="[&>*]:align-middle">
@@ -379,18 +372,14 @@ export default function Index() {
               store={offenseSelect}
               gutter={4}
               sameWidth
-              className="z-50 flex flex-col bg-popover border-gray-200 border rounded p-2 overflow-auto overscroll-contain"
-              style={{
-                maxHeight: "min(var(--popover-available-height, 300px), 300px)",
-                maxWidth: "max(var(--popover-available-width, 300px), 300px)",
-              }}
+              className="select-popover"
             >
               {availableOffenses.map((value: string, index: number) => (
                 <Ariakit.SelectItem
                   key={`license-${value}`}
                   // @ts-ignore TODO File ticket with ariakit to allow number
                   value={index}
-                  className="px-1 rounded flex items-center gap-2 cursor-pointer hover:bg-blue-500 hover:text-white aria-selected:bg-blue-200 aria-selected:text-white"
+                  className="select-item"
                 >
                   <Ariakit.SelectItemCheck />
                   <div className="[&>*]:align-middle">
