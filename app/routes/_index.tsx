@@ -247,6 +247,14 @@ export default function Index() {
         Just California for now—more states coming soon
       </div>
 
+      <h2 id="filters">
+        Filters{" "}
+        <span className="text-xs">
+          Adding options within a filter "or"s them; adding options between
+          filters "ands" them
+        </span>
+      </h2>
+
       <Form
         method="GET"
         className="flex flex-col gap-4"
