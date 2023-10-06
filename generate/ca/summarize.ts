@@ -60,13 +60,14 @@ import fs from "fs";
       secondaryStatusCounts[s] = (secondaryStatusCounts[s] ?? 0) + 1;
     }
 
-    const school = v.school;
+    const school = v.school ?? null;
     if (!schools.includes(school)) {
       schools.push(school);
     }
     schoolCounts[school] = (schoolCounts[school] ?? 0) + 1;
 
-    const graduationYear = v.graduationYear;
+    // undefined is stored as null in JSON so it would keep adding a null to possible years every run
+    const graduationYear = v.graduationYear ?? null;
     if (!graduationYears.includes(graduationYear)) {
       graduationYears.push(graduationYear);
     }
@@ -87,7 +88,10 @@ import fs from "fs";
       }
     }
 
-    const state = v.state;
+    let state = v.state;
+    if (state === "n/a" || !state) {
+      state = null;
+    }
     if (!states.includes(state)) {
       states.push(state);
     }

@@ -429,7 +429,7 @@ export default function Index() {
                 >
                   <Ariakit.SelectItemCheck />
                   <div className="[&>*]:align-middle">
-                    <span>{key === "undefined" ? "N/A" : key} </span>
+                    <span>{key === "null" ? "N/A" : key} </span>
                     <span className="bg-white rounded-full px-1 text-black text-xs">
                       {availableSchoolCounts[key]}
                     </span>
