@@ -10,12 +10,14 @@ export const selectPhysicians = async ({
   query = "",
   actionTypes = [],
   licenseTypes = [],
+  schools = [],
   offenses = [],
 }: {
   page?: number;
   query?: string;
   actionTypes?: string[];
   licenseTypes?: string[];
+  schools?: string[];
   offenses?: string[];
 }) => {
   const data = JSON.parse(fs.readFileSync("data/ca/clean.json", "utf8"));
@@ -41,6 +43,15 @@ export const selectPhysicians = async ({
     results = results.filter((result) => {
       // Only have licensed ones right now, so need to fix if adding unlicensed
       if (licenseTypes.includes(result.data.licenseType)) {
+        return true;
+      }
+      return false;
+    });
+  }
+
+  if (schools.length) {
+    results = results.filter((result) => {
+      if (schools.includes(result.data.school)) {
         return true;
       }
       return false;

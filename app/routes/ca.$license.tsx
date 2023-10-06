@@ -1,6 +1,6 @@
 import type { DataFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData, useParams } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import fs from "fs";
 
 export const loader = async ({
@@ -33,6 +33,10 @@ export default function Route() {
     <div className="p-8 flex flex-col gap-4">
       <h1>CA {license}</h1>
       <h2>{profile.name}</h2>
+      <h3>
+        {profile.school}
+        {profile.graduationYear && `, class of ${profile.graduationYear}`}
+      </h3>
       <ul className="gap-2 flex flex-col">
         {profile.actions?.map((r: any) => {
           return (
