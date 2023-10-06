@@ -72,12 +72,25 @@ export const selectPhysicians = async ({
   }
 
   const chartData = results.reduce<any>((acc, curr) => {
-    for (let i = 0; i < curr.data.actions?.length; i++) {
-      // For some reason some don't have date it seems
+    // Don't count multiple actions in the same year for number of physicians
+    const currentYears = new Set();
+    for (let i = 0; i < (curr.data.actions?.length ?? 0); i++) {
       const year = curr.data.actions[i].date?.split(",")[1].trim();
-      if (year) {
-        acc[year] = (acc[year] ?? 0) + 1;
+      if (!year) {
+        // console.error(curr);
+        continue;
       }
+
+      if (!acc[year]) {
+        acc[year] = {};
+      }
+
+      if (!currentYears.has(year)) {
+        acc[year].physicians = (acc[year].physicians ?? 0) + 1;
+        currentYears.add(year);
+      }
+
+      acc[year].actions = (acc[year].actions ?? 0) + 1;
     }
     return acc;
   }, {});

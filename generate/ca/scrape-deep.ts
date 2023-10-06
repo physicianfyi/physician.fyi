@@ -217,10 +217,16 @@ import fs from "fs";
                   .querySelector("#vMalpracticeJudgmentJudgmentAmount")
                   ?.innerText.toLowerCase()
                   .trim();
-                action.date = el
-                  .querySelector("#vMalpracticeJudgmentDateIssued")
-                  ?.innerText.toLowerCase()
-                  .trim();
+                action.date =
+                  el
+                    .querySelector("#vMalpracticeJudgmentDateIssued")
+                    ?.innerText.toLowerCase()
+                    .trim() ??
+                  // Some like 341380dc14dd33c1a7a41b7517f816b5 use another field
+                  el
+                    .querySelector("#vMalpracticeJudgmentDateofAction")
+                    ?.innerText.toLowerCase()
+                    .trim();
                 action.info = el
                   .querySelector("#vMalpracticeJudgmentAdditionalInformation")
                   ?.innerText.toLowerCase()

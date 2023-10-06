@@ -506,7 +506,11 @@ export default function Index() {
         <div>
           <span className="font-medium">
             {data.numResults} physicians with{" "}
-            {data.chartData.reduce((acc, curr) => acc + curr.v, 0)} actions
+            {data.chartData.reduce(
+              (acc, curr) => acc + (curr.v.actions ?? 0),
+              0
+            )}{" "}
+            actions
           </span>{" "}
           found
         </div>
@@ -516,8 +520,19 @@ export default function Index() {
 
         <ResponsiveContainer width="100%" height={300}>
           <LineChart id={id} data={data.chartData}>
-            <Line type="monotone" dataKey="v" stroke="#8884d8" />
-            {/* <CartesianGrid stroke="#ccc" /> */}
+            <Line
+              type="natural"
+              dataKey="v.actions"
+              stroke="#8884d8"
+              name="Actions"
+            />
+            <Line
+              type="natural"
+              dataKey="v.physicians"
+              stroke="#82ca9d"
+              animationDuration={300}
+              name="Physicians"
+            />
             <XAxis dataKey="k" />
             <YAxis />
             <Tooltip />
