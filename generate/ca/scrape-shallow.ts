@@ -39,7 +39,7 @@ const PAGE_URL = "https://search.dca.ca.gov/advanced";
   const startIndex = states.findIndex((e) => e === "MO_cities");
   for (let state of states.slice(startIndex)) {
     console.log({ state });
-    // Need to go through cities instead of counties since LA county has > 1k results
+    // Need to go through cities in CA instead of counties since LA county has > 1k results
     const cities = await page.evaluate(
       (state) =>
         Array.from(
@@ -48,9 +48,19 @@ const PAGE_URL = "https://search.dca.ca.gov/advanced";
       state
     );
 
-    for (let city of cities) {
-      console.log({ city });
-      await page.select("#cities", city);
+    const counties = await page.evaluate(
+      (state) =>
+        Array.from(
+          document.querySelectorAll(`#counties > #${state} > option`)
+        ).map((element: any) => element.value),
+      state
+    );
+
+    const geos = state === "CA_cities" ? cities : counties;
+
+    for (let geo of geos) {
+      console.log({ geo });
+      await page.select(state === "CA_cities" ? "#cities" : "#counties", geo);
       await page.select("#boardCode", "16");
       await page.select("#hasDiscipline", "Yes");
       await page.click("#srchSubmitHome");
