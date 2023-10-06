@@ -376,7 +376,9 @@ export default function Index() {
                   key={v}
                   className="flex items-center gap-1 bg-blue-100 whitespace-nowrap text-blue-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"
                 >
-                  <div>{availableLicenseTypes[v] ?? "Unlicensed"}</div>
+                  <div className="uppercase">
+                    {availableLicenseTypes[v] ?? "Unlicensed"}
+                  </div>
                   <div className="bg-white rounded-full px-1">
                     {availableLicenseTypeCounts[availableLicenseTypes[v]]}
                   </div>
@@ -401,7 +403,7 @@ export default function Index() {
                 >
                   <Ariakit.SelectItemCheck />
                   <div className="[&>*]:align-middle">
-                    <span>{key ?? "Unlicensed"} </span>
+                    <span className="uppercase">{key ?? "Unlicensed"} </span>
                     <span className="bg-white rounded-full px-1 text-black text-xs">
                       {availableLicenseTypeCounts[key]}
                     </span>
@@ -443,7 +445,7 @@ export default function Index() {
                   key={v}
                   className="flex items-center gap-1 bg-blue-100 whitespace-nowrap text-blue-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"
                 >
-                  <div>{availableSchools[v]}</div>
+                  <div className="uppercase">{availableSchools[v]}</div>
                   <div className="bg-white rounded-full px-1">
                     {availableSchoolCounts[availableSchools[v]]}
                   </div>
@@ -468,7 +470,9 @@ export default function Index() {
                 >
                   <Ariakit.SelectItemCheck />
                   <div className="[&>*]:align-middle">
-                    <span>{key === "null" ? "N/A" : key} </span>
+                    <span className="uppercase">
+                      {key === "null" ? "N/A" : key}{" "}
+                    </span>
                     <span className="bg-white rounded-full px-1 text-black text-xs">
                       {availableSchoolCounts[key]}
                     </span>
@@ -762,13 +766,14 @@ export default function Index() {
                 <div className="group-hover:bg-card group-focus-visible:bg-card py-1 rounded">
                   <div className="px-1 flex items-center gap-2 group-hover:font-medium group-focus-visible:font-medium">
                     <div>
-                      {data.name}{" "}
+                      <span className="uppercase">{data.name}</span>{" "}
                       {(data.actions?.length ?? 0) > 1 &&
                         `(${data.actions.length} actions)`}
                     </div>
                   </div>
                   <div className="flex items-start sm:items-end gap-1 sm:gap-0 justify-between flex-col sm:flex-row">
-                    <div className="px-1 font-medium flex items-center gap-1 text-xs text-gray-600">
+                    <div className="px-1 font-medium flex items-center gap-1 text-xs text-gray-600 uppercase">
+                      CA
                       <svg
                         className="w-4 h-4"
                         xmlns="http://www.w3.org/2000/svg"
@@ -820,7 +825,7 @@ export default function Index() {
                       {license.startsWith("UNLICENSED-") ? "N/A" : license}
                     </div>
                     {data.actions && (
-                      <div className="flex items-center gap-1 bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-1 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">
+                      <div className="uppercase flex items-center gap-1 bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-1 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">
                         <svg
                           className="w-4 h-4"
                           xmlns="http://www.w3.org/2000/svg"
@@ -853,6 +858,8 @@ export default function Index() {
                         </svg>
                         {data.actions.at(0).date}{" "}
                         {data.actions.length > 1 &&
+                          data.actions.at(-1).date !==
+                            data.actions.at(0).date &&
                           `- ${data.actions.at(-1).date}`}
                       </div>
                     )}

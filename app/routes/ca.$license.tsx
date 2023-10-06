@@ -53,57 +53,71 @@ export default function Route() {
 
   return (
     <div className="p-8 flex flex-col gap-4">
-      <h1>CA {license}</h1>
-      <h2>{profile.name}</h2>
-      <h3>
-        {profile.school}
-        {profile.graduationYear && `, class of ${profile.graduationYear}`}
-      </h3>
-      {profile.survey?.["PRIMARY AREA OF PRACTICE"] && (
-        <h4>
-          Specialty: {profile.survey["PRIMARY AREA OF PRACTICE"]}
-          {profile.survey?.["SECONDARY AREA OF PRACTICE"] && ", "}
-          {profile.survey?.["SECONDARY AREA OF PRACTICE"]?.join(", ")}
-        </h4>
-      )}
+      {/* Just so the disqus thing changing height doesn't show on load */}
+      <div className="min-h-screen flex flex-col gap-8">
+        <div className="">
+          <h1 className="uppercase">{profile.name}</h1>
+          <h4>
+            California License <span className="uppercase">{license}</span>
+          </h4>
 
-      <ul className="gap-2 flex flex-col">
-        {profile.actions?.map((r: any) => {
-          return (
-            <li key={`${r.actionType}${r.date}`} className="border-2 p-2">
-              <div>{r.actionType}</div>
-              {r.url && (
-                <a
-                  href={`https://web.archive.org/web/0/${r.url}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="font-medium"
-                >
-                  View PDF
-                </a>
-              )}
-              <ul className="list-disc list-inside">
-                {r.offenses?.map((o: string) => (
-                  <li key={o}>{o}</li>
-                ))}
-              </ul>
-              <div>{r.date}</div>
-            </li>
-          );
-        })}
-      </ul>
+          <h3 className="uppercase">
+            {profile.school}
+            {profile.graduationYear && `, class of ${profile.graduationYear}`}
+          </h3>
 
-      <DiscussionEmbed
-        shortname="physician-fyi"
-        config={
-          {
-            // url: this.props.article.url,
-            // identifier: this.props.article.id,
-            // title: this.props.article.title,
-            // language: 'zh_TW' //e.g. for Traditional Chinese (Taiwan)
+          {profile.survey?.["PRIMARY AREA OF PRACTICE"] && (
+            <h4>
+              Specialty: {profile.survey["PRIMARY AREA OF PRACTICE"]}
+              {profile.survey?.["SECONDARY AREA OF PRACTICE"] && ", "}
+              {profile.survey?.["SECONDARY AREA OF PRACTICE"]?.join(", ")}
+            </h4>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <h2 id="actions">Actions</h2>
+          <ul className="gap-2 flex flex-col">
+            {profile.actions?.map((r: any) => {
+              return (
+                <li key={`${r.actionType}${r.date}`} className="border-2 p-2">
+                  <div>{r.actionType}</div>
+                  {r.url && (
+                    <a
+                      href={`https://web.archive.org/web/0/${r.url}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-medium"
+                    >
+                      View PDF
+                    </a>
+                  )}
+                  <ul className="list-disc list-inside">
+                    {r.offenses?.map((o: string) => (
+                      <li key={o}>{o}</li>
+                    ))}
+                  </ul>
+                  <div>{r.date}</div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </div>
+
+      <div className="min-h-[362px]">
+        <DiscussionEmbed
+          shortname="physician-fyi"
+          config={
+            {
+              // url: this.props.article.url,
+              // identifier: this.props.article.id,
+              // title: this.props.article.title,
+              // language: 'zh_TW' //e.g. for Traditional Chinese (Taiwan)
+            }
           }
-        }
-      />
+        />
+      </div>
     </div>
   );
 }
