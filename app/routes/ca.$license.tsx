@@ -27,8 +27,22 @@ export const loader = async ({
   }
 
   const data = JSON.parse(fs.readFileSync("data/ca/clean.json", "utf8"));
-
   const profile = data.profiles[license];
+
+  const read = JSON.parse(fs.readFileSync("data/ca/read.json", "utf8")).results;
+
+  for (let action of profile.actions ?? []) {
+    const url = action.url;
+    if (!url) continue;
+
+    const parsedUrl = new URL(url);
+    const did = parsedUrl.searchParams.get("did");
+    const path = `${did}.pdf.txt`;
+
+    if (read[path]) {
+      action.offenses = read[path];
+    }
+  }
 
   return { profile, license };
 };
@@ -69,7 +83,7 @@ export default function Route() {
                 </a>
               )}
               <ul className="list-disc list-inside">
-                {r["Offenses"]?.map((o: string) => (
+                {r.offenses?.map((o: string) => (
                   <li key={o}>{o}</li>
                 ))}
               </ul>

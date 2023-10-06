@@ -4,24 +4,14 @@
 
 import fs from "fs";
 // Doesn't have suggestions for some like 'fmpairment'
-import SpellChecker from "simple-spellchecker";
+// import SpellChecker from "simple-spellchecker";
 
-const SOURCE_DIR = "public/txts/";
+const SOURCE_DIR = "data/ca/txts/";
 
 (async () => {
   const files = fs.readdirSync(SOURCE_DIR);
   const errors: any = {};
   const results: any = {};
-
-  // SpellChecker.getDictionary("en-US", function (err: any, dictionary: any) {
-  //   if (!err) {
-  //     var misspelled = !dictionary.spellCheck("fmpairment");
-  //     if (misspelled) {
-  //       var suggestions = dictionary.getSuggestions("fmpairment");
-  //       console.log(suggestions);
-  //     }
-  //   }
-  // });
 
   await Promise.all(
     files.map(async (file) => {
@@ -548,33 +538,32 @@ const SOURCE_DIR = "public/txts/";
       if (causes.length) {
         results[file] = causes;
       }
-
-      // TODO Write to copy of ca.json then run format on that
     })
   );
 
   fs.writeFile(
-    "data/read.json",
+    "data/ca/read.json",
     JSON.stringify({
       lastRun: new Date(),
       results,
-      errors,
     }),
     (error) => {
       if (error) throw error;
     }
   );
 
-  const data = JSON.parse(fs.readFileSync("data/ca.json", "utf8"));
+  // const data = JSON.parse(fs.readFileSync("data/ca.json", "utf8"));
 
-  for (let i = 0; i < data.results.length; i++) {
-    const offenses = results[`${data.results[i][" "]}.pdf.txt`];
-    if (offenses) {
-      data.results[i]["Offenses"] = offenses;
-    }
-  }
+  // for (let i = 0; i < data.results.length; i++) {
+  //   const offenses = results[`${data.results[i][" "]}.pdf.txt`];
+  //   if (offenses) {
+  //     data.results[i]["Offenses"] = offenses;
+  //   }
+  // }
 
-  fs.writeFile("data/ca-with-offenses.json", JSON.stringify(data), (error) => {
-    if (error) throw error;
-  });
+  // fs.writeFile("data/ca-with-offenses.json", JSON.stringify(data), (error) => {
+  //   if (error) throw error;
+  // });
+
+  console.log(errors)
 })();

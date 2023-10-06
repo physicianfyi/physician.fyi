@@ -76,18 +76,28 @@ export const selectPhysicians = async ({
     });
   }
 
-  // if (offenses.length) {
-  //   results = results.filter((result) => {
-  //     for (let d of result.data) {
-  //       for (let o of offenses) {
-  //         if (d["Offenses"]?.includes(o)) {
-  //           return true;
-  //         }
-  //       }
-  //     }
-  //     return false;
-  //   });
-  // }
+  if (offenses.length) {
+    const read = JSON.parse(
+      fs.readFileSync("data/ca/read.json", "utf8")
+    ).results;
+
+    results = results.filter((result) => {
+      for (let action of result.data.actions ?? []) {
+        const url = action.url;
+        if (!url) continue;
+
+        const parsedUrl = new URL(url);
+        const did = parsedUrl.searchParams.get("did");
+        const path = `${did}.pdf.txt`;
+
+        if (read[path] && offenses.some((o) => read[path].includes(o))) {
+          return true;
+        }
+      }
+
+      return false;
+    });
+  }
 
   if (query) {
     const options = {

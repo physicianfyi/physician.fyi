@@ -11,8 +11,12 @@ const PAGE_URL = "https://search.dca.ca.gov/advanced";
 
 (async () => {
   // Diff with stored profile if exists
-  const profiles =
-    JSON.parse(fs.readFileSync("data/ca/scrape.json", "utf8")).profiles ?? {};
+  let profiles: any = {};
+  try {
+    profiles = JSON.parse(
+      fs.readFileSync("data/ca/scrape.json", "utf8")
+    ).profiles;
+  } catch {}
 
   // Launch the browser and open a new blank page
   const browser = await puppeteer.launch({
@@ -36,7 +40,7 @@ const PAGE_URL = "https://search.dca.ca.gov/advanced";
   );
 
   // TODO Add state to summarize and only go through top couple states since it takes days otherwise for minimal return
-  const startIndex = states.findIndex((e) => e === "MO_cities");
+  const startIndex = states.findIndex((e) => e === "ND_cities");
   for (let state of states.slice(startIndex)) {
     console.log({ state });
     // Need to go through cities in CA instead of counties since LA county has > 1k results

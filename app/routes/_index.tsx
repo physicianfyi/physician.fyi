@@ -57,13 +57,13 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
     summarizedData.offenses ?? { results: [], counts: {} };
 
   // Don't show filtering for ones with just 1 match
-  // availableOffenses = availableOffenses.filter((o: string) => {
-  //   return availableOffenseCounts[o] >= 5;
-  // });
-  // Since we show options by count object now; this also has the benefit of not messing up indices if we include some later
+  // Since we show options by count object now; this also has the benefit of not messing up indices if we include some later instead of filtering availableOffenses
   availableSchoolCounts = Object.fromEntries(
     Object.entries<any>(availableSchoolCounts).filter(([k, v]) => v > 2)
   );
+  // availableOffenseCounts = Object.fromEntries(
+  //   Object.entries<any>(availableOffenseCounts).filter(([k, v]) => v > 2)
+  // );
 
   const data = await selectPhysicians({
     page,
@@ -593,18 +593,18 @@ export default function Index() {
               sameWidth
               className="select-popover"
             >
-              {availableOffenses.map((value: string, index: number) => (
+              {Object.keys(availableOffenseCounts).map((key: string) => (
                 <Ariakit.SelectItem
-                  key={`license-${value}`}
+                  key={`offense-${key}`}
                   // @ts-ignore TODO File ticket with ariakit to allow number
-                  value={index}
+                  value={availableOffenses.indexOf(key)}
                   className="select-item"
                 >
                   <Ariakit.SelectItemCheck />
                   <div className="[&>*]:align-middle">
-                    <span>{value} </span>
+                    <span>{key} </span>
                     <span className="bg-white rounded-full px-1 text-black text-xs">
-                      {availableOffenseCounts[value]}
+                      {availableOffenseCounts[key]}
                     </span>
                   </div>
                 </Ariakit.SelectItem>

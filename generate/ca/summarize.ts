@@ -10,6 +10,8 @@ import fs from "fs";
     fs.readFileSync("data/ca/clean.json", "utf8")
   ).profiles;
 
+  const read = JSON.parse(fs.readFileSync("data/ca/read.json", "utf8")).results;
+
   let file;
   try {
     file = fs.readFileSync("data/ca/summarize.json", "utf8");
@@ -38,6 +40,8 @@ import fs from "fs";
   const states: string[] = data.states?.results ?? [];
   const stateCounts: any = {};
   // Not doing geospatial ones right now because might not need
+  const offenses: string[] = data.offenses?.results ?? [];
+  const offenseCounts: any = {};
 
   for (let [, v] of Object.entries<any>(profiles)) {
     // Only difference with using just DCA as data source is there are no unlicensed ones
@@ -87,6 +91,23 @@ import fs from "fs";
         actionTypeCounts[a.actionType] =
           (actionTypeCounts[a.actionType] ?? 0) + 1;
         currentActionTypes.add(a.actionType);
+      }
+
+      const url = a.url;
+      if (!url) continue;
+
+      const parsedUrl = new URL(url);
+      const did = parsedUrl.searchParams.get("did");
+      const path = `${did}.pdf.txt`;
+      const currentOffenses = new Set();
+      for (let o of read[path] ?? []) {
+        if (!offenses.includes(o)) {
+          offenses.push(o);
+        }
+        if (!currentOffenses.has(o)) {
+          offenseCounts[o] = (offenseCounts[o] ?? 0) + 1;
+          currentOffenses.add(o);
+        }
       }
     }
 
@@ -182,6 +203,13 @@ import fs from "fs";
       results: states,
       counts: Object.fromEntries(
         Object.entries<any>(stateCounts).sort(([, a], [, b]) => b - a)
+      ),
+    },
+    offenses: {
+      numResults: offenses.length,
+      results: offenses,
+      counts: Object.fromEntries(
+        Object.entries<any>(offenseCounts).sort(([, a], [, b]) => b - a)
       ),
     },
   };
