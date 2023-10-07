@@ -9,6 +9,7 @@ export const selectPhysicians = async ({
   page = 0,
   query = "",
   actionTypes = [],
+  licenseStatuses = [],
   licenseTypes = [],
   schools = [],
   specialties = [],
@@ -17,6 +18,7 @@ export const selectPhysicians = async ({
   page?: number;
   query?: string;
   actionTypes?: string[];
+  licenseStatuses?: string[];
   licenseTypes?: string[];
   schools?: string[];
   specialties?: string[];
@@ -36,6 +38,16 @@ export const selectPhysicians = async ({
         if (actionTypes.includes(action.actionType)) {
           return true;
         }
+      }
+      return false;
+    });
+  }
+
+  if (licenseStatuses.length) {
+    results = results.filter((result) => {
+      // Only have licensed ones right now, so need to fix if adding unlicensed
+      if (licenseStatuses.includes(result.data.licenseStatus)) {
+        return true;
       }
       return false;
     });

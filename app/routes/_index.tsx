@@ -40,6 +40,12 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
   const { results: availableTypes, counts: availableTypeCounts } =
     summarizedData.actionTypes;
 
+  const licenseStatuses = JSON.parse(url.searchParams.get("u") ?? "[]");
+  const {
+    results: availableLicenseStatuses,
+    counts: availableLicenseStatusCounts,
+  } = summarizedData.licenseStatuses;
+
   const licenseTypes = JSON.parse(url.searchParams.get("l") ?? "[]");
   const { results: availableLicenseTypes, counts: availableLicenseTypeCounts } =
     summarizedData.licenseTypes;
@@ -69,6 +75,9 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
     page,
     query,
     actionTypes: types.map((t: number) => availableTypes[t]),
+    licenseStatuses: licenseStatuses.map(
+      (u: number) => availableLicenseStatuses[u]
+    ),
     licenseTypes: licenseTypes.map((t: number) => availableLicenseTypes[t]),
     schools: schools.map((s: number) => availableSchools[s]),
     specialties: specialties.map((a: number) => availableSpecialties[a]),
@@ -79,6 +88,8 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
     data,
     availableTypes,
     availableTypeCounts,
+    availableLicenseStatuses,
+    availableLicenseStatusCounts,
     availableLicenseTypes,
     availableLicenseTypeCounts,
     availableSchools,
@@ -97,6 +108,10 @@ export default function Index() {
   // TODO Figure out why plain object makes condition in effect run infinitely
   let types: number[] = useMemo(
     () => JSON.parse(params.get("t") ?? "[]"),
+    [params]
+  );
+  let licenseStatuses: number[] = useMemo(
+    () => JSON.parse(params.get("u") ?? "[]"),
     [params]
   );
   let licenseTypes: number[] = useMemo(
@@ -120,6 +135,8 @@ export default function Index() {
     data,
     availableTypes,
     availableTypeCounts,
+    availableLicenseStatuses,
+    availableLicenseStatusCounts,
     availableLicenseTypes,
     availableLicenseTypeCounts,
     availableSchools,
@@ -138,6 +155,14 @@ export default function Index() {
   });
   const typeValues = select.useState("value");
   const mounted = select.useState("mounted");
+
+  const licenseStatusSelect = Ariakit.useSelectStore({
+    // @ts-ignore ariakit TS issue
+    defaultValue: licenseStatuses,
+    focusLoop: true,
+  });
+  const licenseStatusValues = licenseStatusSelect.useState("value");
+  const licenseStatusMounted = licenseStatusSelect.useState("mounted");
 
   const licenseTypeSelect = Ariakit.useSelectStore({
     // @ts-ignore ariakit TS issue
@@ -185,6 +210,20 @@ export default function Index() {
       });
     }
   }, [submit, typeValues, types]);
+  useEffect(() => {
+    if (
+      licenseStatuses.length !== licenseStatusValues.length ||
+      licenseStatuses.some(
+        // @ts-ignore ariakit TS issue
+        (value, index) => value !== licenseStatusValues[index]
+      )
+    ) {
+      submit(filterRef.current, {
+        // TODO For some reason not working here or as Form prop
+        preventScrollReset: true,
+      });
+    }
+  }, [submit, licenseStatusValues, licenseStatuses]);
   useEffect(() => {
     if (
       licenseTypes.length !== licenseTypeValues.length ||
@@ -275,6 +314,12 @@ export default function Index() {
           hidden
         />
         <input
+          name="u"
+          value={JSON.stringify(licenseStatusValues)}
+          readOnly
+          hidden
+        />
+        <input
           name="l"
           value={JSON.stringify(licenseTypeValues)}
           readOnly
@@ -345,6 +390,75 @@ export default function Index() {
                     <span>{key} </span>
                     <span className="bg-white rounded-full px-1 text-black text-xs">
                       {availableTypeCounts[key]}
+                    </span>
+                  </div>
+                </Ariakit.SelectItem>
+              ))}
+            </Ariakit.SelectPopover>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <div className="flex items-end justify-between">
+            <Ariakit.SelectLabel
+              className="select-label"
+              store={licenseStatusSelect}
+            >
+              License status
+            </Ariakit.SelectLabel>
+            {licenseStatusValues.length > 0 && (
+              <button
+                type="button"
+                className="text-xs hover:underline"
+                onClick={() => {
+                  licenseStatusSelect.setValue([]);
+                }}
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          <Ariakit.Select
+            store={licenseStatusSelect}
+            className="flex justify-between items-center py-2.5 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+          >
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* @ts-ignore */}
+              {licenseStatusValues.map((v) => (
+                <div
+                  key={v}
+                  className="flex items-center gap-1 bg-blue-100 whitespace-nowrap text-blue-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"
+                >
+                  <div className="uppercase">
+                    {availableLicenseStatuses[v] ?? "Unlicensed"}
+                  </div>
+                  <div className="bg-white rounded-full px-1">
+                    {availableLicenseStatusCounts[availableLicenseStatuses[v]]}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <Ariakit.SelectArrow />
+          </Ariakit.Select>
+          {licenseStatusMounted && (
+            <Ariakit.SelectPopover
+              store={licenseStatusSelect}
+              gutter={4}
+              sameWidth
+              className="select-popover"
+            >
+              {Object.keys(availableLicenseStatusCounts).map((key: string) => (
+                <Ariakit.SelectItem
+                  key={`status-${key}`}
+                  // @ts-ignore TODO File ticket with ariakit to allow number
+                  value={availableLicenseStatuses.indexOf(key)}
+                  className="select-item"
+                >
+                  <Ariakit.SelectItemCheck />
+                  <div className="[&>*]:align-middle">
+                    <span className="uppercase">{key ?? "Unlicensed"} </span>
+                    <span className="bg-white rounded-full px-1 text-black text-xs">
+                      {availableLicenseStatusCounts[key]}
                     </span>
                   </div>
                 </Ariakit.SelectItem>
@@ -645,6 +759,12 @@ export default function Index() {
               hidden
             />
             <input
+              name="u"
+              value={JSON.stringify(licenseStatusValues)}
+              readOnly
+              hidden
+            />
+            <input
               name="l"
               value={JSON.stringify(licenseTypeValues)}
               readOnly
@@ -777,7 +897,11 @@ export default function Index() {
                     <div className="px-1 font-medium flex items-center gap-1 text-xs text-gray-600 uppercase">
                       CA
                       <svg
-                        className="w-4 h-4"
+                        className={`w-4 h-4 ${
+                          data.licenseStatus === "license renewed & current"
+                            ? "text-green-500"
+                            : "text-red-500"
+                        }`}
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 256 256"
                       >
