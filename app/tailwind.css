@@ -90,6 +90,9 @@
 
       --radius: 0.5rem;
       --toastify-color-success: #16a34a; /* green-600 */
+
+      /* Makes scroll bars dark */
+      color-scheme: dark;
     }
   }
 }

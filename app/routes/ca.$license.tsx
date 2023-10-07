@@ -187,7 +187,8 @@ export default function Route() {
         </div>
       </div>
 
-      <div className="min-h-[362px]">
+      {/* dark color scheme messes up colors here */}
+      <div className="min-h-[362px] [color-scheme:light]">
         <DiscussionEmbed
           shortname="physician-fyi"
           config={

@@ -55,6 +55,8 @@ import fs from "fs";
             "PUBLIC LETTER OF REPRIMAND",
           contentMalpracticeSettlements: "MALPRACTICE SETTLEMENTS",
         }[v.actions[i].actionType as string] ?? v.actions[i].actionType;
+
+      v.actions[i].date = v.actions[i].date.replace(/3023$/, "2023");
     }
 
     const secondSpecialties = v.survey?.["SECONDARY AREA OF PRACTICE"]?.filter(
