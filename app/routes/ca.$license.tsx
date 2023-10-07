@@ -3,6 +3,7 @@ import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { DiscussionEmbed } from "disqus-react";
 import fs from "fs";
+import { ResponsiveContainer, PieChart, Pie, Cell, LabelList } from "recharts";
 
 export const links: LinksFunction = () => [
   {
@@ -47,9 +48,46 @@ export const loader = async ({
   return { profile, license, baseUrl: data.baseUrl };
 };
 
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+
+const RADIAN = Math.PI / 180;
+const renderCustomLabel = ({
+  cx,
+  cy,
+  midAngle,
+  innerRadius,
+  outerRadius,
+  percent,
+  index,
+}: any) => {
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text
+      x={x}
+      y={y}
+      fill="white"
+      textAnchor={x > cx ? "start" : "end"}
+      dominantBaseline="central"
+    >
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+};
+
 export default function Route() {
   // const params = useParams()
   const { profile, license, baseUrl } = useLoaderData<typeof loader>();
+
+  const pieData = Object.entries(profile.minActivities).reduce<any>(
+    (acc, [k, v]) => {
+      if (v) acc.push({ name: k, value: v });
+      return acc;
+    },
+    []
+  );
 
   return (
     <div className="p-8 flex flex-col gap-4">
@@ -79,9 +117,43 @@ export default function Route() {
           {profile.survey?.["PRIMARY AREA OF PRACTICE"] && (
             <h4>
               Specialty: {profile.survey["PRIMARY AREA OF PRACTICE"]}
-              {profile.survey?.["SECONDARY AREA OF PRACTICE"] && ", "}
+              {profile.survey?.["SECONDARY AREA OF PRACTICE"]?.length > 0 &&
+                ", "}
               {profile.survey?.["SECONDARY AREA OF PRACTICE"]?.join(", ")}
             </h4>
+          )}
+
+          {Boolean(profile.minHours) && (
+            <div className="">
+              <h4>{profile.minHours} hours minimum per week</h4>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    dataKey="value"
+                    labelLine={false}
+                    data={pieData}
+                    fill="#8884d8"
+                    label={renderCustomLabel}
+                    outerRadius={80}
+                    cx="50%"
+                    cy="50%"
+                  >
+                    <LabelList
+                      dataKey="name"
+                      position="outside"
+                      style={{ fontSize: "10px" }}
+                      className="stroke-primary"
+                    />
+                    {pieData.map((entry: any, index: number) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
           )}
         </div>
 

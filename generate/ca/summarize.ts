@@ -12,12 +12,10 @@ import fs from "fs";
 
   const read = JSON.parse(fs.readFileSync("data/ca/read.json", "utf8")).results;
 
-  let file;
+  let file = "{}";
   try {
     file = fs.readFileSync("data/ca/summarize.json", "utf8");
-  } catch {
-    file = "{}";
-  }
+  } catch {}
   const data = JSON.parse(file);
 
   const licenseTypes: string[] = data.licenseTypes?.results ?? [];
@@ -123,8 +121,9 @@ import fs from "fs";
     let secondSpecialties = v.survey?.["SECONDARY AREA OF PRACTICE"] ?? [];
     for (let secondSpecialty of secondSpecialties) {
       if (
-        secondSpecialty === "DECLINE TO STATE" ||
-        secondSpecialty === "NOT APPLICABLE" ||
+        // Should be covered in clean
+        // secondSpecialty === "DECLINE TO STATE" ||
+        // secondSpecialty === "NOT APPLICABLE" ||
         !secondSpecialty
       ) {
         secondSpecialty = null;

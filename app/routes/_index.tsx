@@ -67,9 +67,9 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
   availableSchoolCounts = Object.fromEntries(
     Object.entries<any>(availableSchoolCounts).filter(([k, v]) => v > 2)
   );
-  // availableOffenseCounts = Object.fromEntries(
-  //   Object.entries<any>(availableOffenseCounts).filter(([k, v]) => v > 2)
-  // );
+  availableOffenseCounts = Object.fromEntries(
+    Object.entries<any>(availableOffenseCounts).filter(([k, v]) => v > 3)
+  );
 
   const data = await selectPhysicians({
     page,
@@ -296,7 +296,7 @@ export default function Index() {
 
       <Form
         method="GET"
-        className="flex flex-col gap-4"
+        className="grid grid-cols-12 gap-4 [&>*]:col-span-12 [&>*]:sm:col-span-6"
         ref={filterRef}
         // TODO not working here or as submit prop
         preventScrollReset

@@ -1,5 +1,5 @@
 /**
- * Step 2: Cleans things found after the fact and merges scrape-deep and scrape-shallow
+ * Step 2: Cleans things found after the fact, reformats data to be useful, and merges scrape-deep and scrape-shallow
  */
 
 import fs from "fs";
@@ -55,6 +55,38 @@ import fs from "fs";
             "PUBLIC LETTER OF REPRIMAND",
           contentMalpracticeSettlements: "MALPRACTICE SETTLEMENTS",
         }[v.actions[i].actionType as string] ?? v.actions[i].actionType;
+    }
+
+    const secondSpecialties = v.survey?.["SECONDARY AREA OF PRACTICE"]?.filter(
+      (p: string) => !["DECLINE TO STATE", "NOT APPLICABLE"].includes(p)
+    );
+    if (secondSpecialties) {
+      v.survey["SECONDARY AREA OF PRACTICE"] = secondSpecialties;
+    }
+
+    const activities = v.survey?.["PRACTICE ACTIVITIES"];
+    if (activities) {
+      let numHours = 0;
+      let minActivities: any = {};
+      for (let [k, v] of Object.entries<any>(activities)) {
+        if (
+          [
+            "ADMINISTRATION",
+            "DIRECT PATIENT CARE (INCLUDING TELEHEALTH)",
+            "OTHER",
+            "RESEARCH",
+            "TRAINING",
+          ].includes(k)
+        ) {
+          const hours = Number(v.match(/^[0-9]{1,2}/)?.[0] ?? 0);
+          numHours += hours;
+          minActivities[k] = hours;
+        }
+      }
+      if (numHours) {
+        v.minHours = numHours;
+        v.minActivities = minActivities;
+      }
     }
   }
 
