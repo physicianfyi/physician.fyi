@@ -555,34 +555,36 @@ import fs from "fs";
 
       deepProfiles[license] = deepProfile;
       delete profile.fetch;
+
+      // Write every profile read to not have to redo on crashes
+
+      // Write shallow file to mark ones fetched
+      fs.writeFile(
+        "data/ca/scrape-shallow.json",
+        JSON.stringify({
+          ...shallowData,
+          profiles: shallowProfiles,
+        }),
+        (error) => {
+          if (error) throw error;
+        }
+      );
+
+      // Write to a new file since good to keep separate scripts writing to separate files
+      fs.writeFile(
+        "data/ca/scrape-deep.json",
+        JSON.stringify({
+          ...deepData,
+          deepLastRun: new Date(),
+          numProfiles: Object.keys(deepProfiles).length,
+          profiles: deepProfiles,
+        }),
+        (error) => {
+          if (error) throw error;
+        }
+      );
     }
   }
-
-  // Write shallow file to mark ones fetched
-  fs.writeFile(
-    "data/ca/scrape-shallow.json",
-    JSON.stringify({
-      ...shallowData,
-      profiles: shallowProfiles,
-    }),
-    (error) => {
-      if (error) throw error;
-    }
-  );
-
-  // Write to a new file since good to keep separate scripts writing to separate files
-  fs.writeFile(
-    "data/ca/scrape-deep.json",
-    JSON.stringify({
-      ...deepData,
-      deepLastRun: new Date(),
-      numProfiles: Object.keys(deepProfiles).length,
-      profiles: deepProfiles,
-    }),
-    (error) => {
-      if (error) throw error;
-    }
-  );
 
   await browser.close();
 })();

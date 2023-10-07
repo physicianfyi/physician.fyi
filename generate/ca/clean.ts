@@ -58,12 +58,17 @@ import fs from "fs";
     }
   }
 
-  const profiles = Object.entries<any>(shallowProfiles).map(([k, v]) => {
-    return {
-      ...shallowProfiles[k],
-      ...deepProfiles[k],
-    };
-  });
+  const profiles = Object.fromEntries(
+    Object.entries<any>(shallowProfiles).map(([k, v]) => {
+      return [
+        k,
+        {
+          ...shallowProfiles[k],
+          ...deepProfiles[k],
+        },
+      ];
+    })
+  );
 
   const json = {
     // Has lastRun dates

@@ -251,7 +251,7 @@ export default function Index() {
         Filters{" "}
         <span className="text-xs">
           Adding options within a filter "or"s them; adding options between
-          filters "ands" them
+          filters "and"s them
         </span>
       </h2>
 
