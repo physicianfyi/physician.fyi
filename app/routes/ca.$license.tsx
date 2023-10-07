@@ -1,7 +1,10 @@
 import {
+  ChartPie,
+  ClockClockwise,
   Gavel,
   GraduationCap,
   IdentificationBadge,
+  User,
 } from "@phosphor-icons/react";
 import type { DataFunctionArgs, LinksFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
@@ -13,7 +16,7 @@ import { ResponsiveContainer, PieChart, Pie, Cell, LabelList } from "recharts";
 export const links: LinksFunction = () => [
   {
     rel: "icon",
-    href: "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔍</text></svg>",
+    href: "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👨‍⚕️</text></svg>",
   },
 ];
 
@@ -100,7 +103,9 @@ export default function Route() {
       <div className="min-h-screen flex flex-col gap-8">
         <div className="">
           <div className="flex justify-between">
-            <h1 className="uppercase">{profile.name}</h1>
+            <h1 className="uppercase">
+              <User weight="bold" className="inline-icon" /> {profile.name}
+            </h1>
             <a
               href={`${baseUrl}${profile.licenseUrl}`}
               target="_blank"
@@ -122,24 +127,32 @@ export default function Route() {
             California License <span className="uppercase">{license}</span>
           </h4>
 
+          {profile.survey?.["PRIMARY AREA OF PRACTICE"] && (
+            <h4>
+              {profile.survey["PRIMARY AREA OF PRACTICE"]}
+              {profile.survey?.["SECONDARY AREA OF PRACTICE"]?.length > 0 &&
+                ", "}
+              {profile.survey?.["SECONDARY AREA OF PRACTICE"]?.join(", ")}
+            </h4>
+          )}
+        </div>
+
+        <div>
           <h3 className="uppercase">
             <GraduationCap weight="bold" className="inline-icon mr-1" />
             {profile.school}
             {profile.graduationYear && `, class of ${profile.graduationYear}`}
           </h3>
 
-          {profile.survey?.["PRIMARY AREA OF PRACTICE"] && (
-            <h4>
-              Specialty: {profile.survey["PRIMARY AREA OF PRACTICE"]}
-              {profile.survey?.["SECONDARY AREA OF PRACTICE"]?.length > 0 &&
-                ", "}
-              {profile.survey?.["SECONDARY AREA OF PRACTICE"]?.join(", ")}
-            </h4>
-          )}
-
           {Boolean(profile.minHours) && (
             <div className="">
-              <h4>{profile.minHours} hours minimum per week</h4>
+              <h4>
+                <ChartPie
+                  weight="bold"
+                  className="inline w-[1.25em] h-[1.25em]"
+                />{" "}
+                {profile.minHours} hours minimum per week
+              </h4>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
@@ -178,24 +191,64 @@ export default function Route() {
           <ul className="gap-2 flex flex-col">
             {profile.actions?.map((r: any) => {
               return (
-                <li key={`${r.actionType}${r.date}`} className="border-2 p-2">
-                  <div>{r.actionType}</div>
-                  {r.url && (
-                    <a
-                      href={`https://web.archive.org/web/0/${r.url}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="font-medium"
-                    >
-                      View PDF
-                    </a>
+                <li
+                  key={`${r.actionType}${r.date}`}
+                  className="border-2 p-2 flex flex-col gap-2"
+                >
+                  <div className="flex justify-between items-center flex-wrap">
+                    <div className="font-semibold">{r.actionType}</div>
+                    {r.url && (
+                      <>
+                        <a
+                          href={`https://web.archive.org/web/0/${r.url}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="font-medium"
+                        >
+                          View PDF ({r.numPages} pages)
+                        </a>
+                      </>
+                    )}
+                  </div>
+
+                  {r.url && r.offenses && (
+                    <>
+                      <ul className="list-disc list-inside">
+                        <div className="font-medium">Offenses</div>
+                        {r.offenses.map((o: string) => (
+                          <li key={o}>{o}</li>
+                        ))}
+                      </ul>
+                    </>
                   )}
-                  <ul className="list-disc list-inside">
-                    {r.offenses?.map((o: string) => (
-                      <li key={o}>{o}</li>
-                    ))}
-                  </ul>
-                  <div>{r.date}</div>
+
+                  <div className="flex flex-col gap-1">
+                    {Object.keys(r).map((k) => {
+                      if (
+                        [
+                          "offenses",
+                          "actionType",
+                          "date",
+                          "url",
+                          "numPages",
+                        ].includes(k)
+                      ) {
+                        return null;
+                      }
+                      return (
+                        <div key={k} className="uppercase">
+                          <span className="font-medium">{k}:</span> {r[k]}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="flex justify-end items-center">
+                    <div className="w-fit uppercase flex items-center gap-1 bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-1 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">
+                      <ClockClockwise className="w-4 h-4" weight="bold" />
+                      {r.date}
+                    </div>
+                  </div>
                 </li>
               );
             })}
