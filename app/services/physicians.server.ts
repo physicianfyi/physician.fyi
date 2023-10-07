@@ -122,6 +122,8 @@ export const selectPhysicians = async ({
     results = fuse.search(query).map((r) => r.item);
   }
 
+  // TODO Sort by if their license is active or not
+
   const chartData = results.reduce<any>((acc, curr) => {
     // Don't count multiple actions in the same year for number of physicians
     const currentYears = new Set();

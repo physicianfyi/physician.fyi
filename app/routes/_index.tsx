@@ -25,6 +25,7 @@ import {
   Info,
   MagnifyingGlass,
   Sliders,
+  UserList,
   X,
 } from "@phosphor-icons/react";
 
@@ -295,7 +296,7 @@ export default function Index() {
       </div>
 
       <h2 id="filters">
-        <Sliders className="inline-icon" /> Filters
+        <Sliders className="inline-icon" weight="bold" /> Filters
         <Ariakit.TooltipProvider showTimeout={0}>
           <Ariakit.TooltipAnchor
             className=""
@@ -303,7 +304,7 @@ export default function Index() {
               <Info weight="duotone" className="inline align-super text-lg" />
             }
           ></Ariakit.TooltipAnchor>
-          <Ariakit.Tooltip className="text-xs">
+          <Ariakit.Tooltip className="text-xs font-semibold bg-popover text-popover-foreground rounded p-2 border border-border">
             Adding options within a filter "or"s them; adding options between
             filters "and"s them
           </Ariakit.Tooltip>
@@ -312,7 +313,7 @@ export default function Index() {
 
       <Form
         method="GET"
-        className="grid grid-cols-12 gap-4 [&>*]:col-span-12 [&>*]:sm:col-span-6"
+        className="grid grid-cols-12 gap-4 [&>*]:col-span-12 [&>*]:md:col-span-6 [&>*]:xl:col-span-4"
         ref={filterRef}
         // TODO not working here or as submit prop
         preventScrollReset
@@ -866,7 +867,9 @@ export default function Index() {
         </ResponsiveContainer>
       </div>
 
-      <h2 id="results">Doctors</h2>
+      <h2 id="results">
+        <UserList className="inline-icon" weight="bold" /> Doctors
+      </h2>
 
       <ul className="flex flex-col gap-2">
         {results.map(({ license, data }) => {
@@ -894,14 +897,25 @@ export default function Index() {
                   <div className="flex items-start sm:items-end gap-1 sm:gap-0 justify-between flex-col sm:flex-row">
                     <div className="px-1 font-medium flex items-center gap-1 text-xs text-gray-600 uppercase">
                       CA
-                      <IdentificationBadge
-                        className={`w-4 h-4 ${
-                          data.licenseStatus === "license renewed & current"
-                            ? "text-green-500"
-                            : "text-red-500"
-                        }`}
-                        weight="bold"
-                      />
+                      <Ariakit.TooltipProvider showTimeout={0}>
+                        <Ariakit.TooltipAnchor
+                          className=""
+                          render={
+                            <IdentificationBadge
+                              className={`w-4 h-4 ${
+                                data.licenseStatus ===
+                                "license renewed & current"
+                                  ? "text-green-500"
+                                  : "text-red-500"
+                              }`}
+                              weight="bold"
+                            />
+                          }
+                        ></Ariakit.TooltipAnchor>
+                        <Ariakit.Tooltip className="uppercase text-xs font-semibold bg-popover text-popover-foreground rounded p-2 border border-border">
+                          {data.licenseStatus}
+                        </Ariakit.Tooltip>
+                      </Ariakit.TooltipProvider>
                       {license.startsWith("UNLICENSED-") ? "N/A" : license}
                     </div>
                     {data.actions && (
