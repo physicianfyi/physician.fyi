@@ -34,6 +34,8 @@ import fs from "fs";
   const actionTypeCounts: any = {};
   const specialties: string[] = data.specialties?.results ?? [];
   const specialtyCounts: any = {};
+  const certifications: string[] = data.certifications?.results ?? [];
+  const certificationCounts: any = {};
   // This is more just for internal use to see what states we need to scrape shallowly to cover most
   const states: string[] = data.states?.results ?? [];
   const stateCounts: any = {};
@@ -135,6 +137,17 @@ import fs from "fs";
         (specialtyCounts[secondSpecialty] ?? 0) + 1;
     }
 
+    let certification = v.survey?.["ABMS CERTIFICATIONS"] ?? [null];
+    for (let c of certification) {
+      if (!c) {
+        c = null;
+      }
+      if (!certifications.includes(c)) {
+        certifications.push(c);
+      }
+      certificationCounts[c] = (certificationCounts[c] ?? 0) + 1;
+    }
+
     let state = v.state;
     if (state === "n/a" || !state) {
       state = null;
@@ -195,6 +208,13 @@ import fs from "fs";
       results: specialties,
       counts: Object.fromEntries(
         Object.entries<any>(specialtyCounts).sort(([, a], [, b]) => b - a)
+      ),
+    },
+    certifications: {
+      numResults: certifications.length,
+      results: certifications,
+      counts: Object.fromEntries(
+        Object.entries<any>(certificationCounts).sort(([, a], [, b]) => b - a)
       ),
     },
     states: {

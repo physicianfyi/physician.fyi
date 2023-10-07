@@ -22,7 +22,9 @@ import {
 import {
   ClockClockwise,
   IdentificationBadge,
+  Info,
   MagnifyingGlass,
+  Sliders,
   X,
 } from "@phosphor-icons/react";
 
@@ -293,11 +295,22 @@ export default function Index() {
       </div>
 
       <h2 id="filters">
-        Filters{" "}
-        <span className="text-xs">
-          Adding options within a filter "or"s them; adding options between
-          filters "and"s them
-        </span>
+        <Sliders className="inline-block" /> Filters
+        <Ariakit.TooltipProvider showTimeout={0}>
+          <Ariakit.TooltipAnchor
+            className=""
+            render={
+              <Info
+                weight="duotone"
+                className="inline-block align-super text-lg"
+              />
+            }
+          ></Ariakit.TooltipAnchor>
+          <Ariakit.Tooltip className="text-xs">
+            Adding options within a filter "or"s them; adding options between
+            filters "and"s them
+          </Ariakit.Tooltip>
+        </Ariakit.TooltipProvider>
       </h2>
 
       <Form
@@ -856,7 +869,7 @@ export default function Index() {
         </ResponsiveContainer>
       </div>
 
-      <h2 id="results">Results</h2>
+      <h2 id="results">Doctors</h2>
 
       <ul className="flex flex-col gap-2">
         {results.map(({ license, data }) => {

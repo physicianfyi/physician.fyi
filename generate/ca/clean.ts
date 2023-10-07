@@ -66,6 +66,13 @@ import fs from "fs";
       v.survey["SECONDARY AREA OF PRACTICE"] = secondSpecialties;
     }
 
+    const certifications = v.survey?.["ABMS CERTIFICATIONS"]?.filter(
+      (p: string) => !["OTHER - NONE"].includes(p)
+    );
+    if (certifications) {
+      v.survey["ABMS CERTIFICATIONS"] = certifications;
+    }
+
     const activities = v.survey?.["PRACTICE ACTIVITIES"];
     if (activities) {
       let numHours = 0;
