@@ -44,19 +44,29 @@ export const loader = async ({
     }
   }
 
-  return { profile, license };
+  return { profile, license, baseUrl: data.baseUrl };
 };
 
 export default function Route() {
   // const params = useParams()
-  const { profile, license } = useLoaderData<typeof loader>();
+  const { profile, license, baseUrl } = useLoaderData<typeof loader>();
 
   return (
     <div className="p-8 flex flex-col gap-4">
       {/* Just so the disqus thing changing height doesn't show on load */}
       <div className="min-h-screen flex flex-col gap-8">
         <div className="">
-          <h1 className="uppercase">{profile.name}</h1>
+          <div className="flex justify-between">
+            <h1 className="uppercase">{profile.name}</h1>
+            <a
+              href={`${baseUrl}${profile.licenseUrl}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              View license
+            </a>
+          </div>
+
           <h4>
             California License <span className="uppercase">{license}</span>
           </h4>
