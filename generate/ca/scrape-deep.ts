@@ -38,10 +38,7 @@ import fs from "fs";
   // Set screen size
   await page.setViewport({ width: 1080, height: 1024 });
 
-  for (let [license, profile] of Object.entries<any>(shallowProfiles).slice(
-    0,
-    2000
-  )) {
+  for (let [license, profile] of Object.entries<any>(shallowProfiles)) {
     if (profile.fetch) {
       // Navigate the page to a URL
       await page.goto(`${shallowData.baseUrl}${profile.licenseUrl}`);
