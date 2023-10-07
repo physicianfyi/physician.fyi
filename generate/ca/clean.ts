@@ -66,6 +66,9 @@ import fs from "fs";
   });
 
   const json = {
+    // Has lastRun dates
+    ...shallowData,
+    ...deepData,
     cleanLastRun: new Date(),
     numProfiles: Object.keys(profiles).length,
     profiles,

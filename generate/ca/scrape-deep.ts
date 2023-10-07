@@ -40,7 +40,7 @@ import fs from "fs";
 
   for (let [license, profile] of Object.entries<any>(shallowProfiles).slice(
     0,
-    2
+    2000
   )) {
     if (profile.fetch) {
       // Navigate the page to a URL

@@ -152,7 +152,10 @@
     @apply underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none;
   }
   label {
-    @apply cursor-pointer text-sm font-medium;
+    @apply text-sm font-medium;
+  }
+  label[for]:not([for=""]) {
+    @apply cursor-pointer;
   }
   ::selection {
     @apply bg-indigo-300/40;
@@ -196,6 +199,11 @@
 
   .select-item {
     @apply scroll-m-2 p-1 flex items-center gap-2 cursor-pointer data-[active-item]:bg-accent rounded-sm aria-selected:bg-accent/50;
+  }
+
+  /* Need to do this separately from normal label targeting because Ariakit doesn't render a label */
+  .select-label {
+    @apply text-sm font-medium !cursor-pointer;
   }
 }
 

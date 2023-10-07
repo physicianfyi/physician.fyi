@@ -291,7 +291,7 @@ export default function Index() {
 
         <div className="flex flex-col gap-1">
           <div className="flex items-end justify-between">
-            <Ariakit.SelectLabel className="text-sm font-medium" store={select}>
+            <Ariakit.SelectLabel className="select-label" store={select}>
               Type of action
             </Ariakit.SelectLabel>
             {typeValues.length > 0 && (
@@ -356,7 +356,7 @@ export default function Index() {
         <div className="flex flex-col gap-1">
           <div className="flex items-end justify-between">
             <Ariakit.SelectLabel
-              className="text-sm font-medium"
+              className="select-label"
               store={licenseTypeSelect}
             >
               Type of license
@@ -424,10 +424,7 @@ export default function Index() {
 
         <div className="flex flex-col gap-1">
           <div className="flex items-end justify-between">
-            <Ariakit.SelectLabel
-              className="text-sm font-medium"
-              store={schoolSelect}
-            >
+            <Ariakit.SelectLabel className="select-label" store={schoolSelect}>
               School
             </Ariakit.SelectLabel>
             {schoolValues.length > 0 && (
@@ -494,7 +491,7 @@ export default function Index() {
         <div className="flex flex-col gap-1">
           <div className="flex items-end justify-between">
             <Ariakit.SelectLabel
-              className="text-sm font-medium"
+              className="select-label"
               store={specialtySelect}
             >
               Specialty
@@ -560,10 +557,7 @@ export default function Index() {
 
         <div className="flex flex-col gap-1">
           <div className="flex items-end justify-between">
-            <Ariakit.SelectLabel
-              className="text-sm font-medium"
-              store={offenseSelect}
-            >
+            <Ariakit.SelectLabel className="select-label" store={offenseSelect}>
               Offense
             </Ariakit.SelectLabel>
             {offenseValues.length > 0 && (
