@@ -14,7 +14,7 @@ const PAGE_URL = "https://search.dca.ca.gov/advanced";
   let profiles: any = {};
   try {
     profiles = JSON.parse(
-      fs.readFileSync("data/ca/scrape.json", "utf8")
+      fs.readFileSync("data/ca/scrape-shallow.json", "utf8")
     ).profiles;
   } catch {}
 
@@ -39,7 +39,7 @@ const PAGE_URL = "https://search.dca.ca.gov/advanced";
     )
   );
 
-  // TODO Add state to summarize and only go through top couple states since it takes days otherwise for minimal return
+  // Can only go through top couple states since it takes days otherwise for minimal return
   const startIndex = states.findIndex((e) => e === "ND_cities");
   for (let state of states.slice(startIndex)) {
     console.log({ state });
@@ -240,9 +240,13 @@ const PAGE_URL = "https://search.dca.ca.gov/advanced";
       profiles,
       baseUrl: "https://search.dca.ca.gov",
     };
-    fs.writeFile("data/ca/scrape.json", JSON.stringify(json), (error) => {
-      if (error) throw error;
-    });
+    fs.writeFile(
+      "data/ca/scrape-shallow.json",
+      JSON.stringify(json),
+      (error) => {
+        if (error) throw error;
+      }
+    );
   }
 
   await browser.close();

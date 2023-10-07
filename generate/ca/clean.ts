@@ -1,14 +1,20 @@
 /**
- * Step 2: Cleans things found after the fact
+ * Step 2: Cleans things found after the fact and merges scrape-deep and scrape-shallow
  */
 
 import fs from "fs";
 
 (async () => {
-  const data = JSON.parse(fs.readFileSync("data/ca/scrape-deep.json", "utf8"));
-  const profiles = data.profiles;
+  const shallowData = JSON.parse(
+    fs.readFileSync("data/ca/scrape-shallow.json", "utf8")
+  );
+  const shallowProfiles = shallowData.profiles;
+  const deepData = JSON.parse(
+    fs.readFileSync("data/ca/scrape-deep.json", "utf8")
+  );
+  const deepProfiles = deepData.profiles;
 
-  for (let [, v] of Object.entries<any>(profiles)) {
+  for (let [, v] of Object.entries<any>(shallowProfiles)) {
     // Merge ones that there are only a few of and are same meaning as a more common one
     v.licenseStatus =
       {
@@ -28,7 +34,9 @@ import fs from "fs";
           "probationary registration": "probationary license",
         }[v.secondaryStatus[i] as string] ?? v.secondaryStatus[i];
     }
+  }
 
+  for (let [, v] of Object.entries<any>(deepProfiles)) {
     for (let i = 0; i < (v.actions?.length ?? 0); i++) {
       v.actions[i].actionType =
         {
@@ -50,9 +58,16 @@ import fs from "fs";
     }
   }
 
+  const profiles = Object.entries<any>(shallowProfiles).map(([k, v]) => {
+    return {
+      ...shallowProfiles[k],
+      ...deepProfiles[k],
+    };
+  });
+
   const json = {
-    ...data,
     cleanLastRun: new Date(),
+    numProfiles: Object.keys(profiles).length,
     profiles,
   };
 

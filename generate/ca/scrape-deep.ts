@@ -18,8 +18,16 @@ import fs from "fs";
 // }
 
 (async () => {
-  const data = JSON.parse(fs.readFileSync("data/ca/scrape.json", "utf8"));
-  const profiles = data.profiles;
+  const shallowData = JSON.parse(
+    fs.readFileSync("data/ca/scrape-shallow.json", "utf8")
+  );
+  const shallowProfiles = shallowData.profiles;
+
+  let deepData: any = { profiles: {} };
+  try {
+    deepData = JSON.parse(fs.readFileSync("data/ca/scrape-deep.json", "utf8"));
+  } catch {}
+  const deepProfiles = deepData.profiles;
 
   // Launch the browser and open a new blank page
   const browser = await puppeteer.launch({
@@ -30,18 +38,18 @@ import fs from "fs";
   // Set screen size
   await page.setViewport({ width: 1080, height: 1024 });
 
-  for (let [license, profile] of Object.entries<any>(profiles).slice(
-    2000,
-    2250
+  for (let [license, profile] of Object.entries<any>(shallowProfiles).slice(
+    0,
+    2
   )) {
     if (profile.fetch) {
       // Navigate the page to a URL
-      await page.goto(`${data.baseUrl}${profile.licenseUrl}`);
+      await page.goto(`${shallowData.baseUrl}${profile.licenseUrl}`);
       console.log(license);
 
       // Need to pass baseActions separately due to esbuild error
       const deepProfile = await page.evaluate(
-        (baseProfile, baseActions = [], baseProbationSummaries = []) => {
+        (shallowProfile, baseActions = [], baseProbationSummaries = []) => {
           const profile: any = {};
           profile.licenseIssuedAt = document
             .getElementById("issueDate")
@@ -82,12 +90,12 @@ import fs from "fs";
           profile.address = address?.[0].replace(/,\s*$/, "").trim();
           // https://search.dca.ca.gov/details/8002/G/58053/a64e3ea964356a9d1c6baccc4b3e9e8f has empty second line
           const address2 = address?.[1].replace(/,\s*$/, "").trim();
-          if (address2 && !address2.startsWith(baseProfile.city)) {
+          if (address2 && !address2.startsWith(shallowProfile.city)) {
             profile.address2 = address2;
 
             // eg, https://search.dca.ca.gov/details/8002/A/49264/a8e99b012afe9a60eaad770f9df71238
             const address3 = address?.[2].replace(/,\s*$/, "").trim();
-            if (address3 && !address3.startsWith(baseProfile.city)) {
+            if (address3 && !address3.startsWith(shallowProfile.city)) {
               profile.address3 = address3;
             }
           }
@@ -440,6 +448,8 @@ import fs from "fs";
               }
 
               // Don't add ones already in baseProfile.actions
+              // Note that if anything changed with one, this will be a new entry
+              // Therefore may want to store date scraped with each action
               if (
                 !baseActions.some((a: any) =>
                   Object.keys(action).every((k) => a[k] === action[k])
@@ -539,28 +549,40 @@ import fs from "fs";
           return profile;
         },
         profile,
-        profile.actions,
-        profile.probationSummaries
+        deepProfiles[license]?.actions ?? [],
+        deepProfiles[license]?.probationSummaries ?? []
       );
 
-      profiles[license] = {
-        ...profile,
-        ...deepProfile,
-      };
-      delete profiles[license].fetch;
+      deepProfiles[license] = deepProfile;
+      delete profile.fetch;
     }
   }
 
-  const json = {
-    ...data,
-    deepLastRun: new Date(),
-    profiles,
-  };
+  // Write shallow file to mark ones fetched
+  fs.writeFile(
+    "data/ca/scrape-shallow.json",
+    JSON.stringify({
+      ...shallowData,
+      profiles: shallowProfiles,
+    }),
+    (error) => {
+      if (error) throw error;
+    }
+  );
 
-  // For now write to a new file, but the point is for this be the same file as scrape-shallow
-  fs.writeFile("data/ca/scrape-deep.json", JSON.stringify(json), (error) => {
-    if (error) throw error;
-  });
+  // Write to a new file since good to keep separate scripts writing to separate files
+  fs.writeFile(
+    "data/ca/scrape-deep.json",
+    JSON.stringify({
+      ...deepData,
+      deepLastRun: new Date(),
+      numProfiles: Object.keys(deepProfiles).length,
+      profiles: deepProfiles,
+    }),
+    (error) => {
+      if (error) throw error;
+    }
+  );
 
   await browser.close();
 })();

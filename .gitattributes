@@ -8,3 +8,4 @@ data/ca/scrape-deep.json filter=lfs diff=lfs merge=lfs -text
 data/ca/scrape.json filter=lfs diff=lfs merge=lfs -text
 data/ca/summarize.json filter=lfs diff=lfs merge=lfs -text
 data/ca/old filter=lfs diff=lfs merge=lfs -text
+data/ca/scrape-shallow.json filter=lfs diff=lfs merge=lfs -text
