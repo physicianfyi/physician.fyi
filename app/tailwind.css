@@ -208,6 +208,10 @@
   .select-label {
     @apply text-sm font-medium !cursor-pointer;
   }
+
+  .inline-icon {
+    @apply inline w-[1.25em] h-[1.25em] align-bottom;
+  }
 }
 
 @layer components {

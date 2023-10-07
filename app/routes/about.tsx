@@ -5,22 +5,22 @@ export default function Route() {
 
       <p>
         Only after experiencing medical malpractice did I begin to realize just
-        how frequent it is and that most patients are not aware of how to look
-        up a doctor's history or take recourse when victimized. A big part of
-        this is because doctors and their stakeholders fiercely suppress cases
-        against them. Doctors offer refunds in exchange for signing a gag clause
-        (i.e., non-disclosure/disparagement agreement) barring the victim from
-        ever talking about it. If the victim is within the statute of
-        limitations (which is very short in some states) and they sue, doctors
-        carry hefty malpractice insurance that coerces settlement with victims
-        out of court, once again stipulating that they not speak. If those
-        methods don't work, doctors hire reputation cleaners to get unfavorable
-        reviews taken down directly by the review platform or by threat of
-        lawsuit over libel.
+        how frequently it occurs and that most patients are not aware of how to
+        look up a doctor's history or take recourse when victimized. A big part
+        of this is because doctors and their stakeholders fiercely suppress
+        cases against them. Doctors offer refunds in exchange for signing a gag
+        clause (i.e., non-disclosure/disparagement agreement) barring the victim
+        from ever talking about it. If the victim is within the statute of
+        limitations (which is very short in some states, like California's 1
+        year due to MICRA) and they sue, doctors carry hefty malpractice
+        insurance that coerces settlement with victims out of court, once again
+        stipulating that they not speak. If those methods don't work, doctors
+        hire reputation cleaners to get unfavorable reviews taken down directly
+        by the review platform or by threat of lawsuit over libel.
       </p>
 
       <p>
-        Most victims don't know they can file a complaint with the doctor's
+        Many victims don't know they can file a complaint with the doctor's
         licensing body (the state medical board). However, even if the victim
         does file a complaint, the complaint process is very opaque. Medical
         boards have a history of going very easy on doctors, perhaps because
@@ -40,14 +40,23 @@ export default function Route() {
         >
           Florida's has 12 doctors and just 3 consumers
         </a>
-        ). Watch the clip below for some further insight into how concerning the
+        ). Furthermore, doctors' interest groups (like the California Medical
+        Association or CMA) lobby to minimize regulations that could hold
+        doctors accountable. Their influence over medical boards becomes even
+        more direct when seeing that{" "}
+        <a
+          href="https://www.cbsnews.com/news/doctor-complaints-discipline-california-medical-board/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          2 current MBC members are former CMA presidents
+        </a>
+        . Watch the clip below for some further insight into how concerning the
         issue is, including the fact that your complaint in California has a
         1.4% chance of getting the doctor disciplined with probation and that
         the board does not consult the complainant after submission, often just
         accepting the doctor's rebuttal.
       </p>
-
-      {/* TODO Add that many MBC members are also part of CMA, a lobbying group for doctors */}
 
       <iframe
         width="100%"
@@ -71,7 +80,7 @@ export default function Route() {
 
       <p>
         I'd like to recognize the patient advocates who have come before, such
-        as 4patientsafety.org.
+        as the creators of 4patientsafety.org.
       </p>
     </article>
   );

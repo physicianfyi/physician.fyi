@@ -295,15 +295,12 @@ export default function Index() {
       </div>
 
       <h2 id="filters">
-        <Sliders className="inline-block" /> Filters
+        <Sliders className="inline-icon" /> Filters
         <Ariakit.TooltipProvider showTimeout={0}>
           <Ariakit.TooltipAnchor
             className=""
             render={
-              <Info
-                weight="duotone"
-                className="inline-block align-super text-lg"
-              />
+              <Info weight="duotone" className="inline align-super text-lg" />
             }
           ></Ariakit.TooltipAnchor>
           <Ariakit.Tooltip className="text-xs">
@@ -876,13 +873,23 @@ export default function Index() {
           return (
             <li key={license}>
               <Link to={`/ca/${license}`} className="group">
-                <div className="group-hover:bg-card group-focus-visible:bg-card py-1 rounded">
-                  <div className="px-1 flex items-center gap-2 group-hover:font-medium group-focus-visible:font-medium">
+                <div className="group-hover:bg-card group-focus-visible:bg-card p-4 rounded flex flex-col gap-4">
+                  <div className="px-1 group-hover:font-medium group-focus-visible:font-medium">
                     <div>
                       <span className="uppercase">{data.name}</span>{" "}
                       {(data.actions?.length ?? 0) > 1 &&
                         `(${data.actions.length} actions)`}
                     </div>
+                    {data.survey?.["PRIMARY AREA OF PRACTICE"] && (
+                      <div className="text-sm">
+                        {data.survey["PRIMARY AREA OF PRACTICE"]}
+                        {data.survey?.["SECONDARY AREA OF PRACTICE"]?.length >
+                          0 && ", "}
+                        {data.survey?.["SECONDARY AREA OF PRACTICE"]?.join(
+                          ", "
+                        )}
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-start sm:items-end gap-1 sm:gap-0 justify-between flex-col sm:flex-row">
                     <div className="px-1 font-medium flex items-center gap-1 text-xs text-gray-600 uppercase">

@@ -1,4 +1,8 @@
-import { GraduationCap, IdentificationBadge } from "@phosphor-icons/react";
+import {
+  Gavel,
+  GraduationCap,
+  IdentificationBadge,
+} from "@phosphor-icons/react";
 import type { DataFunctionArgs, LinksFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
@@ -119,7 +123,7 @@ export default function Route() {
           </h4>
 
           <h3 className="uppercase">
-            <GraduationCap weight="bold" className="inline mr-1" />
+            <GraduationCap weight="bold" className="inline-icon mr-1" />
             {profile.school}
             {profile.graduationYear && `, class of ${profile.graduationYear}`}
           </h3>
@@ -168,7 +172,9 @@ export default function Route() {
         </div>
 
         <div className="flex flex-col gap-2">
-          <h2 id="actions">Actions</h2>
+          <h2 id="actions">
+            <Gavel className="inline-icon" /> Actions
+          </h2>
           <ul className="gap-2 flex flex-col">
             {profile.actions?.map((r: any) => {
               return (
