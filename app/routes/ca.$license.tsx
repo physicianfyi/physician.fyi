@@ -1,3 +1,4 @@
+import { GraduationCap, IdentificationBadge } from "@phosphor-icons/react";
 import type { DataFunctionArgs, LinksFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
@@ -81,7 +82,7 @@ export default function Route() {
   // const params = useParams()
   const { profile, license, baseUrl } = useLoaderData<typeof loader>();
 
-  const pieData = Object.entries(profile.minActivities).reduce<any>(
+  const pieData = Object.entries(profile.minActivities ?? {}).reduce<any>(
     (acc, [k, v]) => {
       if (v) acc.push({ name: k, value: v });
       return acc;
@@ -106,10 +107,19 @@ export default function Route() {
           </div>
 
           <h4>
+            <IdentificationBadge
+              className={`inline mr-1 ${
+                profile.licenseStatus === "license renewed & current"
+                  ? "text-green-500"
+                  : "text-red-500"
+              }`}
+              weight="bold"
+            />
             California License <span className="uppercase">{license}</span>
           </h4>
 
           <h3 className="uppercase">
+            <GraduationCap weight="bold" className="inline mr-1" />
             {profile.school}
             {profile.graduationYear && `, class of ${profile.graduationYear}`}
           </h3>

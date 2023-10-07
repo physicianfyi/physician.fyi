@@ -19,6 +19,12 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
+import {
+  ClockClockwise,
+  IdentificationBadge,
+  MagnifyingGlass,
+  X,
+} from "@phosphor-icons/react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -793,21 +799,7 @@ export default function Index() {
                   // grid place-items-center to center svg like button did
                   className="grid place-items-center p-2.5 h-full text-sm font-medium text-white bg-gray-400 rounded-l-lg border border-gray-400 hover:bg-gray-800 focus:ring-4 focus:z-10 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true"
-                    className="w-4 h-4"
-                    fill="currentColor"
-                    viewBox="0 0 256 256"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M208.49,191.51a12,12,0,0,1-17,17L128,145,64.49,208.49a12,12,0,0,1-17-17L111,128,47.51,64.49a12,12,0,0,1,17-17L128,111l63.51-63.52a12,12,0,0,1,17,17L145,128Z"
-                    ></path>
-                  </svg>
+                  <X size={32} className="w-4 h-4" weight="bold" />
                 </Link>
               )}
 
@@ -815,21 +807,7 @@ export default function Index() {
                 type="submit"
                 className="p-2.5 h-full text-sm font-medium text-white focus:z-10 bg-blue-700 rounded-r-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               >
-                <svg
-                  className="w-4 h-4"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                  />
-                </svg>
+                <MagnifyingGlass className="w-4 h-4" weight="duotone" />
               </button>
             </div>
           </div>
@@ -896,92 +874,19 @@ export default function Index() {
                   <div className="flex items-start sm:items-end gap-1 sm:gap-0 justify-between flex-col sm:flex-row">
                     <div className="px-1 font-medium flex items-center gap-1 text-xs text-gray-600 uppercase">
                       CA
-                      <svg
+                      <IdentificationBadge
                         className={`w-4 h-4 ${
                           data.licenseStatus === "license renewed & current"
                             ? "text-green-500"
                             : "text-red-500"
                         }`}
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 256 256"
-                      >
-                        <circle
-                          cx="128"
-                          cy="136"
-                          r="32"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="24"
-                        />
-                        <rect
-                          x="32"
-                          y="48"
-                          width="192"
-                          height="160"
-                          rx="8"
-                          transform="translate(256) rotate(90)"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="24"
-                        />
-                        <line
-                          x1="96"
-                          y1="68"
-                          x2="160"
-                          y2="68"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="24"
-                        />
-                        <path
-                          d="M84,187.21a60,60,0,0,1,88,0"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="24"
-                        />
-                      </svg>
+                        weight="bold"
+                      />
                       {license.startsWith("UNLICENSED-") ? "N/A" : license}
                     </div>
                     {data.actions && (
                       <div className="uppercase flex items-center gap-1 bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-1 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">
-                        <svg
-                          className="w-4 h-4"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 256 256"
-                        >
-                          <polyline
-                            points="128 80 128 128 168 152"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="24"
-                          />
-                          <polyline
-                            points="184 104 224 104 224 64"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="24"
-                          />
-                          <path
-                            d="M188.4,192a88,88,0,1,1,1.83-126.23C202,77.69,211.72,88.93,224,104"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="24"
-                          />
-                        </svg>
+                        <ClockClockwise className="w-4 h-4" weight="bold" />
                         {data.actions.at(0).date}{" "}
                         {data.actions.length > 1 &&
                           data.actions.at(-1).date !==
@@ -1026,6 +931,12 @@ export default function Index() {
           {/* Want to maintain query when paginating */}
           <input name="q" value={query} hidden readOnly />
           <input name="t" value={JSON.stringify(typeValues)} readOnly hidden />
+          <input
+            name="u"
+            value={JSON.stringify(licenseStatusValues)}
+            readOnly
+            hidden
+          />
           <input
             name="l"
             value={JSON.stringify(licenseTypeValues)}
