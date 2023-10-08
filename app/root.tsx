@@ -9,7 +9,10 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import * as Ariakit from "@ariakit/react";
+
 import styles from "./tailwind.css";
+import { List } from "@phosphor-icons/react";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
@@ -38,17 +41,42 @@ export default function App() {
             <Link to="/" className="text-lg font-bold font-serif">
               👨‍⚕️ physician.fyi 🔍
             </Link>
-            <div className="flex items-center gap-2">
-              <Link to="/about" className="text-md font-bold">
-                About
-              </Link>
-              <Link to="/what-to-do" className="text-md font-bold">
-                What to do
-              </Link>
-              <Link to="/contact" className="text-md font-bold">
-                Contact
-              </Link>
-            </div>
+
+            <Ariakit.MenuProvider>
+              <Ariakit.MenuButton className="button">
+                <List className="w-8 h-8" weight="bold" />
+              </Ariakit.MenuButton>
+              <Ariakit.Menu
+                gutter={8}
+                className="flex flex-col gap-2 bg-popover text-popover-foreground p-2 rounded border border-border"
+              >
+                <Ariakit.MenuItem
+                  className="text-md font-bold"
+                  // onClick={() => alert("Edit")}
+                  as={Link}
+                  to="/about"
+                >
+                  About
+                </Ariakit.MenuItem>
+                <Ariakit.MenuItem
+                  className="text-md font-bold"
+                  // onClick={() => alert("Edit")}
+                  as={Link}
+                  to="/what-to-do"
+                >
+                  What to do
+                </Ariakit.MenuItem>
+                <Ariakit.MenuSeparator className="separator" />
+                <Ariakit.MenuItem
+                  className="text-md font-bold"
+                  // onClick={() => alert("Edit")}
+                  as={Link}
+                  to="/contact"
+                >
+                  Contact
+                </Ariakit.MenuItem>
+              </Ariakit.Menu>
+            </Ariakit.MenuProvider>
           </nav>
 
           <Outlet />
