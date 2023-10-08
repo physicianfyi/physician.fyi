@@ -305,7 +305,7 @@ export default function Index() {
               <Info weight="duotone" className="inline align-super text-lg" />
             }
           ></Ariakit.TooltipAnchor>
-          <Ariakit.Tooltip className="text-xs font-semibold bg-popover text-popover-foreground rounded p-2 border border-border">
+          <Ariakit.Tooltip className="text-xs font-semibold popover">
             Adding options within a filter "or"s them; adding options between
             filters "and"s them
           </Ariakit.Tooltip>
@@ -394,7 +394,7 @@ export default function Index() {
               store={select}
               gutter={4}
               sameWidth
-              className="select-popover"
+              className="popover"
             >
               {Object.keys(availableTypeCounts).map((key: string) => (
                 <Ariakit.SelectItem
@@ -463,7 +463,7 @@ export default function Index() {
               store={licenseStatusSelect}
               gutter={4}
               sameWidth
-              className="select-popover"
+              className="popover"
             >
               {Object.keys(availableLicenseStatusCounts).map((key: string) => (
                 <Ariakit.SelectItem
@@ -532,7 +532,7 @@ export default function Index() {
               store={licenseTypeSelect}
               gutter={4}
               sameWidth
-              className="select-popover"
+              className="popover"
             >
               {Object.keys(availableLicenseTypeCounts).map((key: string) => (
                 <Ariakit.SelectItem
@@ -596,7 +596,7 @@ export default function Index() {
               store={schoolSelect}
               gutter={4}
               sameWidth
-              className="select-popover"
+              className="popover"
             >
               {Object.keys(availableSchoolCounts).map((key: string) => (
                 <Ariakit.SelectItem
@@ -665,7 +665,7 @@ export default function Index() {
               store={specialtySelect}
               gutter={4}
               sameWidth
-              className="select-popover"
+              className="popover"
             >
               {Object.keys(availableSpecialtyCounts).map((key: string) => (
                 <Ariakit.SelectItem
@@ -732,7 +732,7 @@ export default function Index() {
               store={offenseSelect}
               gutter={4}
               sameWidth
-              className="select-popover"
+              className="popover"
             >
               {Object.keys(availableOffenseCounts).map((key: string) => (
                 <Ariakit.SelectItem
@@ -916,7 +916,7 @@ export default function Index() {
                             />
                           }
                         ></Ariakit.TooltipAnchor>
-                        <Ariakit.Tooltip className="uppercase text-xs font-semibold bg-popover text-popover-foreground rounded p-2 border border-border">
+                        <Ariakit.Tooltip className="uppercase text-xs font-semibold popover">
                           {data.licenseStatus}
                         </Ariakit.Tooltip>
                       </Ariakit.TooltipProvider>

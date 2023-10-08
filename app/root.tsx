@@ -46,10 +46,7 @@ export default function App() {
               <Ariakit.MenuButton className="button">
                 <List className="w-8 h-8" weight="bold" />
               </Ariakit.MenuButton>
-              <Ariakit.Menu
-                gutter={8}
-                className="flex flex-col gap-2 bg-popover text-popover-foreground p-2 rounded border border-border"
-              >
+              <Ariakit.Menu gutter={8} className="popover">
                 <Ariakit.MenuItem
                   className="text-md font-bold"
                   // onClick={() => alert("Edit")}
