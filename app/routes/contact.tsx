@@ -10,6 +10,7 @@ export default function Route() {
         frameBorder="0"
         marginHeight={0}
         marginWidth={0}
+        className="[color-scheme:light]"
       >
         Loading…
       </iframe>
