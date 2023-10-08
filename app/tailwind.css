@@ -212,6 +212,10 @@
   .inline-icon {
     @apply inline w-[1.25em] h-[1.25em] align-bottom;
   }
+
+  .menu-line {
+    @apply h-1 w-6 my-0.5 rounded-full bg-primary transition ease-in-out transform duration-150;
+  }
 }
 
 @layer components {

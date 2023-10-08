@@ -12,7 +12,6 @@ import {
 import * as Ariakit from "@ariakit/react";
 import { PostHogProvider } from "posthog-js/react";
 import posthog from "posthog-js";
-import { List } from "@phosphor-icons/react";
 import styles from "./tailwind.css";
 
 export const links: LinksFunction = () => [
@@ -56,13 +55,14 @@ export default function App() {
             </Link>
 
             <Ariakit.MenuProvider>
-              <Ariakit.MenuButton className="button">
-                <List className="w-8 h-8" weight="bold" />
+              <Ariakit.MenuButton className="group flex flex-col h-12 w-12 justify-center items-center">
+                <div className="menu-line group-aria-expanded:rotate-45 group-aria-expanded:translate-y-2 group-aria-expanded:opacity-50 group-focus-visible:opacity-100 opacity-50 group-hover:opacity-100 group-aria-expanded:group-hover:opacity-100" />
+                <div className="menu-line group-aria-expanded:opacity-0 opacity-50 group-hover:opacity-100 group-focus-visible:opacity-100" />
+                <div className="menu-line group-aria-expanded:-rotate-45 group-aria-expanded:-translate-y-2 group-aria-expanded:opacity-50 group-focus-visible:opacity-100 opacity-50 group-hover:opacity-100 group-aria-expanded:group-hover:opacity-100" />
               </Ariakit.MenuButton>
               <Ariakit.Menu gutter={8} className="popover">
                 <Ariakit.MenuItem
                   className="text-md font-bold"
-                  // onClick={() => alert("Edit")}
                   as={Link}
                   to="/about"
                 >
@@ -70,7 +70,6 @@ export default function App() {
                 </Ariakit.MenuItem>
                 <Ariakit.MenuItem
                   className="text-md font-bold"
-                  // onClick={() => alert("Edit")}
                   as={Link}
                   to="/what-to-do"
                 >
@@ -79,7 +78,6 @@ export default function App() {
                 <Ariakit.MenuSeparator className="separator" />
                 <Ariakit.MenuItem
                   className="text-md font-bold"
-                  // onClick={() => alert("Edit")}
                   as={Link}
                   to="/contact"
                 >
