@@ -9,6 +9,7 @@ import {
 import { PAGE_SIZE } from "~/services/constants";
 import { selectPhysicians } from "~/services/physicians.server";
 import fs from "fs";
+import path from "path";
 import * as Ariakit from "@ariakit/react";
 import { useEffect, useId, useMemo, useRef } from "react";
 import {
@@ -42,7 +43,7 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
   const query = url.searchParams.get("q") ?? "";
 
   const summarizedData = JSON.parse(
-    fs.readFileSync("data/ca/summarize.json", "utf8")
+    fs.readFileSync(path.join(process.cwd(), "data/ca/summarize.json"), "utf8")
   );
 
   const types = JSON.parse(url.searchParams.get("t") ?? "[]");

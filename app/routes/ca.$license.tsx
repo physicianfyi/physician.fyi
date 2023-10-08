@@ -12,6 +12,7 @@ import { useLoaderData } from "@remix-run/react";
 import { DiscussionEmbed } from "disqus-react";
 import fs from "fs";
 import { ResponsiveContainer, PieChart, Pie, Cell, LabelList } from "recharts";
+import path from "path";
 
 export const links: LinksFunction = () => [
   {
@@ -35,10 +36,14 @@ export const loader = async ({
     );
   }
 
-  const data = JSON.parse(fs.readFileSync("data/ca/clean.json", "utf8"));
+  const data = JSON.parse(
+    fs.readFileSync(path.join(process.cwd(), "data/ca/clean.json"), "utf8")
+  );
   const profile = data.profiles[license];
 
-  const read = JSON.parse(fs.readFileSync("data/ca/read.json", "utf8")).results;
+  const read = JSON.parse(
+    fs.readFileSync(path.join(process.cwd(), "data/ca/read.json"), "utf8")
+  ).results;
 
   for (let action of profile.actions ?? []) {
     const url = action.url;
