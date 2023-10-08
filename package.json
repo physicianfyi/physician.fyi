@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@ariakit/react": "^0.3.3",
-    "@phosphor-icons/react": "^2.0.13",
+    "@phosphor-icons/react": "^2.0.10",
     "@remix-run/css-bundle": "^2.0.1",
     "@remix-run/node": "^2.0.1",
     "@remix-run/react": "^2.0.1",
