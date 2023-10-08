@@ -29,6 +29,7 @@ import {
   UserList,
   X,
 } from "@phosphor-icons/react";
+import { usePostHog } from "posthog-js/react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -112,6 +113,11 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
 };
 
 export default function Index() {
+  const posthog = usePostHog();
+  useEffect(() => {
+    posthog?.capture("$pageview");
+  }, [posthog]);
+
   const [params] = useSearchParams();
   const page = Number(params.get("p") ?? 0);
   const query = params.get("q") ?? "";

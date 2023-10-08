@@ -10,9 +10,10 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import * as Ariakit from "@ariakit/react";
-
-import styles from "./tailwind.css";
+import { PostHogProvider } from "posthog-js/react";
+import posthog from "posthog-js";
 import { List } from "@phosphor-icons/react";
+import styles from "./tailwind.css";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: styles },
@@ -25,6 +26,18 @@ export const links: LinksFunction = () => [
 ];
 
 export const meta: MetaFunction = () => [{}];
+
+// Check that PostHog is client-side (used to handle SSR)
+if (typeof window !== "undefined") {
+  posthog.init("phc_xmeKaxAQpUPLbVkn32p7sg1FSlOPdaekyjAthRCajW1", {
+    api_host: "https://app.posthog.com",
+    // Enable debug mode in development
+    loaded: (posthog) => {
+      if (process.env.NODE_ENV === "development") posthog.debug();
+    },
+    capture_pageview: false, // Manually send because it doesn't work when client side routing
+  });
+}
 
 export default function App() {
   return (
@@ -76,7 +89,15 @@ export default function App() {
             </Ariakit.MenuProvider>
           </nav>
 
-          <Outlet />
+          {/* https://github.com/proofzero/rollupid/blob/f43d794625f47a99cec97836d4b4a65858ae4530/apps/console/app/root.tsx#L284 */}
+          {typeof window !== "undefined" ? (
+            <PostHogProvider client={posthog}>
+              <Outlet />
+            </PostHogProvider>
+          ) : (
+            <Outlet />
+          )}
+
           <ScrollRestoration />
           <Scripts />
           <LiveReload />

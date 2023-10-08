@@ -13,6 +13,8 @@ import { DiscussionEmbed } from "disqus-react";
 import fs from "fs";
 import { ResponsiveContainer, PieChart, Pie, Cell, LabelList } from "recharts";
 import path from "path";
+import { usePostHog } from "posthog-js/react";
+import { useEffect } from "react";
 
 export const links: LinksFunction = () => [
   {
@@ -91,6 +93,11 @@ const renderCustomLabel = ({
 };
 
 export default function Route() {
+  const posthog = usePostHog();
+  useEffect(() => {
+    posthog?.capture("$pageview");
+  }, [posthog]);
+
   // const params = useParams()
   const { profile, license, baseUrl } = useLoaderData<typeof loader>();
 
@@ -194,69 +201,73 @@ export default function Route() {
             <Gavel className="inline-icon" /> Actions
           </h2>
           <ul className="gap-2 flex flex-col">
-            {profile.actions?.toReversed().map((r: any) => {
-              return (
-                <li
-                  key={`${r.actionType}${r.date}`}
-                  className="border-2 p-2 flex flex-col gap-2"
-                >
-                  <div className="flex justify-between items-center flex-wrap">
-                    <div className="font-semibold">{r.actionType}</div>
-                    {r.url && (
+            {/* .toReversed seems to not be in node version, just browser */}
+            {profile.actions
+              ?.slice(0)
+              .reverse()
+              .map((r: any) => {
+                return (
+                  <li
+                    key={`${r.actionType}${r.date}`}
+                    className="border-2 p-2 flex flex-col gap-2"
+                  >
+                    <div className="flex justify-between items-center flex-wrap">
+                      <div className="font-semibold">{r.actionType}</div>
+                      {r.url && (
+                        <>
+                          <a
+                            href={`https://web.archive.org/web/0/${r.url}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="font-medium"
+                          >
+                            View PDF ({r.numPages} pages)
+                          </a>
+                        </>
+                      )}
+                    </div>
+
+                    {r.url && r.offenses && (
                       <>
-                        <a
-                          href={`https://web.archive.org/web/0/${r.url}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="font-medium"
-                        >
-                          View PDF ({r.numPages} pages)
-                        </a>
+                        <ul className="list-disc list-inside">
+                          <div className="font-medium">Offenses</div>
+                          {r.offenses.map((o: string) => (
+                            <li key={o}>{o}</li>
+                          ))}
+                        </ul>
                       </>
                     )}
-                  </div>
 
-                  {r.url && r.offenses && (
-                    <>
-                      <ul className="list-disc list-inside">
-                        <div className="font-medium">Offenses</div>
-                        {r.offenses.map((o: string) => (
-                          <li key={o}>{o}</li>
-                        ))}
-                      </ul>
-                    </>
-                  )}
-
-                  <div className="flex flex-col gap-1">
-                    {Object.keys(r).map((k) => {
-                      if (
-                        [
-                          "offenses",
-                          "actionType",
-                          "date",
-                          "url",
-                          "numPages",
-                        ].includes(k)
-                      ) {
-                        return null;
-                      }
-                      return (
-                        <div key={k} className="uppercase">
-                          <span className="font-medium">{k}:</span> {r[k]}
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <div className="flex justify-end items-center">
-                    <div className="w-fit uppercase flex items-center gap-1 bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-1 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">
-                      <ClockClockwise className="w-4 h-4" weight="bold" />
-                      {r.date}
+                    <div className="flex flex-col gap-1">
+                      {Object.keys(r).map((k) => {
+                        if (
+                          [
+                            "offenses",
+                            "actionType",
+                            "date",
+                            "url",
+                            "numPages",
+                          ].includes(k)
+                        ) {
+                          return null;
+                        }
+                        return (
+                          <div key={k} className="uppercase">
+                            <span className="font-medium">{k}:</span> {r[k]}
+                          </div>
+                        );
+                      })}
                     </div>
-                  </div>
-                </li>
-              );
-            })}
+
+                    <div className="flex justify-end items-center">
+                      <div className="w-fit uppercase flex items-center gap-1 bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-1 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">
+                        <ClockClockwise className="w-4 h-4" weight="bold" />
+                        {r.date}
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
           </ul>
         </div>
       </div>

@@ -1,4 +1,12 @@
+import { usePostHog } from "posthog-js/react";
+import { useEffect } from "react";
+
 export default function Route() {
+  const posthog = usePostHog();
+  useEffect(() => {
+    posthog?.capture("$pageview");
+  }, [posthog]);
+
   return (
     <article className="p-8 prose dark:prose-invert mx-auto">
       <h1>What to do if you've been harmed</h1>

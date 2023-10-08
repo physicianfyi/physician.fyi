@@ -6,5 +6,5 @@ export default {
   // publicPath: "/build/",
   // serverBuildPath: "build/index.js",
   tailwind: true,
-  serverDependenciesToBundle: ["@phosphor-icons/react"],
+  serverDependenciesToBundle: ["@phosphor-icons/react", "posthog-js/react"],
 };
