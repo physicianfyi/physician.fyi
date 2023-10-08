@@ -110,7 +110,7 @@ export default function Route() {
   );
 
   return (
-    <div className="p-8 flex flex-col gap-4">
+    <div className="p-8 flex flex-col gap-4 max-w-6xl mx-auto">
       {/* Just so the disqus thing changing height doesn't show on load */}
       <div className="min-h-screen flex flex-col gap-8">
         <div className="">
