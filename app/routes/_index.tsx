@@ -74,10 +74,10 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
   // Don't show filtering for ones with just 1 match
   // Since we show options by count object now; this also has the benefit of not messing up indices if we include some later instead of filtering availableOffenses
   availableSchoolCounts = Object.fromEntries(
-    Object.entries<any>(availableSchoolCounts).filter(([k, v]) => v > 2)
+    Object.entries<any>(availableSchoolCounts).filter(([k, v]) => v > 4)
   );
   availableOffenseCounts = Object.fromEntries(
-    Object.entries<any>(availableOffenseCounts).filter(([k, v]) => v > 3)
+    Object.entries<any>(availableOffenseCounts).filter(([k, v]) => v > 4)
   );
 
   const data = await selectPhysicians({
@@ -689,7 +689,10 @@ export default function Index() {
         <div className="flex flex-col gap-1">
           <div className="flex items-end justify-between">
             <Ariakit.SelectLabel className="select-label" store={offenseSelect}>
-              Offense
+              Offense{" "}
+              <span className="bg-indigo-400 text-white px-1.5 py-0.5 rounded text-xs font-semibold shadow-inner border border-indigo-500">
+                beta
+              </span>
             </Ariakit.SelectLabel>
             {offenseValues.length > 0 && (
               <button

@@ -189,7 +189,7 @@ export default function Route() {
             <Gavel className="inline-icon" /> Actions
           </h2>
           <ul className="gap-2 flex flex-col">
-            {profile.actions?.map((r: any) => {
+            {profile.actions?.toReversed().map((r: any) => {
               return (
                 <li
                   key={`${r.actionType}${r.date}`}
