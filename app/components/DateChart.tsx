@@ -178,9 +178,11 @@ export const DateChart = ({
           height={300}
           id={id}
           data={data}
-          onMouseDown={(e) =>
-            setZoomGraph((prev) => ({ ...prev, refAreaLeft: e.activeLabel }))
-          }
+          onMouseDown={(e) => {
+            if (e) {
+              setZoomGraph((prev) => ({ ...prev, refAreaLeft: e.activeLabel }));
+            }
+          }}
           onMouseMove={(e) =>
             zoomGraph.refAreaLeft &&
             setZoomGraph((prev) => ({ ...prev, refAreaRight: e.activeLabel }))
