@@ -15,6 +15,8 @@ export const selectPhysicians = async ({
   schools = [],
   specialties = [],
   offenses = [],
+  beginning,
+  ending,
 }: {
   page?: number;
   query?: string;
@@ -24,6 +26,8 @@ export const selectPhysicians = async ({
   schools?: string[];
   specialties?: string[];
   offenses?: string[];
+  beginning?: number;
+  ending?: number;
 }) => {
   const data = JSON.parse(fs.readFileSync("data/ca/clean.json", "utf8"));
 
@@ -112,6 +116,32 @@ export const selectPhysicians = async ({
     });
   }
 
+  if (beginning) {
+    results = results.filter((result) => {
+      if (
+        result.data.actions?.some(
+          (action: any) => Number(action.date.split(",")[1].trim()) >= beginning
+        )
+      ) {
+        return true;
+      }
+      return false;
+    });
+  }
+
+  if (ending) {
+    results = results.filter((result) => {
+      if (
+        result.data.actions?.some(
+          (action: any) => Number(action.date.split(",")[1].trim()) <= ending
+        )
+      ) {
+        return true;
+      }
+      return false;
+    });
+  }
+
   if (query) {
     const options = {
       includeScore: false,
@@ -181,7 +211,11 @@ export const selectPhysicians = async ({
     lastUpdated: data.deepLastRun,
     chartData: Object.keys(chartData)
       .sort()
-      .map((k) => ({ k, v: chartData[k] })),
+      .map((k) => ({
+        year: Number(k),
+        actions: chartData[k].actions,
+        physicians: chartData[k].physicians,
+      })),
     geo,
   };
 };

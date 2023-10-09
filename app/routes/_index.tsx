@@ -11,15 +11,7 @@ import { selectPhysicians } from "~/services/physicians.server";
 import fs from "fs";
 import path from "path";
 import * as Ariakit from "@ariakit/react";
-import { useEffect, useId, useMemo, useRef } from "react";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
-  Tooltip,
-} from "recharts";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ClockClockwise,
   IdentificationBadge,
@@ -31,6 +23,7 @@ import {
 } from "@phosphor-icons/react";
 import { usePostHog } from "posthog-js/react";
 import { Map } from "~/components/Map";
+import { DateChart } from "~/components/DateChart";
 
 export const meta: MetaFunction = () => {
   return [
@@ -74,6 +67,9 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
   let { results: availableOffenses, counts: availableOffenseCounts } =
     summarizedData.offenses ?? { results: [], counts: {} };
 
+  const beginning = Number(url.searchParams.get("b") ?? "0");
+  const ending = Number(url.searchParams.get("e") ?? "0");
+
   // Don't show filtering for ones with just 1 match
   // Since we show options by count object now; this also has the benefit of not messing up indices if we include some later instead of filtering availableOffenses
   availableSchoolCounts = Object.fromEntries(
@@ -94,6 +90,8 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
     schools: schools.map((s: number) => availableSchools[s]),
     specialties: specialties.map((a: number) => availableSpecialties[a]),
     offenses: offenses.map((o: number) => availableOffenses[o]),
+    ...(beginning && { beginning }),
+    ...(ending && { ending }),
   });
 
   return {
@@ -147,6 +145,26 @@ export default function Index() {
     () => JSON.parse(params.get("o") ?? "[]"),
     [params]
   );
+  let beginningParam: number = useMemo(
+    () => Number(params.get("b") ?? "0"),
+    [params]
+  );
+  let endingParam: number = useMemo(
+    () => Number(params.get("e") ?? "0"),
+    [params]
+  );
+  const [beginning, setBeginning] = useState<number>(0);
+  const [ending, setEnding] = useState<number>(0);
+  useEffect(() => {
+    if (beginningParam) {
+      setBeginning(beginningParam);
+    }
+  }, [beginningParam]);
+  useEffect(() => {
+    if (endingParam) {
+      setEnding(endingParam);
+    }
+  }, [endingParam]);
 
   const {
     data,
@@ -288,9 +306,19 @@ export default function Index() {
       });
     }
   }, [submit, offenseValues, offenses]);
+  useEffect(() => {
+    // Submit even if 0 since resetting
+    submit(filterRef.current, {
+      preventScrollReset: true,
+    });
+  }, [beginning, submit]);
+  useEffect(() => {
+    submit(filterRef.current, {
+      preventScrollReset: true,
+    });
+  }, [ending, submit]);
 
   const queryRef = useRef<HTMLFormElement>(null);
-  const id = useId();
 
   return (
     <div className="p-4 sm:p-8 md:p-16 flex flex-col gap-4">
@@ -358,6 +386,8 @@ export default function Index() {
           hidden
         />
         <input name="o" value={JSON.stringify(offenseValues)} readOnly hidden />
+        <input name="b" value={beginning} hidden readOnly />
+        <input name="e" value={ending} hidden readOnly />
 
         <div className="flex flex-col gap-1">
           <div className="flex items-end justify-between">
@@ -836,46 +866,30 @@ export default function Index() {
         </div>
       </Form>
 
-      <div
-        className="flex items-center flex-wrap justify-between gap-2 p-4 text-sm text-card-foreground rounded-lg bg-card"
-        role="alert"
-      >
-        <div>
-          <span className="font-medium">
-            {data.numResults} physicians with{" "}
-            {data.chartData.reduce(
-              (acc, curr) => acc + (curr.v.actions ?? 0),
-              0
-            )}{" "}
-            actions
-          </span>{" "}
-          found
-        </div>
-        <div className="text-xs">
-          Last updated {data.lastUpdated.split("T")[0]}
+      <div className="text-card-foreground rounded-lg bg-card p-4">
+        <div className="flex items-center flex-wrap justify-between gap-2 text-sm">
+          <div role="alert">
+            <span className="font-medium">
+              {data.numResults} physicians with{" "}
+              {data.chartData.reduce(
+                (acc, curr) => acc + (curr.actions ?? 0),
+                0
+              )}{" "}
+              actions
+            </span>{" "}
+            found
+          </div>
+
+          <div className="text-xs">
+            Last updated {data.lastUpdated.split("T")[0]}
+          </div>
         </div>
 
-        {/* TODO Filter by date range here https://recharts.org/en-US/examples/HighlightAndZoomLineChart */}
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart id={id} data={data.chartData}>
-            <Line
-              type="monotone"
-              dataKey="v.actions"
-              stroke="#8884d8"
-              name="Actions"
-            />
-            <Line
-              type="monotone"
-              dataKey="v.physicians"
-              stroke="#82ca9d"
-              animationDuration={300}
-              name="Physicians"
-            />
-            <XAxis dataKey="k" />
-            <YAxis />
-            <Tooltip />
-          </LineChart>
-        </ResponsiveContainer>
+        <DateChart
+          data={data.chartData}
+          setBeginning={setBeginning}
+          setEnding={setEnding}
+        />
 
         <div className="w-full overflow-hidden flex flex-col gap-1">
           <span className="w-fit bg-indigo-400 text-white px-1.5 py-0.5 rounded text-xs font-semibold shadow-inner border border-indigo-500">
@@ -1013,6 +1027,8 @@ export default function Index() {
             readOnly
             hidden
           />
+          <input name="b" value={beginning} hidden readOnly />
+          <input name="e" value={ending} hidden readOnly />
           <button
             name="p"
             value={page - 1}
