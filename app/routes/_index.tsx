@@ -142,29 +142,6 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
     offenses: offenses.map((o: number) => availableOffenses[o]),
   });
 
-  const geoData = JSON.parse(
-    fs.readFileSync(path.join(process.cwd(), "data/ca/geocode.json"), "utf8")
-  );
-  const geo = {
-    type: "FeatureCollection",
-    features: data.results.reduce<any[]>((acc, { license, data }) => {
-      if (geoData[license]) {
-        acc.push({
-          type: "Feature",
-          geometry: {
-            type: "Point",
-            coordinates: [geoData[license].lon, geoData[license].lat, 0],
-          },
-          properties: {
-            id: license,
-            numActions: data.actions?.length ?? 0,
-          },
-        });
-      }
-      return acc;
-    }, []),
-  };
-
   return {
     data,
     availableTypes,
@@ -179,7 +156,6 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
     availableSpecialtyCounts,
     availableOffenses,
     availableOffenseCounts,
-    geo,
   };
 };
 
@@ -232,7 +208,6 @@ export default function Index() {
     availableSpecialtyCounts,
     availableOffenses,
     availableOffenseCounts,
-    geo,
   } = useLoaderData<typeof loader>();
   const results = data.results;
 
@@ -1023,7 +998,7 @@ export default function Index() {
             <Source
               id="disciplines"
               type="geojson"
-              data={geo as any}
+              data={data.geo as any}
               cluster={true}
               clusterMaxZoom={14}
               clusterRadius={50}
