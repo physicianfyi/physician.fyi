@@ -4,6 +4,7 @@ import {
   Gavel,
   GraduationCap,
   IdentificationBadge,
+  MapPin,
   User,
 } from "@phosphor-icons/react";
 import type { DataFunctionArgs, LinksFunction } from "@remix-run/node";
@@ -113,7 +114,7 @@ export default function Route() {
     <div className="p-8 flex flex-col gap-4 max-w-6xl mx-auto">
       {/* Just so the disqus thing changing height doesn't show on load */}
       <div className="min-h-screen flex flex-col gap-8">
-        <div className="">
+        <div className="flex flex-col gap-1">
           <div className="flex justify-between">
             <h1 className="uppercase">
               <User weight="bold" className="inline-icon" /> {profile.name}
@@ -147,6 +148,21 @@ export default function Route() {
               {profile.survey?.["SECONDARY AREA OF PRACTICE"]?.join(", ")}
             </h4>
           )}
+
+          <div className="flex gap-2">
+            <h2>
+              <MapPin weight="duotone" className="" />
+            </h2>
+            <div className="uppercase">
+              <div>{profile.address}</div>
+              <div>{profile.address2}</div>
+              <div>{profile.address3}</div>
+              <div>{profile.city}</div>
+              <div>{profile.county}</div>
+              <div>{profile.state}</div>
+              <div>{profile.zip}</div>
+            </div>
+          </div>
         </div>
 
         <div>
