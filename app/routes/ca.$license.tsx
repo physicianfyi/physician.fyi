@@ -267,6 +267,16 @@ export default function Route() {
                         ) {
                           return null;
                         }
+                        if (["history"].includes(k)) {
+                          return Object.keys(r[k]).map((k2) => {
+                            return (
+                              <div key={k2} className="uppercase">
+                                <span className="font-medium">{k2}:</span>{" "}
+                                {r[k][k2]}
+                              </div>
+                            );
+                          });
+                        }
                         return (
                           <div key={k} className="uppercase">
                             <span className="font-medium">{k}:</span> {r[k]}
