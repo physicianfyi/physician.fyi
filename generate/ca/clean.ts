@@ -54,6 +54,8 @@ import fs from "fs";
           contentLICENSEISSUEDWITHPUBLICLETTEROFREPRIMAND:
             "PUBLIC LETTER OF REPRIMAND",
           contentMalpracticeSettlements: "MALPRACTICE SETTLEMENTS",
+          "ORDER FOR LICENSE SURRENDER DURING ADIMINISTRATIVE ACTION":
+            "ORDER FOR LICENSE SURRENDER DURING ADMINISTRATIVE ACTION",
         }[v.actions[i].actionType as string] ?? v.actions[i].actionType;
 
       v.actions[i].date = v.actions[i].date.replace(/3023$/, "2023");
