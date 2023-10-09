@@ -171,46 +171,46 @@ export default function Route() {
             {profile.school}
             {profile.graduationYear && `, class of ${profile.graduationYear}`}
           </h3>
-
-          {Boolean(profile.minHours) && (
-            <div className="">
-              <h4>
-                <ChartPie
-                  weight="bold"
-                  className="inline w-[1.25em] h-[1.25em]"
-                />{" "}
-                {profile.minHours} hours minimum per week
-              </h4>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    dataKey="value"
-                    labelLine={false}
-                    data={pieData}
-                    fill="#8884d8"
-                    label={renderCustomLabel}
-                    outerRadius={80}
-                    cx="50%"
-                    cy="50%"
-                  >
-                    <LabelList
-                      dataKey="name"
-                      position="outside"
-                      style={{ fontSize: "10px" }}
-                      className="stroke-primary"
-                    />
-                    {pieData.map((entry: any, index: number) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={COLORS[index % COLORS.length]}
-                      />
-                    ))}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          )}
         </div>
+
+        {Boolean(profile.minHours) && (
+          <div className="">
+            <h4>
+              <ChartPie
+                weight="bold"
+                className="inline w-[1.25em] h-[1.25em]"
+              />{" "}
+              {profile.minHours} hours minimum per week
+            </h4>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  dataKey="value"
+                  labelLine={false}
+                  data={pieData}
+                  fill="#8884d8"
+                  label={renderCustomLabel}
+                  outerRadius={80}
+                  cx="50%"
+                  cy="50%"
+                >
+                  <LabelList
+                    dataKey="name"
+                    position="outside"
+                    style={{ fontSize: "10px" }}
+                    className="stroke-primary"
+                  />
+                  {pieData.map((entry: any, index: number) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        )}
 
         <div className="flex flex-col gap-2">
           <h2 id="actions">
