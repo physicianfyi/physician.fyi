@@ -11,7 +11,7 @@ import { selectPhysicians } from "~/services/physicians.server";
 import fs from "fs";
 import path from "path";
 import * as Ariakit from "@ariakit/react";
-import { useEffect, useId, useMemo, useRef } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import {
   LineChart,
   Line,
@@ -30,7 +30,7 @@ import {
   X,
 } from "@phosphor-icons/react";
 import { usePostHog } from "posthog-js/react";
-import Map, { Layer, Source } from "react-map-gl";
+import Map, { Layer, Popup, Source } from "react-map-gl";
 import type { LayerProps, MapRef } from "react-map-gl";
 import type { GeoJSONSource } from "mapbox-gl";
 
@@ -212,28 +212,55 @@ export default function Index() {
   const results = data.results;
 
   const mapRef = useRef<MapRef>(null);
+  const [popupInfo, setPopupInfo] = useState<{
+    lngLat: [number, number];
+    results: any;
+  } | null>(null);
 
   const onClick = (event: any) => {
     const feature = event.features[0];
     if (!feature) return;
-    // console.log(feature);
-    const clusterId = feature.properties.cluster_id;
 
-    const mapboxSource = mapRef.current?.getSource(
-      "disciplines"
-    ) as GeoJSONSource;
-
-    mapboxSource.getClusterExpansionZoom(clusterId, (err, zoom) => {
-      if (err) {
-        return;
+    if (feature.layer.id === "unclustered-point") {
+      // Fix for weird issue where clicking another dot while a popup is open breaks it from then on. Need to close one and then click another for it to keep working
+      if (popupInfo) {
+        setPopupInfo(null);
+      } else {
+        const results = [feature.properties];
+        for (let i = 1; i < event.features.length; i++) {
+          const coords = event.features[i].geometry.coordinates;
+          if (
+            coords[0] === feature.geometry.coordinates[0] &&
+            coords[1] === feature.geometry.coordinates[1] &&
+            !results.find((r) => r.id === event.features[i].properties.id)
+          ) {
+            results.push(event.features[i].properties);
+          }
+        }
+        setPopupInfo({
+          lngLat: feature.geometry.coordinates,
+          results,
+        });
       }
+    } else {
+      const clusterId = feature.properties.cluster_id;
 
-      mapRef.current?.easeTo({
-        center: feature.geometry.coordinates,
-        zoom,
-        duration: 250,
+      const mapboxSource = mapRef.current?.getSource(
+        "disciplines"
+      ) as GeoJSONSource;
+
+      mapboxSource.getClusterExpansionZoom(clusterId, (err, zoom) => {
+        if (err) {
+          return;
+        }
+
+        mapRef.current?.easeTo({
+          center: feature.geometry.coordinates,
+          zoom,
+          duration: 250,
+        });
       });
-    });
+    }
 
     // TODO
     // map.on('click', 'unclustered-point', (e) => {
@@ -977,7 +1004,7 @@ export default function Index() {
           </LineChart>
         </ResponsiveContainer>
 
-        <div className="pb-10 w-full overflow-hidden flex flex-col gap-1">
+        <div className="w-full overflow-hidden flex flex-col gap-1">
           <span className="w-fit bg-indigo-400 text-white px-1.5 py-0.5 rounded text-xs font-semibold shadow-inner border border-indigo-500">
             beta
           </span>
@@ -992,7 +1019,10 @@ export default function Index() {
             ref={mapRef}
             style={{ width: "100%", height: 400 }}
             mapStyle="mapbox://styles/mapbox/streets-v9"
-            interactiveLayerIds={[clusterLayer.id as string]}
+            interactiveLayerIds={[
+              clusterLayer.id as string,
+              unclusteredPointLayer.id as string,
+            ]}
             mapboxAccessToken="pk.eyJ1IjoicGh5c2ljaWFuZnlpIiwiYSI6ImNsbmk4ZXB1djFha2kybHBkcDRicmZvNHgifQ.iEXcoDG8yBi23d_chOU8xQ"
           >
             <Source
@@ -1007,6 +1037,32 @@ export default function Index() {
               <Layer {...clusterCountLayer} />
               <Layer {...unclusteredPointLayer} />
             </Source>
+
+            {popupInfo && (
+              <Popup
+                // tipSize={5}
+                longitude={popupInfo.lngLat[0]}
+                latitude={popupInfo.lngLat[1]}
+                onClose={() => setPopupInfo(null)}
+                // className="popover"
+              >
+                <ul className="flex flex-col gap-2">
+                  {popupInfo.results.map((r: any) => {
+                    return (
+                      <li key={r.id}>
+                        <Link to={`/ca/${r.id}`} className="uppercase">
+                          {r.name}
+                        </Link>
+                        <div className="uppercase">CA {r.id}</div>
+                        <div>{r.numActions} actions</div>
+
+                        <hr className="h-px mt-2 bg-gray-200 border-0 dark:bg-gray-700" />
+                      </li>
+                    );
+                  })}
+                </ul>
+              </Popup>
+            )}
           </Map>
         </div>
       </div>
@@ -1076,7 +1132,7 @@ export default function Index() {
                 </div>
               </Link>
 
-              <hr className="h-px mt-2 bg-gray-200 border-0 dark:bg-gray-700"></hr>
+              <hr className="h-px mt-2 bg-gray-200 border-0 dark:bg-gray-700" />
             </li>
           );
         })}

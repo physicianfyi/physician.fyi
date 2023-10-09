@@ -165,6 +165,7 @@ export const selectPhysicians = async ({
           },
           properties: {
             id: license,
+            name: data.name,
             numActions: data.actions?.length ?? 0,
           },
         });

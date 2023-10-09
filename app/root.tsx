@@ -13,8 +13,10 @@ import * as Ariakit from "@ariakit/react";
 import { PostHogProvider } from "posthog-js/react";
 import posthog from "posthog-js";
 import styles from "./tailwind.css";
+import mapboxStyles from "mapbox-gl/dist/mapbox-gl.css";
 
 export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: mapboxStyles },
   { rel: "stylesheet", href: styles },
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
   // https://css-tricks.com/emoji-as-a-favicon/
