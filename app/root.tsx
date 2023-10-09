@@ -63,23 +63,20 @@ export default function App() {
               <Ariakit.Menu gutter={8} className="popover">
                 <Ariakit.MenuItem
                   className="text-md font-bold"
-                  as={Link}
-                  to="/about"
+                  render={<Link to="/about" />}
                 >
                   About
                 </Ariakit.MenuItem>
                 <Ariakit.MenuItem
                   className="text-md font-bold"
-                  as={Link}
-                  to="/what-to-do"
+                  render={<Link to="/what-to-do" />}
                 >
                   What to do
                 </Ariakit.MenuItem>
                 <Ariakit.MenuSeparator className="separator" />
                 <Ariakit.MenuItem
                   className="text-md font-bold"
-                  as={Link}
-                  to="/contact"
+                  render={<Link to="/contact" />}
                 >
                   Contact
                 </Ariakit.MenuItem>

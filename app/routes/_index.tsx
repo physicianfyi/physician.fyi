@@ -30,6 +30,53 @@ import {
   X,
 } from "@phosphor-icons/react";
 import { usePostHog } from "posthog-js/react";
+import Map, { Layer, Source } from "react-map-gl";
+import type { LayerProps, MapRef } from "react-map-gl";
+import type { GeoJSONSource } from "mapbox-gl";
+
+const clusterLayer: LayerProps = {
+  id: "clusters",
+  type: "circle",
+  source: "disciplines",
+  filter: ["has", "point_count"],
+  paint: {
+    "circle-color": [
+      "step",
+      ["get", "point_count"],
+      "#51bbd6",
+      100,
+      "#f1f075",
+      750,
+      "#f28cb1",
+    ],
+    "circle-radius": ["step", ["get", "point_count"], 20, 100, 30, 750, 40],
+  },
+};
+
+const clusterCountLayer: LayerProps = {
+  id: "cluster-count",
+  type: "symbol",
+  source: "disciplines",
+  filter: ["has", "point_count"],
+  layout: {
+    "text-field": "{point_count_abbreviated}",
+    "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
+    "text-size": 12,
+  },
+};
+
+const unclusteredPointLayer: LayerProps = {
+  id: "unclustered-point",
+  type: "circle",
+  source: "disciplines",
+  filter: ["!", ["has", "point_count"]],
+  paint: {
+    "circle-color": "#11b4da",
+    "circle-radius": 4,
+    "circle-stroke-width": 1,
+    "circle-stroke-color": "#fff",
+  },
+};
 
 export const meta: MetaFunction = () => {
   return [
@@ -95,6 +142,29 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
     offenses: offenses.map((o: number) => availableOffenses[o]),
   });
 
+  const geoData = JSON.parse(
+    fs.readFileSync(path.join(process.cwd(), "data/ca/geocode.json"), "utf8")
+  );
+  const geo = {
+    type: "FeatureCollection",
+    features: data.results.reduce<any[]>((acc, { license, data }) => {
+      if (geoData[license]) {
+        acc.push({
+          type: "Feature",
+          geometry: {
+            type: "Point",
+            coordinates: [geoData[license].lon, geoData[license].lat, 0],
+          },
+          properties: {
+            id: license,
+            numActions: data.actions?.length ?? 0,
+          },
+        });
+      }
+      return acc;
+    }, []),
+  };
+
   return {
     data,
     availableTypes,
@@ -109,6 +179,7 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
     availableSpecialtyCounts,
     availableOffenses,
     availableOffenseCounts,
+    geo,
   };
 };
 
@@ -161,8 +232,63 @@ export default function Index() {
     availableSpecialtyCounts,
     availableOffenses,
     availableOffenseCounts,
+    geo,
   } = useLoaderData<typeof loader>();
   const results = data.results;
+
+  const mapRef = useRef<MapRef>(null);
+
+  const onClick = (event: any) => {
+    const feature = event.features[0];
+    if (!feature) return;
+    // console.log(feature);
+    const clusterId = feature.properties.cluster_id;
+
+    const mapboxSource = mapRef.current?.getSource(
+      "disciplines"
+    ) as GeoJSONSource;
+
+    mapboxSource.getClusterExpansionZoom(clusterId, (err, zoom) => {
+      if (err) {
+        return;
+      }
+
+      mapRef.current?.easeTo({
+        center: feature.geometry.coordinates,
+        zoom,
+        duration: 250,
+      });
+    });
+
+    // TODO
+    // map.on('click', 'unclustered-point', (e) => {
+    //   const coordinates = e.features[0].geometry.coordinates.slice();
+    //   const mag = e.features[0].properties.mag;
+    //   const tsunami =
+    //   e.features[0].properties.tsunami === 1 ? 'yes' : 'no';
+
+    //   // Ensure that if the map is zoomed out such that
+    //   // multiple copies of the feature are visible, the
+    //   // popup appears over the copy being pointed to.
+    //   while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+    //   coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+    //   }
+
+    //   new mapboxgl.Popup()
+    //   .setLngLat(coordinates)
+    //   .setHTML(
+    //   `magnitude: ${mag}<br>Was there a tsunami?: ${tsunami}`
+    //   )
+    //   .addTo(map);
+    //   });
+
+    //   map.on('mouseenter', 'clusters', () => {
+    //   map.getCanvas().style.cursor = 'pointer';
+    //   });
+    //   map.on('mouseleave', 'clusters', () => {
+    //   map.getCanvas().style.cursor = '';
+    //   });
+  };
 
   const select = Ariakit.useSelectStore({
     // @ts-ignore ariakit TS issue
@@ -875,6 +1001,39 @@ export default function Index() {
             <Tooltip />
           </LineChart>
         </ResponsiveContainer>
+
+        <div className="pb-10 w-full overflow-hidden flex flex-col gap-1">
+          <span className="w-fit bg-indigo-400 text-white px-1.5 py-0.5 rounded text-xs font-semibold shadow-inner border border-indigo-500">
+            beta
+          </span>
+          <Map
+            mapLib={import("mapbox-gl")}
+            initialViewState={{
+              longitude: -120,
+              latitude: 37.5,
+              zoom: 4.5,
+            }}
+            onClick={onClick}
+            ref={mapRef}
+            style={{ width: "100%", height: 400 }}
+            mapStyle="mapbox://styles/mapbox/streets-v9"
+            interactiveLayerIds={[clusterLayer.id as string]}
+            mapboxAccessToken="pk.eyJ1IjoicGh5c2ljaWFuZnlpIiwiYSI6ImNsbmk4ZXB1djFha2kybHBkcDRicmZvNHgifQ.iEXcoDG8yBi23d_chOU8xQ"
+          >
+            <Source
+              id="disciplines"
+              type="geojson"
+              data={geo as any}
+              cluster={true}
+              clusterMaxZoom={14}
+              clusterRadius={50}
+            >
+              <Layer {...clusterLayer} />
+              <Layer {...clusterCountLayer} />
+              <Layer {...unclusteredPointLayer} />
+            </Source>
+          </Map>
+        </div>
       </div>
 
       <h2 id="results">
