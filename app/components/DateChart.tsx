@@ -24,6 +24,7 @@ type InitialState = {
 
 type DataType = { year: number; actions: number; physicians: number };
 
+// https://github.com/recharts/recharts/issues/3369#issuecomment-1432203138
 export const DateChart = ({
   data: initialData,
   setBeginning,

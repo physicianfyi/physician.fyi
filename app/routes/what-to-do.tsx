@@ -33,9 +33,10 @@ export default function Route() {
             adverse event report with the FDA
           </a>
           , which compels the manufacturer to investigate and publicly respond
-          with their analysis within a month. Leave your email in that form so
-          that the manufacturer can contact you for additional data—your email
-          will not be made public.
+          with their analysis within a month, which can exclude device
+          malfunction or indicate if the doctor improperly administered
+          something. Leave your email in that form so that the manufacturer can
+          contact you for additional data—your email will not be made public.
         </li>
         <li>
           File a complaint with the medical board in the state you were harmed
