@@ -90,8 +90,8 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
     schools: schools.map((s: number) => availableSchools[s]),
     specialties: specialties.map((a: number) => availableSpecialties[a]),
     offenses: offenses.map((o: number) => availableOffenses[o]),
-    ...(beginning && { beginning }),
-    ...(ending && { ending }),
+    beginning,
+    ending,
   });
 
   return {

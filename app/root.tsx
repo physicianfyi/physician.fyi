@@ -141,6 +141,15 @@ export default function App() {
                 </Link>
               </li>
               <li>
+                <a
+                  href="https://app.posthog.com/shared/b7S6XJpQIKhs2yIzZlxPA5PRJphXgA"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Analytics
+                </a>
+              </li>
+              <li>
                 <Link to="/contact" className="text-md font-medium">
                   Contact
                 </Link>
