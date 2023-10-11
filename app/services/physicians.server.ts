@@ -143,9 +143,11 @@ export const selectPhysicians = async ({
   }
 
   if (query) {
-    const options = {
+    const options: Fuse.IFuseOptions<(typeof results)[number]> = {
       includeScore: false,
       keys: query.match(/^[a-zA-Z] [0-9]+$/) ? ["license"] : [["data", "name"]],
+      // Default is .6, but got complaint that it's too lenient
+      threshold: 0.5,
     };
 
     const fuse = new Fuse(results, options);
