@@ -148,6 +148,7 @@ export const selectPhysicians = async ({
       keys: query.match(/^[a-zA-Z] [0-9]+$/) ? ["license"] : [["data", "name"]],
       // Default is .6, but got complaint that it's too lenient
       threshold: 0.5,
+      ignoreLocation: true,
     };
 
     const fuse = new Fuse(results, options);
