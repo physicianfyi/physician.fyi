@@ -34,6 +34,17 @@ import fs from "fs";
           "probationary registration": "probationary license",
         }[v.secondaryStatus[i] as string] ?? v.secondaryStatus[i];
     }
+
+    // Parsing name doesn't work for fictitious name permits
+    // const name = v.name.split(",");
+    // console.log(name);
+    // v.lastName = name[0].trim();
+    // v.firstName = name[1].trim().split(" ")[0];
+    // const middleName = name[1].trim().split(" ")[1];
+    // if (middleName) {
+    //   v.middleName = middleName;
+    // }
+    // delete v.name;
   }
 
   for (let [, v] of Object.entries<any>(deepProfiles)) {

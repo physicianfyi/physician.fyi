@@ -904,10 +904,10 @@ export default function Index() {
       </h2>
 
       <ul className="flex flex-col gap-2">
-        {results.map(({ license, data }) => {
+        {results.map(({ license, data, state }) => {
           return (
             <li key={license}>
-              <Link to={`/ca/${license}`} className="group">
+              <Link to={`/${state}/${license}`} className="group">
                 <div className="group-hover:bg-card group-focus-visible:bg-card p-4 rounded flex flex-col gap-4">
                   <div className="px-1 group-hover:font-medium group-focus-visible:font-medium">
                     <div>
@@ -928,7 +928,7 @@ export default function Index() {
                   </div>
                   <div className="flex items-start sm:items-end gap-1 sm:gap-0 justify-between flex-col sm:flex-row">
                     <div className="px-1 font-medium flex items-center gap-1 text-xs text-gray-600 uppercase">
-                      CA
+                      {state}
                       <Ariakit.TooltipProvider showTimeout={0}>
                         <Ariakit.TooltipAnchor
                           className=""

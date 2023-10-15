@@ -1,6 +1,6 @@
 import fs from "fs";
 import Fuse from "fuse.js";
-import { PAGE_SIZE } from "./constants";
+import { PAGE_SIZE, STATES } from "./constants";
 import path from "path";
 
 /**
@@ -29,13 +29,22 @@ export const selectPhysicians = async ({
   beginning?: number;
   ending?: number;
 }) => {
-  const data = JSON.parse(fs.readFileSync("data/ca/clean.json", "utf8"));
+  let lastUpdated;
+  let results = [];
+  for (let S of STATES) {
+    const data = JSON.parse(fs.readFileSync(`data/${S}/clean.json`, "utf8"));
+    lastUpdated = data.cleanLastRun;
 
-  // TODO Also generate this as a new file like ca-grouped-flat.json
-  let results = Object.keys(data.profiles).map((key) => ({
-    license: key,
-    data: data.profiles[key],
-  }));
+    // TODO Also generate this as a new file like ca-grouped-flat.json
+    results.push(
+      ...Object.keys(data.profiles).map((key) => ({
+        license: key,
+        data: data.profiles[key],
+        state: S,
+      }))
+    );
+  }
+  console.log("read");
 
   if (actionTypes.length) {
     results = results.filter((result) => {
@@ -163,7 +172,8 @@ export const selectPhysicians = async ({
     // Don't count multiple actions in the same year for number of physicians
     const currentYears = new Set();
     for (let i = 0; i < (curr.data.actions?.length ?? 0); i++) {
-      const year = curr.data.actions[i].date?.split(",")[1].trim();
+      // TODO Either clean FL to have same date format or handle other format here
+      const year = curr.data.actions[i].date?.split(",")[1]?.trim();
       if (!year) {
         // console.error(curr);
         continue;
@@ -211,7 +221,7 @@ export const selectPhysicians = async ({
     // Recalculated since this is for filtered results
     numResults: results.length,
     results: results.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE),
-    lastUpdated: data.deepLastRun,
+    lastUpdated,
     chartData: Object.keys(chartData)
       .sort()
       .map((k) => ({

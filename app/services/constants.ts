@@ -1,3 +1,3 @@
 export const PAGE_SIZE = 50;
 
-export const STATES = ["ca", "test"];
+export const STATES = ["ca", "fl"];
