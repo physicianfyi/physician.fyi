@@ -70,6 +70,10 @@ import fs from "fs";
         delete v.actions[i].documentId;
       }
     }
+
+    if (v.graduationYear) {
+      v.graduationYear = Number(v.graduationYear);
+    }
   }
 
   const profiles = Object.fromEntries(

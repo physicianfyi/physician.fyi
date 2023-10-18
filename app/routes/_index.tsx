@@ -363,7 +363,17 @@ export default function Index() {
         className="p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300"
         role="alert"
       >
-        Just California for now—more states coming soon
+        Just California and Florida for now—more states coming soon
+        <div>
+          If you'd like to help,{" "}
+          <a
+            href="https://discord.gg/vKpkKcXagr"
+            target="_blank"
+            rel="noreferrer"
+          >
+            join the Discord
+          </a>
+        </div>
       </div>
 
       <h2 id="filters">

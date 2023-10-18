@@ -47,7 +47,7 @@ import { delay } from "generate/util";
   });
   const page = await browser.newPage();
 
-  for (let i = 1; i < parsed.data.length; i++) {
+  for (let i = 3000; i < parsed.data.length; i++) {
     console.log(i);
     const entry = parsed.data[i] as string[];
     const license = entry[1];
@@ -57,57 +57,83 @@ import { delay } from "generate/util";
     const licenseId = shallowEntry["lic_id"];
     const caseNumber = entry[6];
     const existingActions = profiles[licenseId]?.actions ?? [];
-    if (existingActions.find((a: any) => a.caseNumber === caseNumber)) {
-      continue;
-    }
-
     const professionCode = shallowEntry["pro_cde"];
-    const url = `https://mqa-internet.doh.state.fl.us/MQASearchServices/HealthCareProviders/LicenseVerification?LicInd=${licenseId}&ProCde=${professionCode}`;
 
-    // Navigate the page to a URL
-    await page.goto(url);
+    if (!existingActions.find((a: any) => a.caseNumber === caseNumber)) {
+      const url = `https://mqa-internet.doh.state.fl.us/MQASearchServices/HealthCareProviders/LicenseVerification?LicInd=${licenseId}&ProCde=${professionCode}`;
 
-    // Set screen size
-    await page.setViewport({ width: 1080, height: 1024 });
+      // Navigate the page to a URL
+      await page.goto(url);
 
-    try {
-      await page.click("a[href='#Disciplines']");
-    } catch {
-      console.log("error:", { licenseId });
-      continue;
+      // Set screen size
+      await page.setViewport({ width: 1080, height: 1024 });
+
+      try {
+        await page.click("a[href='#Disciplines']");
+      } catch {
+        console.log("error:", { licenseId });
+        continue;
+      }
+
+      // This is network request so give it some leeway, 3000 seemed to mostly work
+      await delay(5000);
+
+      // For some reason this way doesn't seem to work
+      // Sometimes there is no caseId, ie no link to PDF
+      const documentId = await page.evaluate((caseNumber) => {
+        const onclick = document
+          .evaluate(
+            `//a[contains(text(), '${caseNumber}')]`,
+            document,
+            null,
+            XPathResult.FIRST_ORDERED_NODE_TYPE,
+            null
+          )
+          // @ts-ignore
+          .singleNodeValue?.getAttribute("onclick");
+        return onclick?.split("('")[1].split("')")[0];
+      }, caseNumber);
+
+      profiles[licenseId] = {
+        actions: [
+          ...existingActions,
+          {
+            ...(documentId && { documentId }),
+            actionType: entry[7],
+            date: entry[8],
+            caseNumber,
+          },
+        ],
+      };
+      console.log({ licenseId });
     }
 
-    // This is network request so give it some leeway, 3000 seemed to mostly work
-    await delay(5000);
-
-    // For some reason this way doesn't seem to work
-    // Sometimes there is no caseId, ie no link to PDF
-    const documentId = await page.evaluate((caseNumber) => {
-      const onclick = document
-        .evaluate(
-          `//a[contains(text(), '${caseNumber}')]`,
-          document,
-          null,
-          XPathResult.FIRST_ORDERED_NODE_TYPE,
-          null
-        )
-        // @ts-ignore
-        .singleNodeValue?.getAttribute("onclick");
-      return onclick?.split("('")[1].split("')")[0];
-    }, caseNumber);
-
-    profiles[licenseId] = {
-      actions: [
-        ...existingActions,
-        {
-          ...(documentId && { documentId }),
-          actionType: entry[7],
-          date: entry[8],
-          caseNumber,
-        },
-      ],
-    };
-    console.log({ licenseId });
+    if (!profiles[licenseId].school) {
+      const url = `https://mqa-internet.doh.state.fl.us/MQASearchServices/HealthCareProviders/Details?LicInd=${licenseId}&ProCde=${professionCode}`;
+      await page.goto(url);
+      await page.setViewport({ width: 1080, height: 1024 });
+      await delay(5000);
+      const { school, graduationYear } = await page.evaluate(() => {
+        const school = document
+          .querySelector("#EducationAndTraining > table > tbody > tr > td")
+          // @ts-ignore
+          ?.innerText?.trim();
+        const graduationYear = document
+          .querySelector(
+            "#EducationAndTraining > table > tbody > tr > td:nth-child(4)"
+          )
+          //@ts-ignore
+          ?.innerText?.trim()
+          ?.split("/")
+          .at(-1);
+        return { school, graduationYear };
+      });
+      profiles[licenseId] = {
+        ...profiles[licenseId],
+        ...(school && { school }),
+        ...(graduationYear && { graduationYear }),
+      };
+    }
 
     fs.writeFile(
       "data/fl/scrape-deep.json",
@@ -115,8 +141,6 @@ import { delay } from "generate/util";
         deepLastRun: new Date(),
         numProfiles: Object.keys(profiles).length,
         profiles,
-        // baseUrl:
-        //   "https://mqa-internet.doh.state.fl.us/MQASearchServices/Document",
       }),
       (error) => {
         if (error) throw error;
