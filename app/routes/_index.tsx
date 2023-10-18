@@ -6,7 +6,7 @@ import {
   useSearchParams,
   useSubmit,
 } from "@remix-run/react";
-import { PAGE_SIZE } from "~/services/constants";
+import { PAGE_SIZE, STATES } from "~/services/constants";
 import { selectPhysicians } from "~/services/physicians.server";
 import fs from "fs";
 import path from "path";
@@ -37,9 +37,44 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
   const page = Number(url.searchParams.get("p") ?? 0);
   const query = url.searchParams.get("q") ?? "";
 
-  const summarizedData = JSON.parse(
-    fs.readFileSync(path.join(process.cwd(), "data/ca/summarize.json"), "utf8")
-  );
+  const summarizedDatas = STATES.map((s) => {
+    return JSON.parse(
+      fs.readFileSync(
+        path.join(process.cwd(), `data/${s}/summarize.json`),
+        "utf8"
+      )
+    );
+  });
+  const summarizedData = summarizedDatas.reduce<any>((acc, curr) => {
+    for (let [k, v] of Object.entries<any>(curr)) {
+      if (k === "lastRun") {
+        acc[k] = v;
+        continue;
+      }
+
+      if (acc.hasOwnProperty(k)) {
+        acc[k].numResults += v.numResults;
+
+        for (let r of v.results) {
+          if (!acc[k].results.includes(r)) {
+            acc[k].results.push(r);
+          }
+        }
+
+        for (let [k2, v2] of Object.entries(v.counts)) {
+          if (acc[k].counts.hasOwnProperty(k2)) {
+            acc[k].counts[k2] += v2;
+          } else {
+            acc[k].counts[k2] = v2;
+          }
+        }
+      } else {
+        acc[k] = v;
+      }
+    }
+
+    return acc;
+  }, {});
 
   const types = JSON.parse(url.searchParams.get("t") ?? "[]");
   const { results: availableTypes, counts: availableTypeCounts } =

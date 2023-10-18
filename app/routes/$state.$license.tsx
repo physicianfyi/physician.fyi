@@ -69,7 +69,7 @@ export const loader = async ({
 
   for (let action of profile.actions ?? []) {
     const url = action.url;
-    if (!url) continue;
+    if (!url || state !== "ca") continue;
 
     const parsedUrl = new URL(url);
     const did = parsedUrl.searchParams.get("did");
@@ -257,7 +257,8 @@ export default function Route() {
                             rel="noreferrer"
                             className="font-medium"
                           >
-                            View PDF ({r.numPages} pages)
+                            View PDF{" "}
+                            {r.numPages > 0 && <>({r.numPages} pages)</>}
                           </a>
                         </>
                       )}

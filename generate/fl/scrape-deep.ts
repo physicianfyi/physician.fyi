@@ -54,11 +54,13 @@ import { delay } from "generate/util";
     const shallowEntry = Object.values(shallowProfiles).find(
       (p: any) => p["License-Number"] === license
     ) as any;
-    // This is not possible since we are going through actions
-    // if (shallowEntry["Board-Action-Indicator"] === 'N') {
-    //   continue;
-    // }
     const licenseId = shallowEntry["lic_id"];
+    const caseNumber = entry[6];
+    const existingActions = profiles[licenseId]?.actions ?? [];
+    if (existingActions.find((a: any) => a.caseNumber === caseNumber)) {
+      continue;
+    }
+
     const professionCode = shallowEntry["pro_cde"];
     const url = `https://mqa-internet.doh.state.fl.us/MQASearchServices/HealthCareProviders/LicenseVerification?LicInd=${licenseId}&ProCde=${professionCode}`;
 
@@ -68,12 +70,15 @@ import { delay } from "generate/util";
     // Set screen size
     await page.setViewport({ width: 1080, height: 1024 });
 
-    await page.click("a[href='#Disciplines']");
+    try {
+      await page.click("a[href='#Disciplines']");
+    } catch {
+      console.log("error:", { licenseId });
+      continue;
+    }
 
     // This is network request so give it some leeway, 3000 seemed to mostly work
     await delay(5000);
-
-    const caseNumber = entry[6];
 
     // For some reason this way doesn't seem to work
     // Sometimes there is no caseId, ie no link to PDF
@@ -91,29 +96,18 @@ import { delay } from "generate/util";
       return onclick?.split("('")[1].split("')")[0];
     }, caseNumber);
 
-    if (!documentId) continue;
-
-    const existingActions = profiles[licenseId]?.actions ?? [];
-
-    if (
-      !existingActions.find(
-        (a: any) =>
-          a.documentId === documentId &&
-          a.actionType === entry[7] &&
-          a.date === entry[8]
-      )
-    ) {
-      profiles[licenseId] = {
-        actions: [
-          ...existingActions,
-          {
-            documentId,
-            actionType: entry[7],
-            date: entry[8],
-          },
-        ],
-      };
-    }
+    profiles[licenseId] = {
+      actions: [
+        ...existingActions,
+        {
+          ...(documentId && { documentId }),
+          actionType: entry[7],
+          date: entry[8],
+          caseNumber,
+        },
+      ],
+    };
+    console.log({ licenseId });
 
     fs.writeFile(
       "data/fl/scrape-deep.json",
@@ -121,8 +115,8 @@ import { delay } from "generate/util";
         deepLastRun: new Date(),
         numProfiles: Object.keys(profiles).length,
         profiles,
-        baseUrl:
-          "https://mqa-internet.doh.state.fl.us/MQASearchServices/Document",
+        // baseUrl:
+        //   "https://mqa-internet.doh.state.fl.us/MQASearchServices/Document",
       }),
       (error) => {
         if (error) throw error;

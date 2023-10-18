@@ -17,7 +17,10 @@ import fs from "fs";
   const keysToDelete = [];
   for (let [k, v] of Object.entries<any>(shallowProfiles)) {
     // For now just using full name
-    v.name = `${v["Last-Name"]}, ${v["First-Name"]} ${v["Middle-Name"]}`;
+    v.name = `${v["Last-Name"]}, ${v["First-Name"]}`;
+    if (v["Middle-Name"]) {
+      v.name = `${v.name} ${v["Middle-Name"]}`;
+    }
     delete v["Last-Name"];
     delete v["First-Name"];
     delete v["Middle-Name"];
@@ -25,16 +28,49 @@ import fs from "fs";
     if (v["Board-Action-Indicator"] === "N") {
       keysToDelete.push(k);
     }
+
+    v.licenseUrl = `/HealthCareProviders/LicenseVerification?LicInd=${v["lic_id"]}&ProCde=${v["pro_cde"]}`;
+    delete v["lic_id"];
+    delete v["pro_cde"];
+
+    v.address = v["Practice-Location-Address-Line1"];
+    delete v["Practice-Location-Address-Line1"];
+    v.city = v["Practice-Location-Address-City"];
+    delete v["Practice-Location-Address-City"];
+    v.zip = v["Practice-Location-Address-ZIPcode"];
+    delete v["Practice-Location-Address-ZIPcode"];
+    v.state = v["Practice-Location-Address-State"];
+    delete v["Practice-Location-Address-State"];
+    v.county = v["County-Description"];
+    delete v["County-Description"];
+    // Number code
+    delete v["County"];
+
+    v.licenseStatus = v["License-Status-Description"];
+    delete v["License-Status-Description"];
+    // Map to california/common versions
+    v.licenseStatus =
+      {
+        CLEAR: "license renewed & current",
+        REVOKED: "license revoked",
+        DECEASED: "licensee deceased",
+      }[v.licenseStatus as string] ?? v.licenseStatus;
   }
 
   for (let k of keysToDelete) {
     delete shallowProfiles[k];
   }
 
-  // for (let [, v] of Object.entries<any>(deepProfiles)) {
-  //   for (let i = 0; i < (v.actions?.length ?? 0); i++) {
-  //   }
-  // }
+  for (let [, v] of Object.entries<any>(deepProfiles)) {
+    for (let i = 0; i < (v.actions?.length ?? 0); i++) {
+      if (v.actions[i].documentId) {
+        v.actions[
+          i
+        ].url = `https://mqa-internet.doh.state.fl.us/MQASearchServices/Document?id=${v.actions[i].documentId}`;
+        delete v.actions[i].documentId;
+      }
+    }
+  }
 
   const profiles = Object.fromEntries(
     Object.entries<any>(shallowProfiles).map(([k, v]) => {

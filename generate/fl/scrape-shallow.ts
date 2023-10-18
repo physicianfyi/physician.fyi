@@ -65,8 +65,7 @@ import crypto from "node:crypto";
     shallowLastRun: new Date(),
     numProfiles: Object.keys(profiles).length,
     profiles,
-    baseUrl:
-      "https://mqa-internet.doh.state.fl.us/MQASearchServices/HealthCareProviders/LicenseVerification",
+    baseUrl: "https://mqa-internet.doh.state.fl.us/MQASearchServices",
   };
   fs.writeFile("data/fl/scrape-shallow.json", JSON.stringify(json), (error) => {
     if (error) throw error;

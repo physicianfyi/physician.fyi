@@ -44,7 +44,6 @@ export const selectPhysicians = async ({
       }))
     );
   }
-  console.log("read");
 
   if (actionTypes.length) {
     results = results.filter((result) => {
@@ -173,7 +172,7 @@ export const selectPhysicians = async ({
     const currentYears = new Set();
     for (let i = 0; i < (curr.data.actions?.length ?? 0); i++) {
       // TODO Either clean FL to have same date format or handle other format here
-      const year = curr.data.actions[i].date?.split(",")[1]?.trim();
+      const year = curr.data.actions[i].date?.split(/[,/]/).at(-1)?.trim();
       if (!year) {
         // console.error(curr);
         continue;
