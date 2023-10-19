@@ -55,6 +55,8 @@ You want to produce several files in the directory `data/[state]`:
 - read.json (optional, used to populate offenses filter)
 - geocode.json (optional, used to populate map)
 
+Lastly you want to add the state in `app/services/constants`
+
 ### Running app
 
 From your terminal:
