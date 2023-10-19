@@ -51,7 +51,7 @@ import NodeGeocoder from "node-geocoder";
         ...(v.city !== "NONE" && { city: v.city }),
         ...(v.county !== "UNKNOWN" &&
           v.county !== "Out of State" && { county: v.county }),
-        ...(v.zip !== "00000" && { postalcode: v.zip.split("-")[0] }),
+        ...(v.zip && v.zip !== "00000" && { postalcode: v.zip.split("-")[0] }),
         state: v.state,
         // Sending undefined breaks API
         // ...(v.country && { country: v.country }),
@@ -89,7 +89,7 @@ import NodeGeocoder from "node-geocoder";
         ...(v.city !== "NONE" && { city: v.city }),
         ...(v.county !== "UNKNOWN" &&
           v.county !== "Out of State" && { county: v.county }),
-        ...(v.zip !== "00000" && { postalcode: v.zip.split("-")[0] }),
+        ...(v.zip && v.zip !== "00000" && { postalcode: v.zip.split("-")[0] }),
         state: v.state,
       };
       queries[k] = query;
