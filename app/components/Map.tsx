@@ -1,30 +1,47 @@
 import { Link } from "@remix-run/react";
-import { useCallback, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { GeoJSONSource, LayerProps, MapRef } from "react-map-gl";
 import MapGL, { Layer, Popup, Source } from "react-map-gl";
 
-function useMediaQuery(query: string) {
-  const subscribe = useCallback(
-    (callback: () => void) => {
-      const matchMedia = window.matchMedia(query);
-
-      matchMedia.addEventListener("change", callback);
-      return () => {
-        matchMedia.removeEventListener("change", callback);
-      };
-    },
-    [query]
-  );
-
-  const getSnapshot = () => {
-    return window.matchMedia(query).matches;
+function useMediaQuery(query: string): boolean {
+  const getMatches = (query: string): boolean => {
+    // Prevents SSR issues
+    if (typeof window !== "undefined") {
+      return window.matchMedia(query).matches;
+    }
+    return false;
   };
 
-  const getServerSnapshot = () => {
-    throw Error("useMediaQuery is a client-only hook");
-  };
+  const [matches, setMatches] = useState<boolean>(getMatches(query));
 
-  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  function handleChange() {
+    setMatches(getMatches(query));
+  }
+
+  useEffect(() => {
+    const matchMedia = window.matchMedia(query);
+
+    // Triggered at the first client-side load and if query changes
+    handleChange();
+
+    // Listen matchMedia
+    if (matchMedia.addListener) {
+      matchMedia.addListener(handleChange);
+    } else {
+      matchMedia.addEventListener("change", handleChange);
+    }
+
+    return () => {
+      if (matchMedia.removeListener) {
+        matchMedia.removeListener(handleChange);
+      } else {
+        matchMedia.removeEventListener("change", handleChange);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query]);
+
+  return matches;
 }
 
 const clusterLayer: LayerProps = {
