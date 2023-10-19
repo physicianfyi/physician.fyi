@@ -19,13 +19,16 @@ import fs from "fs";
     v.licenseStatus =
       {
         "delinquent - registration renewal fee has not been paid. no practice is permitted.":
-          "delinquent - license renewal fee has not been paid. no practice is permitted.",
+          "delinquent",
+        "delinquent - license renewal fee has not been paid. no practice is permitted.":
+          "delinquent",
         "registration renewed & current": "license renewed & current",
         "registration surrendered": "license surrendered",
         "voluntary surrender": "license surrendered",
         "permit canceled": "license canceled",
         "registration revoked": "license revoked",
         "license current": "license renewed & current",
+        "family support suspension": "emergency suspension",
       }[v.licenseStatus as string] ?? v.licenseStatus;
 
     for (let i = 0; i < v.secondaryStatus.length; i++) {
@@ -34,6 +37,14 @@ import fs from "fs";
           "probationary registration": "probationary license",
         }[v.secondaryStatus[i] as string] ?? v.secondaryStatus[i];
     }
+
+    // Other states only have one type of doctor license
+    v.licenseType =
+      {
+        "physician and surgeon a": "medical doctor",
+        "physician and surgeon g": "medical doctor",
+        "physician and surgeon c": "medical doctor",
+      }[v.licenseType as string] ?? v.licenseType;
 
     // Parsing name doesn't work for fictitious name permits
     // const name = v.name.split(",");
@@ -49,7 +60,7 @@ import fs from "fs";
 
   for (let [, v] of Object.entries<any>(deepProfiles)) {
     for (let i = 0; i < (v.actions?.length ?? 0); i++) {
-      v.actions[i].actionType =
+      v.actions[i].actionType = (
         {
           contentAdministrativeDisciplinaryActions: "ADMINISTRATIVE DISCIPLINE",
           contentAdministrativeActionTakenbyOtherStateorFederalGovernment:
@@ -67,23 +78,56 @@ import fs from "fs";
           contentMalpracticeSettlements: "MALPRACTICE SETTLEMENTS",
           "ORDER FOR LICENSE SURRENDER DURING ADIMINISTRATIVE ACTION":
             "ORDER FOR LICENSE SURRENDER DURING ADMINISTRATIVE ACTION",
-        }[v.actions[i].actionType as string] ?? v.actions[i].actionType;
+        }[v.actions[i].actionType as string] ?? v.actions[i].actionType
+      ).toLowerCase();
 
       v.actions[i].date = v.actions[i].date.replace(/3023$/, "2023");
     }
 
+    // Remove medicine suffix since Florida data doesn't have it
+    const school = v.school
+      ?.replace(
+        /((faculty|school|college) of (medicine( and surgery)?|physicians and surgeons))$/,
+        ""
+      )
+      .trim();
+    if (school) {
+      v.school = school;
+    }
+
+    // Get specialties from various fields
+    const specialties = [];
+    let primarySpecialty = v.survey?.["PRIMARY AREA OF PRACTICE"];
+    if (primarySpecialty === "DECLINE TO STATE" || !primarySpecialty) {
+      primarySpecialty = null;
+    }
+    if (primarySpecialty) {
+      specialties.push(primarySpecialty);
+    }
+    delete v.survey?.["PRIMARY AREA OF PRACTICE"];
     const secondSpecialties = v.survey?.["SECONDARY AREA OF PRACTICE"]?.filter(
       (p: string) => !["DECLINE TO STATE", "NOT APPLICABLE"].includes(p)
     );
     if (secondSpecialties) {
-      v.survey["SECONDARY AREA OF PRACTICE"] = secondSpecialties;
+      specialties.push(...secondSpecialties);
     }
-
+    delete v.survey?.["SECONDARY AREA OF PRACTICE"];
     const certifications = v.survey?.["ABMS CERTIFICATIONS"]?.filter(
       (p: string) => !["OTHER - NONE"].includes(p)
     );
     if (certifications) {
-      v.survey["ABMS CERTIFICATIONS"] = certifications;
+      for (let c of certifications.map((c: string) =>
+        c.replace(/^.*-/, "").trim()
+      )) {
+        if (!specialties.includes(c)) {
+          specialties.push(c);
+        }
+      }
+    }
+    delete v.survey?.["ABMS CERTIFICATIONS"];
+    // TODO Can't figure out why DECLINE TO STATE is ending up in data
+    if (specialties.length) {
+      v.specialties = specialties;
     }
 
     const activities = v.survey?.["PRACTICE ACTIVITIES"];

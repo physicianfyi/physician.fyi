@@ -25,6 +25,9 @@ import fs from "fs";
     delete v["First-Name"];
     delete v["Middle-Name"];
 
+    v.licenseType = v["Profession-Name"].toLowerCase();
+    delete v["Profession-Name"];
+
     if (v["Board-Action-Indicator"] === "N") {
       keysToDelete.push(k);
     }
@@ -49,12 +52,20 @@ import fs from "fs";
     v.licenseStatus = v["License-Status-Description"];
     delete v["License-Status-Description"];
     // Map to california/common versions
-    v.licenseStatus =
+    v.licenseStatus = (
       {
         CLEAR: "license renewed & current",
         REVOKED: "license revoked",
         DECEASED: "licensee deceased",
-      }[v.licenseStatus as string] ?? v.licenseStatus;
+        "VOL RELINQ": "license surrendered",
+        "NULL AND VOID": "license canceled",
+        "DISCP RELINQ": "license revoked",
+        RETIRED: "license surrendered",
+        "VOLUN WITHDRAW": "license surrendered",
+        "EMERG SUSPENS": "emergency suspension",
+        SUSPENDED: "license canceled",
+      }[v.licenseStatus as string] ?? v.licenseStatus
+    ).toLowerCase();
   }
 
   for (let k of keysToDelete) {
@@ -69,10 +80,31 @@ import fs from "fs";
         ].url = `https://mqa-internet.doh.state.fl.us/MQASearchServices/Document?id=${v.actions[i].documentId}`;
         delete v.actions[i].documentId;
       }
+
+      v.actions[i].actionType = (
+        {
+          "Administrative Complaint Filed": "ADMINISTRATIVE DISCIPLINE",
+        }[v.actions[i].actionType as string] ?? v.actions[i].actionType
+      ).toLowerCase();
     }
 
     if (v.graduationYear) {
-      v.graduationYear = Number(v.graduationYear);
+      if (v.graduationYear === "0001") {
+        delete v.graduationYear;
+      } else {
+        v.graduationYear = Number(v.graduationYear);
+      }
+    }
+
+    if (v.school) {
+      v.school = v.school.toLowerCase();
+    }
+
+    const specialties = v.specialties?.map((s: any) =>
+      s.certification.replace(/^.*-/, "").trim()
+    );
+    if (specialties) {
+      v.specialties = specialties;
     }
   }
 

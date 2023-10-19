@@ -41,6 +41,10 @@ import crypto from "node:crypto";
     // Note license id (2) gives full results whereas license number (6) has a few hundred dupes for some reason
     // Only caveat is deep data is keyed on license number so a little less effecient
     const license = items[2];
+    // There are sometimes empty lines
+    if (!license) {
+      continue;
+    }
 
     // For now skip ones we already have
     // TODO Diff them and save changes and mark as needing a new deep scrape

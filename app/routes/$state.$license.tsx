@@ -160,14 +160,7 @@ export default function Route() {
             <span className="uppercase">{license}</span>
           </h4>
 
-          {profile.survey?.["PRIMARY AREA OF PRACTICE"] && (
-            <h4>
-              {profile.survey["PRIMARY AREA OF PRACTICE"]}
-              {profile.survey?.["SECONDARY AREA OF PRACTICE"]?.length > 0 &&
-                ", "}
-              {profile.survey?.["SECONDARY AREA OF PRACTICE"]?.join(", ")}
-            </h4>
-          )}
+          {profile.specialties && <h4>{profile.specialties.join(", ")}</h4>}
 
           <div className="flex gap-2">
             <h2>

@@ -47,7 +47,8 @@ import { delay } from "generate/util";
   });
   const page = await browser.newPage();
 
-  for (let i = 3000; i < parsed.data.length; i++) {
+  // Starts at 1 to skip column titles
+  for (let i = 3400; i < parsed.data.length; i++) {
     console.log(i);
     const entry = parsed.data[i] as string[];
     const license = entry[1];
@@ -108,31 +109,57 @@ import { delay } from "generate/util";
       console.log({ licenseId });
     }
 
-    if (!profiles[licenseId].school) {
+    if (!profiles[licenseId].school || !profiles[licenseId].specialties) {
       const url = `https://mqa-internet.doh.state.fl.us/MQASearchServices/HealthCareProviders/Details?LicInd=${licenseId}&ProCde=${professionCode}`;
       await page.goto(url);
       await page.setViewport({ width: 1080, height: 1024 });
       await delay(5000);
-      const { school, graduationYear } = await page.evaluate(() => {
-        const school = document
-          .querySelector("#EducationAndTraining > table > tbody > tr > td")
-          // @ts-ignore
-          ?.innerText?.trim();
-        const graduationYear = document
-          .querySelector(
-            "#EducationAndTraining > table > tbody > tr > td:nth-child(4)"
-          )
-          //@ts-ignore
-          ?.innerText?.trim()
-          ?.split("/")
-          .at(-1);
-        return { school, graduationYear };
-      });
-      profiles[licenseId] = {
-        ...profiles[licenseId],
-        ...(school && { school }),
-        ...(graduationYear && { graduationYear }),
-      };
+      if (!profiles[licenseId].school) {
+        const { school, graduationYear } = await page.evaluate(() => {
+          const school = document
+            .querySelector("#EducationAndTraining > table > tbody > tr > td")
+            // @ts-ignore
+            ?.innerText?.trim();
+          const graduationYear = document
+            .querySelector(
+              "#EducationAndTraining > table > tbody > tr > td:nth-child(4)"
+            )
+            //@ts-ignore
+            ?.innerText?.trim()
+            ?.split("/")
+            .at(-1);
+          return { school, graduationYear };
+        });
+        profiles[licenseId] = {
+          ...profiles[licenseId],
+          ...(school && { school }),
+          ...(graduationYear && { graduationYear }),
+        };
+      }
+      if (!profiles[licenseId].specialties) {
+        const specialties = await page.evaluate(() => {
+          const boards = document.querySelectorAll(
+            "#SpecialtyCertification > table > tbody > tr > td:nth-child(1)"
+          );
+          const certs = document.querySelectorAll(
+            "#SpecialtyCertification > table > tbody > tr > td:nth-child(2)"
+          );
+          const specialties = [];
+          for (let i = 0; i < boards.length; i++) {
+            specialties.push({
+              // @ts-ignore
+              board: boards[i].innerText.trim(),
+              // @ts-ignore
+              certification: certs[i].innerText.trim(),
+            });
+          }
+          return specialties;
+        });
+        profiles[licenseId] = {
+          ...profiles[licenseId],
+          ...(specialties?.length && { specialties }),
+        };
+      }
     }
 
     fs.writeFile(

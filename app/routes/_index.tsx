@@ -478,22 +478,24 @@ export default function Index() {
               sameWidth
               className="popover"
             >
-              {Object.keys(availableTypeCounts).map((key: string) => (
-                <Ariakit.SelectItem
-                  key={`action-${key}`}
-                  // @ts-ignore TODO File ticket with ariakit to allow number
-                  value={availableTypes.indexOf(key)}
-                  className="select-item"
-                >
-                  <Ariakit.SelectItemCheck />
-                  <div className="[&>*]:align-middle">
-                    <span>{key} </span>
-                    <span className="bg-white rounded-full px-1 text-black text-xs">
-                      {availableTypeCounts[key]}
-                    </span>
-                  </div>
-                </Ariakit.SelectItem>
-              ))}
+              {Object.keys(availableTypeCounts)
+                .sort((a, b) => availableTypeCounts[b] - availableTypeCounts[a])
+                .map((key: string) => (
+                  <Ariakit.SelectItem
+                    key={`action-${key}`}
+                    // @ts-ignore TODO File ticket with ariakit to allow number
+                    value={availableTypes.indexOf(key)}
+                    className="select-item"
+                  >
+                    <Ariakit.SelectItemCheck />
+                    <div className="[&>*]:align-middle">
+                      <span>{key} </span>
+                      <span className="bg-white rounded-full px-1 text-black text-xs">
+                        {availableTypeCounts[key]}
+                      </span>
+                    </div>
+                  </Ariakit.SelectItem>
+                ))}
             </Ariakit.SelectPopover>
           )}
         </div>
@@ -547,22 +549,28 @@ export default function Index() {
               sameWidth
               className="popover"
             >
-              {Object.keys(availableLicenseStatusCounts).map((key: string) => (
-                <Ariakit.SelectItem
-                  key={`status-${key}`}
-                  // @ts-ignore TODO File ticket with ariakit to allow number
-                  value={availableLicenseStatuses.indexOf(key)}
-                  className="select-item"
-                >
-                  <Ariakit.SelectItemCheck />
-                  <div className="[&>*]:align-middle">
-                    <span className="uppercase">{key ?? "Unlicensed"} </span>
-                    <span className="bg-white rounded-full px-1 text-black text-xs">
-                      {availableLicenseStatusCounts[key]}
-                    </span>
-                  </div>
-                </Ariakit.SelectItem>
-              ))}
+              {Object.keys(availableLicenseStatusCounts)
+                .sort(
+                  (a, b) =>
+                    availableLicenseStatusCounts[b] -
+                    availableLicenseStatusCounts[a]
+                )
+                .map((key: string) => (
+                  <Ariakit.SelectItem
+                    key={`status-${key}`}
+                    // @ts-ignore TODO File ticket with ariakit to allow number
+                    value={availableLicenseStatuses.indexOf(key)}
+                    className="select-item"
+                  >
+                    <Ariakit.SelectItemCheck />
+                    <div className="[&>*]:align-middle">
+                      <span className="uppercase">{key ?? "Unlicensed"} </span>
+                      <span className="bg-white rounded-full px-1 text-black text-xs">
+                        {availableLicenseStatusCounts[key]}
+                      </span>
+                    </div>
+                  </Ariakit.SelectItem>
+                ))}
             </Ariakit.SelectPopover>
           )}
         </div>
@@ -680,24 +688,28 @@ export default function Index() {
               sameWidth
               className="popover"
             >
-              {Object.keys(availableSchoolCounts).map((key: string) => (
-                <Ariakit.SelectItem
-                  key={`school-${key}`}
-                  // @ts-ignore TODO File ticket with ariakit to allow number
-                  value={availableSchools.indexOf(key)}
-                  className="select-item"
-                >
-                  <Ariakit.SelectItemCheck />
-                  <div className="[&>*]:align-middle">
-                    <span className="uppercase">
-                      {key === "null" ? "N/A" : key}{" "}
-                    </span>
-                    <span className="bg-white rounded-full px-1 text-black text-xs">
-                      {availableSchoolCounts[key]}
-                    </span>
-                  </div>
-                </Ariakit.SelectItem>
-              ))}
+              {Object.keys(availableSchoolCounts)
+                .sort(
+                  (a, b) => availableSchoolCounts[b] - availableSchoolCounts[a]
+                )
+                .map((key: string) => (
+                  <Ariakit.SelectItem
+                    key={`school-${key}`}
+                    // @ts-ignore TODO File ticket with ariakit to allow number
+                    value={availableSchools.indexOf(key)}
+                    className="select-item"
+                  >
+                    <Ariakit.SelectItemCheck />
+                    <div className="[&>*]:align-middle">
+                      <span className="uppercase">
+                        {key === "null" ? "N/A" : key}{" "}
+                      </span>
+                      <span className="bg-white rounded-full px-1 text-black text-xs">
+                        {availableSchoolCounts[key]}
+                      </span>
+                    </div>
+                  </Ariakit.SelectItem>
+                ))}
             </Ariakit.SelectPopover>
           )}
         </div>
@@ -749,22 +761,27 @@ export default function Index() {
               sameWidth
               className="popover"
             >
-              {Object.keys(availableSpecialtyCounts).map((key: string) => (
-                <Ariakit.SelectItem
-                  key={`specialty-${key}`}
-                  // @ts-ignore TODO File ticket with ariakit to allow number
-                  value={availableSpecialties.indexOf(key)}
-                  className="select-item"
-                >
-                  <Ariakit.SelectItemCheck />
-                  <div className="[&>*]:align-middle">
-                    <span>{key === "null" ? "N/A" : key} </span>
-                    <span className="bg-white rounded-full px-1 text-black text-xs">
-                      {availableSpecialtyCounts[key]}
-                    </span>
-                  </div>
-                </Ariakit.SelectItem>
-              ))}
+              {Object.keys(availableSpecialtyCounts)
+                .sort(
+                  (a, b) =>
+                    availableSpecialtyCounts[b] - availableSpecialtyCounts[a]
+                )
+                .map((key: string) => (
+                  <Ariakit.SelectItem
+                    key={`specialty-${key}`}
+                    // @ts-ignore TODO File ticket with ariakit to allow number
+                    value={availableSpecialties.indexOf(key)}
+                    className="select-item"
+                  >
+                    <Ariakit.SelectItemCheck />
+                    <div className="[&>*]:align-middle">
+                      <span>{key === "null" ? "N/A" : key} </span>
+                      <span className="bg-white rounded-full px-1 text-black text-xs">
+                        {availableSpecialtyCounts[key]}
+                      </span>
+                    </div>
+                  </Ariakit.SelectItem>
+                ))}
             </Ariakit.SelectPopover>
           )}
         </div>
@@ -960,14 +977,9 @@ export default function Index() {
                       {(data.actions?.length ?? 0) > 1 &&
                         `(${data.actions.length} actions)`}
                     </div>
-                    {data.survey?.["PRIMARY AREA OF PRACTICE"] && (
+                    {data.specialties && (
                       <div className="text-sm">
-                        {data.survey["PRIMARY AREA OF PRACTICE"]}
-                        {data.survey?.["SECONDARY AREA OF PRACTICE"]?.length >
-                          0 && ", "}
-                        {data.survey?.["SECONDARY AREA OF PRACTICE"]?.join(
-                          ", "
-                        )}
+                        {data.specialties.join(", ")}
                       </div>
                     )}
                   </div>
