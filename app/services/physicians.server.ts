@@ -123,7 +123,8 @@ export const selectPhysicians = async ({
     results = results.filter((result) => {
       if (
         result.data.actions?.some(
-          (action: any) => Number(action.date.split(",")[1].trim()) >= beginning
+          (action: any) =>
+            Number(action.date.split(/[,/]/).at(-1).trim()) >= beginning
         )
       ) {
         return true;
@@ -136,7 +137,8 @@ export const selectPhysicians = async ({
     results = results.filter((result) => {
       if (
         result.data.actions?.some(
-          (action: any) => Number(action.date.split(",")[1].trim()) <= ending
+          (action: any) =>
+            Number(action.date.split(/[,/]/).at(-1).trim()) <= ending
         )
       ) {
         return true;
