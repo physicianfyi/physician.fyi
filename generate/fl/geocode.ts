@@ -47,12 +47,13 @@ import NodeGeocoder from "node-geocoder";
       // Try with address
       // TODO Florida stores countries in city field so need to check country list
       queries[k] = {
-        ...(v.address !== "none" && { street: v.address }),
-        ...(v.city !== "NONE" && { city: v.city }),
-        ...(v.county !== "UNKNOWN" &&
-          v.county !== "Out of State" && { county: v.county }),
-        ...(v.zip && v.zip !== "00000" && { postalcode: v.zip.split("-")[0] }),
-        state: v.state,
+        ...(v.address && {
+          street: `${v.address}${v.address2 ? `, ${v.address2}` : ""}`,
+        }),
+        ...(v.city && { city: v.city }),
+        ...(v.county && { county: v.county }),
+        ...(v.zip && { postalcode: v.zip.split("-")[0] }),
+        ...(v.state && { state: v.state }),
         // Sending undefined breaks API
         // ...(v.country && { country: v.country }),
       };
@@ -86,11 +87,10 @@ import NodeGeocoder from "node-geocoder";
       const v = profiles[k];
       // Try without address if it didn't work
       const query = {
-        ...(v.city !== "NONE" && { city: v.city }),
-        ...(v.county !== "UNKNOWN" &&
-          v.county !== "Out of State" && { county: v.county }),
-        ...(v.zip && v.zip !== "00000" && { postalcode: v.zip.split("-")[0] }),
-        state: v.state,
+        ...(v.city && { city: v.city }),
+        ...(v.county && { county: v.county }),
+        ...(v.zip && { postalcode: v.zip.split("-")[0] }),
+        ...(v.state && { state: v.state }),
       };
       queries[k] = query;
     }

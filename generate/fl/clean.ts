@@ -38,6 +38,10 @@ import fs from "fs";
 
     v.address = v["Practice-Location-Address-Line1"];
     delete v["Practice-Location-Address-Line1"];
+    if (v["Practice-Location-Address-line2"]) {
+      v.address2 = v["Practice-Location-Address-line2"];
+      delete v["Practice-Location-Address-line2"];
+    }
     v.city = v["Practice-Location-Address-City"];
     delete v["Practice-Location-Address-City"];
     v.zip = v["Practice-Location-Address-ZIPcode"];
@@ -48,6 +52,46 @@ import fs from "fs";
     delete v["County-Description"];
     // Number code
     delete v["County"];
+
+    if (
+      [
+        "none",
+        "NOT PRACTICING",
+        "*** CONFIDENTIAL ***",
+        "*** NOT AVAILABLE ***",
+      ].includes(v.address)
+    ) {
+      delete v.address;
+    }
+    if (
+      ["NONE", "*** CONFIDENTIAL ***", "*** NOT AVAILABLE ***"].includes(v.city)
+    ) {
+      delete v.city;
+    }
+    if (["UNKNOWN", "Out of State"].includes(v.county)) {
+      delete v.county;
+    }
+    if (["00000", "*****"].includes(v.zip)) {
+      delete v.zip;
+    }
+    if (["**"].includes(v.state)) {
+      delete v.state;
+    }
+
+    if (!v.address && !v.city && !v.zip && !v.state && !v.county) {
+      v.address = v["Mailing-Address-Line1"];
+      if (v["Mailing-Address-line2"]) {
+        v.address2 = v["Mailing-Address-line2"];
+      }
+      v.city = v["Mailing-Address-City"];
+      v.zip = v["Mailing-Address-ZIPcode"];
+      v.state = v["Mailing-Address-State"];
+    }
+    delete v["Mailing-Address-Line1"];
+    delete v["Mailing-Address-line2"];
+    delete v["Mailing-Address-City"];
+    delete v["Mailing-Address-ZIPcode"];
+    delete v["Mailing-Address-State"];
 
     v.licenseStatus = v["License-Status-Description"];
     delete v["License-Status-Description"];
