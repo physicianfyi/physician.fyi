@@ -48,13 +48,18 @@ import { delay } from "generate/util";
   const page = await browser.newPage();
 
   // Starts at 1 to skip column titles
-  for (let i = 4300; i < parsed.data.length; i++) {
+  for (let i = 1; i < parsed.data.length; i++) {
     console.log(i);
     const entry = parsed.data[i] as string[];
     const license = entry[1];
     const shallowEntry = Object.values(shallowProfiles).find(
       (p: any) => p["License-Number"] === license
     ) as any;
+    // For now no need to get details for doctors without actions
+    if (shallowEntry["Board-Action-Indicator"] === "N") {
+      continue;
+    }
+
     const licenseId = shallowEntry["lic_id"];
     const caseNumber = entry[6];
     const existingActions = profiles[licenseId]?.actions ?? [];

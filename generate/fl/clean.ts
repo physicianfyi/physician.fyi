@@ -68,7 +68,7 @@ import fs from "fs";
     ) {
       delete v.city;
     }
-    if (["UNKNOWN", "Out of State"].includes(v.county)) {
+    if (["UNKNOWN", "Out of State", "Foreign"].includes(v.county)) {
       delete v.county;
     }
     if (["00000", "*****"].includes(v.zip)) {
