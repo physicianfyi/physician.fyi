@@ -189,21 +189,33 @@ export const selectPhysicians = async ({
     return acc;
   }, {});
 
-  const geoData = JSON.parse(
-    fs.readFileSync(path.join(process.cwd(), "data/ca/geocode.json"), "utf8")
-  );
+  const geoData = STATES.reduce<any>((acc, curr) => {
+    acc[curr] = JSON.parse(
+      fs.readFileSync(
+        path.join(process.cwd(), `data/${curr}/geocode.json`),
+        "utf8"
+      )
+    );
+    return acc;
+  }, {});
+
   const geo = {
     type: "FeatureCollection",
-    features: results.reduce<any[]>((acc, { license, data }) => {
-      if (geoData[license]) {
+    features: results.reduce<any[]>((acc, { license, data, state }) => {
+      if (geoData[state][license]) {
         acc.push({
           type: "Feature",
           geometry: {
             type: "Point",
-            coordinates: [geoData[license].lon, geoData[license].lat, 0],
+            coordinates: [
+              geoData[state][license].lon,
+              geoData[state][license].lat,
+              0,
+            ],
           },
           properties: {
             id: license,
+            state,
             name: data.name,
             numActions: data.actions?.length ?? 0,
           },

@@ -172,10 +172,12 @@ export const Map = ({ data }: any) => {
             {popupInfo.results.map((r: any) => {
               return (
                 <li key={r.id}>
-                  <Link to={`/ca/${r.id}`} className="uppercase">
+                  <Link to={`/${r.state}/${r.id}`} className="uppercase">
                     {r.name}
                   </Link>
-                  <div className="uppercase">CA {r.id}</div>
+                  <div className="uppercase">
+                    <span className="uppercase">{r.state}</span> {r.id}
+                  </div>
                   <div>{r.numActions} actions</div>
 
                   <hr className="h-px mt-2 bg-gray-200 border-0 dark:bg-gray-700" />
