@@ -38,7 +38,7 @@ import NodeGeocoder from "node-geocoder";
 
   const arrayProfiles = Object.entries<any>(profiles)
     // Filter here because we index into batch later and indices get messed up if excluding things then
-    .filter(([k, v]) => !data.hasOwnProperty[k]);
+    .filter(([k, v]) => !data.hasOwnProperty(k));
 
   while (arrayProfiles.length) {
     const batch = arrayProfiles.splice(0, 30);
