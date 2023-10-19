@@ -22,28 +22,41 @@ import NodeGeocoder from "node-geocoder";
 
   // const response = await geocoder.geocode(
   //   {
-  //     // street: "2680 saturn ave",
+  //     street: "2680 saturn ave",
   //     city: "huntington park",
+  //     // county: null,
+  //     // state: null,
   //     county: "los angeles",
   //     state: "california",
   //     postalcode: "90255",
+  //     // country: undefined,
   //   }
   //   // "2680 saturn ave ste 210, huntington park, los angeles, california, 90255"
   // );
   // console.log(response);
   // return;
 
-  const arrayProfiles = Object.entries<any>(profiles);
+  const arrayProfiles = Object.entries<any>(profiles)
+    // Filter here because we index into batch later and indices get messed up if excluding things then
+    .filter(([k, v]) => !data.hasOwnProperty[k]);
 
   while (arrayProfiles.length) {
     const batch = arrayProfiles.splice(0, 30);
     // Remake queries each batch
     const queries: any = {};
     for (let [k, v] of batch) {
-      if (!data[k]) {
-        const query = `${v.address}, ${v.city}, ${v.county}, ${v.state}, ${v.zip}`;
-        queries[k] = query;
-      }
+      // Try with address
+      queries[k] = {
+        street: `${v.address}${v.address2 ? `, ${v.address2}` : ""}${
+          v.address3 ? `, ${v.address3}` : ""
+        }`,
+        city: v.city,
+        ...(v.county != "n/a" && { county: v.county }),
+        ...(v.state != "n/a" && { state: v.state }),
+        ...(v.zip != "n/a" && { postalcode: v.zip }),
+        // Sending undefined breaks API
+        ...(v.country && { country: v.country }),
+      };
     }
 
     console.log(queries);
@@ -53,11 +66,13 @@ import NodeGeocoder from "node-geocoder";
 
     for (let i = 0; i < results.length; i++) {
       if (results[i].value?.[0]?.latitude) {
+        // Index into batch here, so need same number of items processed
         const key = batch[i][0];
         console.log(key);
         data[key] = {
           lat: results[i].value[0].latitude,
           lon: results[i].value[0].longitude,
+          query: queries[key],
         };
         delete queries[key];
       }
@@ -70,7 +85,15 @@ import NodeGeocoder from "node-geocoder";
     // Retry ones that failed likely because the address had a suite, so just geocode to zip code level
     for (let [k] of Object.entries<any>(queries)) {
       const v = profiles[k];
-      const query = `${v.city}, ${v.county}, ${v.state}, ${v.zip}`;
+      // Try without address if it didn't work
+      const query = {
+        city: v.city,
+        ...(v.county != "n/a" && { county: v.county }),
+        ...(v.state != "n/a" && { state: v.state }),
+        ...(v.zip != "n/a" && { postalcode: v.zip }),
+        // Sending undefined breaks API
+        ...(v.country && { country: v.country }),
+      };
       queries[k] = query;
     }
 
@@ -83,6 +106,7 @@ import NodeGeocoder from "node-geocoder";
         data[key] = {
           lat: results2[i].value[0].latitude,
           lon: results2[i].value[0].longitude,
+          query: queries[key],
         };
         // Can't delete when looking up, but since this is fallback case, just ignore failed ones
         // delete queries[key];

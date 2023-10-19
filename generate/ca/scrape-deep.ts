@@ -39,7 +39,9 @@ import fs from "fs";
   await page.setViewport({ width: 1080, height: 1024 });
 
   for (let [license, profile] of Object.entries<any>(shallowProfiles)) {
-    if (profile.fetch) {
+    // profile.fetch
+    // Rerunning for all due to missing countries
+    if (true) {
       // Navigate the page to a URL
       await page.goto(`${shallowData.baseUrl}${profile.licenseUrl}`);
       console.log(license);
@@ -95,6 +97,15 @@ import fs from "fs";
             if (address3 && !address3.startsWith(shallowProfile.city)) {
               profile.address3 = address3;
             }
+          }
+
+          const country = address?.at(-1)?.replace(/,\s*$/, "").trim();
+          if (
+            country &&
+            !country.startsWith(shallowProfile.city) &&
+            !country.startsWith(shallowProfile.county)
+          ) {
+            profile.country = country;
           }
 
           const probationSummary = (

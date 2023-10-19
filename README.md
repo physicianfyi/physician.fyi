@@ -46,7 +46,8 @@ You want to produce several files in the directory `data/[state]`:
               "date": "5/16/1985",
               ...[any other entries]...
             }
-          ]
+          ],
+          "specialties": ["DERMATOLOGY"]
         }
       }
     }
