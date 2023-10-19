@@ -1,7 +1,31 @@
 import { Link } from "@remix-run/react";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState, useSyncExternalStore } from "react";
 import type { GeoJSONSource, LayerProps, MapRef } from "react-map-gl";
 import MapGL, { Layer, Popup, Source } from "react-map-gl";
+
+function useMediaQuery(query: string) {
+  const subscribe = useCallback(
+    (callback: () => void) => {
+      const matchMedia = window.matchMedia(query);
+
+      matchMedia.addEventListener("change", callback);
+      return () => {
+        matchMedia.removeEventListener("change", callback);
+      };
+    },
+    [query]
+  );
+
+  const getSnapshot = () => {
+    return window.matchMedia(query).matches;
+  };
+
+  const getServerSnapshot = () => {
+    throw Error("useMediaQuery is a client-only hook");
+  };
+
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+}
 
 const clusterLayer: LayerProps = {
   id: "clusters",
@@ -48,6 +72,7 @@ const unclusteredPointLayer: LayerProps = {
 };
 
 export const Map = ({ data }: any) => {
+  const isDark = useMediaQuery("(prefers-color-scheme: dark)");
   const mapRef = useRef<MapRef>(null);
   const [popupInfo, setPopupInfo] = useState<{
     lngLat: [number, number];
@@ -133,14 +158,18 @@ export const Map = ({ data }: any) => {
     <MapGL
       mapLib={import("mapbox-gl")}
       initialViewState={{
-        longitude: -120,
-        latitude: 37.5,
-        zoom: 4.5,
+        longitude: -100,
+        latitude: 40,
+        zoom: 2.5,
       }}
       onClick={onClick}
       ref={mapRef}
       style={{ width: "100%", height: 400 }}
-      mapStyle="mapbox://styles/mapbox/streets-v9"
+      mapStyle={
+        isDark
+          ? "mapbox://styles/mapbox/dark-v11"
+          : "mapbox://styles/mapbox/light-v11"
+      }
       interactiveLayerIds={[
         clusterLayer.id as string,
         unclusteredPointLayer.id as string,

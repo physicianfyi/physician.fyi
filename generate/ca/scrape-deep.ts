@@ -38,14 +38,14 @@ import fs from "fs";
   // Set screen size
   await page.setViewport({ width: 1080, height: 1024 });
 
-  let startingLicenseSeen = false;
+  // let startingLicenseSeen = false;
   for (let [license, profile] of Object.entries<any>(shallowProfiles)) {
-    // profile.fetch
+    //
     // Rerunning for all due to missing countries
-    if (license === "g 35657") {
-      startingLicenseSeen = true;
-    }
-    if (startingLicenseSeen) {
+    // if (license === "g 35657") {
+    //   startingLicenseSeen = true;
+    // }
+    if (profile.fetch) {
       // Navigate the page to a URL
       await page.goto(`${shallowData.baseUrl}${profile.licenseUrl}`);
       console.log(license);

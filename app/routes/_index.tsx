@@ -962,7 +962,7 @@ export default function Index() {
       </div>
 
       <h2 id="results">
-        <UserList className="inline-icon" weight="bold" /> Doctors
+        <UserList className="inline-icon" weight="bold" /> Licenses
       </h2>
 
       <ul className="flex flex-col gap-2">
