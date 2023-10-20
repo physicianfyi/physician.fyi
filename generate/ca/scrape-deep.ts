@@ -102,7 +102,7 @@ import fs from "fs";
               profile.address3 = address3;
             }
           }
-
+          // country doesn't show in shallow search
           const country = address?.at(-1)?.replace(/,\s*$/, "").trim();
           if (
             country &&

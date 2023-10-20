@@ -51,9 +51,9 @@ import NodeGeocoder from "node-geocoder";
           v.address3 ? `, ${v.address3}` : ""
         }`,
         city: v.city,
-        ...(v.county != "n/a" && { county: v.county }),
-        ...(v.state != "n/a" && { state: v.state }),
-        ...(v.zip != "n/a" && { postalcode: v.zip }),
+        ...(v.county && { county: v.county }),
+        ...(v.state && { state: v.state }),
+        ...(v.zip && { postalcode: v.zip }),
         // Sending undefined breaks API
         ...(v.country && { country: v.country }),
       };
@@ -88,9 +88,9 @@ import NodeGeocoder from "node-geocoder";
       // Try without address if it didn't work
       const query = {
         city: v.city,
-        ...(v.county != "n/a" && { county: v.county }),
-        ...(v.state != "n/a" && { state: v.state }),
-        ...(v.zip != "n/a" && { postalcode: v.zip }),
+        ...(v.county && { county: v.county }),
+        ...(v.state && { state: v.state }),
+        ...(v.zip && { postalcode: v.zip }),
         // Sending undefined breaks API
         ...(v.country && { country: v.country }),
       };

@@ -46,6 +46,16 @@ import fs from "fs";
         "physician and surgeon c": "medical doctor",
       }[v.licenseType as string] ?? v.licenseType;
 
+    if (["n/a", "out of country state"].includes(v.state)) {
+      delete v.state;
+    }
+    if (["n/a"].includes(v.county)) {
+      delete v.county;
+    }
+    if (["n/a"].includes(v.zip)) {
+      delete v.zip;
+    }
+
     // Parsing name doesn't work for fictitious name permits
     // const name = v.name.split(",");
     // console.log(name);

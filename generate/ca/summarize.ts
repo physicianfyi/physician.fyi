@@ -121,7 +121,7 @@ import fs from "fs";
     }
 
     let state = v.state;
-    if (state === "n/a" || !state) {
+    if (!state) {
       state = null;
     }
     if (!states.includes(state)) {

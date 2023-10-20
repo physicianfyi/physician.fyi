@@ -64,11 +64,24 @@ import fs from "fs";
       delete v.address;
     }
     if (
+      ["*** CONFIDENTIAL ***", "*** NOT AVAILABLE ***"].includes(v.address2)
+    ) {
+      delete v.address2;
+    }
+    if (
       ["NONE", "*** CONFIDENTIAL ***", "*** NOT AVAILABLE ***"].includes(v.city)
     ) {
       delete v.city;
     }
-    if (["UNKNOWN", "Out of State", "Foreign"].includes(v.county)) {
+    if (
+      [
+        "UNKNOWN",
+        "Out of State",
+        "Foreign",
+        "OUT STATE",
+        "*** CONFIDENTIAL ***",
+      ].includes(v.county)
+    ) {
       delete v.county;
     }
     if (["00000", "*****"].includes(v.zip)) {
@@ -92,6 +105,34 @@ import fs from "fs";
     delete v["Mailing-Address-City"];
     delete v["Mailing-Address-ZIPcode"];
     delete v["Mailing-Address-State"];
+    // Do the cleaning again for any bad values from mailing address
+    if (
+      [
+        "none",
+        "NOT PRACTICING",
+        "*** CONFIDENTIAL ***",
+        "*** NOT AVAILABLE ***",
+      ].includes(v.address)
+    ) {
+      delete v.address;
+    }
+    if (
+      ["*** CONFIDENTIAL ***", "*** NOT AVAILABLE ***"].includes(v.address2)
+    ) {
+      delete v.address2;
+    }
+    if (
+      ["NONE", "*** CONFIDENTIAL ***", "*** NOT AVAILABLE ***"].includes(v.city)
+    ) {
+      delete v.city;
+    }
+    // Don't need to check county again since not in mailing address
+    if (["00000", "*****"].includes(v.zip)) {
+      delete v.zip;
+    }
+    if (["**"].includes(v.state)) {
+      delete v.state;
+    }
 
     v.licenseStatus = v["License-Status-Description"];
     delete v["License-Status-Description"];

@@ -174,6 +174,7 @@ export default function Route() {
               <div>{profile.county}</div>
               <div>{profile.state}</div>
               <div>{profile.zip}</div>
+              <div>{profile.country}</div>
             </div>
           </div>
         </div>
