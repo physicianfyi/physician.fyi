@@ -3,7 +3,6 @@
 <table>
   <tr>
     <th>Stream</th>
-    <!-- <td></td> -->
   </tr>
   <tr>
     <th>1</th>
