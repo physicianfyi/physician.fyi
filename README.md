@@ -12,6 +12,8 @@
 
 #### Add a state
 
+First thing, check the existing PRs to see if anyone is working on the state you had in mind. You can contact them to collaborate or just do another state. If you are starting a new state that nobody else has, create your PR immediately to make it known you are working on that state.
+
 Follow the pattern for other states. Run scripts using something like `npx tsx generate/[state]/[script]`, which typically produces a file with the same name in `data/[state]/[script]`.
 
 1. You will start by scraping the data. With California and Florida so far, it's been necessary to do this in two steps, scrape-shallow followed by scrape-deep for extra info that wasn't available from the shallow source.
