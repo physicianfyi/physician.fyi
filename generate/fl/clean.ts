@@ -25,6 +25,9 @@ import fs from "fs";
     delete v["First-Name"];
     delete v["Middle-Name"];
 
+    v.licenseIssuedAt = v["Original-Date"];
+    delete v["Original-Date"];
+
     v.licenseType = v["Profession-Name"].toLowerCase();
     delete v["Profession-Name"];
 

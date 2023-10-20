@@ -157,7 +157,9 @@ export default function Route() {
               weight="bold"
             />
             <span className="uppercase">{state}</span> License{" "}
-            <span className="uppercase">{license}</span>
+            <span className="uppercase">{license}</span>{" "}
+            <span>issued {profile.licenseIssuedAt}</span>{" "}
+            <span>({profile.licenseStatus})</span>
           </h4>
 
           {profile.specialties && <h4>{profile.specialties.join(", ")}</h4>}

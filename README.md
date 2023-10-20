@@ -18,17 +18,28 @@ Follow the pattern for other states. Run scripts using something like `npx tsx g
 
 - Do not clean or modify the data in this step—it's best to have as close to the raw data as possible stored so that we can efficiently change things about it by reading it from disk instead of having to rescrape each time we change something about how it's cleaned/transformed.
 - Don't store data that was in the shallow scrape file again in the deep scrape file—we check these files in to version control via `git lfs track [file]` and have a space limit. The cleaning step also merges these files.
+- Write the scraper so that subsequent runs preserve previously scraped data to protect against the source unpublishing data. A notable case here will be only ever adding to the actions list for each doctor if a new action is found.
 
 2. If you're proceeding to the PDF processing, you will typically do that now, because the cleaning step will also read from this. But you can skip this step on your initial run through and come back to it.
-3. Now you clean.
-4. Then you summarize.
-5. Then you geocode.
+
+- Download PDFs from URLs in actions from the scrape step above
+- Convert PDFs to PNGs for Tesseract
+- OCR the PNGs
+- Write a script called read which outputs read.json which identifies offenses from the text files
+
+3. Now you clean. Normalize values to be consistent with common values used in the app. If a field has bad data (e.g., address is "n/a") remove it.
+4. Now you summarize. I like to cycle between clean and summarize to see bad data or data that can be normalized.
+
+- Note summarize is meant to preserve existing data, so if you are removing or changing values in clean, delete summarize.json before rerunning summarize to get rid of the outdated values completely.
+
+5. Now you geocode. Store the query that ended up being used for the geocode so that we can go back and check.
 
 You want to produce several files in the directory `data/[state]`:
 
 - clean.json (required) with a schema like:
   - ```
     {
+      "baseUrl": "[base url for licenseUrl]",
       "profiles": {
         [licenseNumber]: {
           "name": "last, first middle",
@@ -39,11 +50,12 @@ You want to produce several files in the directory `data/[state]`:
           "zip": "34995-0745",
           "state": "FL",
           "county": "MARTIN",
+          "country": "",
           "licenseStatus": "license surrendered",
           "actions": [
             {
               "actionType": "voluntary surrender",
-              "date": "5/16/1985",
+              "date": "[DD/MM/YYYY or MM/DD/YYYY or month day, year]",
               ...[any other entries]...
             }
           ],
