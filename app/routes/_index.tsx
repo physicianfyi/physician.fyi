@@ -372,7 +372,16 @@ export default function Index() {
             rel="noreferrer"
           >
             join the Discord
+          </a>{" "}
+          and/or{" "}
+          <a
+            href="https://github.com/physicianfyi/physician.fyi"
+            target="_blank"
+            rel="noreferrer"
+          >
+            check out the repository
           </a>
+          .
         </div>
       </div>
 
