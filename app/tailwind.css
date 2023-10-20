@@ -1,3 +1,6 @@
+/* Could import here instead of root but I think separate is better for network */
+/* @import "mapbox-gl/dist/mapbox-gl.css"; */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -216,6 +219,11 @@
   .menu-line {
     @apply h-1 w-6 my-0.5 rounded-full bg-primary transition ease-in-out transform duration-150;
   }
+}
+
+/* Only works outside base/components layers */
+.mapboxgl-popup-content {
+  @apply popover;
 }
 
 @layer components {

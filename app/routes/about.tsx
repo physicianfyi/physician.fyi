@@ -86,28 +86,52 @@ export default function Route() {
         empower patients to be informed.
       </p>
 
-      <p>
-        I'd like to recognize the patient advocates who have come before, such
-        as the creators of 4patientsafety.org. I'd also like to mention that{" "}
-        <a
-          href="https://www.citizen.org/article/report-ranking-of-the-rate-of-state-medical-boards-serious-disciplinary-actions-2019-2021/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Public Citizen has done good analysis of the rate of serious actions
-          by each state medical board, finding that, for example, DC would have
-          to take action almost 9 times as much as it does right now to match
-          the rate at which Michigan takes action against doctors. They also
-          inform that in a group of physicians who have had 5+ malpractice
-          payments, which accounts for the absolute worst 1% of all physicians,
-          3/4 of them have never had any medical board licensure action at all.
-        </a>
-        . Please also have a look at{" "}
-        <a href="https://www.patientsafetyaction.org/resources/">
-          resources from the Patient Safety Action Network
-        </a>
-        .
-      </p>
+      <ul>
+        <li>
+          I'd also like to mention that{" "}
+          <a
+            href="https://www.citizen.org/article/report-ranking-of-the-rate-of-state-medical-boards-serious-disciplinary-actions-2019-2021/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Public Citizen has done good analysis of the rate of serious actions
+            by each state medical board, finding that, for example, DC would
+            have to take action almost 9 times as much as it does right now to
+            match the rate at which Michigan takes action against doctors. They
+            also inform that in a group of physicians who have had 5+
+            malpractice payments, which accounts for the absolute worst 1% of
+            all physicians, 3/4 of them have never had any medical board
+            licensure action at all
+          </a>
+          .
+        </li>
+        <li>
+          Please also have a look at{" "}
+          <a
+            href="https://www.patientsafetyaction.org/resources/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            resources from the Patient Safety Action Network
+          </a>
+          .
+        </li>
+        <li>
+          Also see the{" "}
+          <a
+            href="https://www.informedpatientinstitute.org/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Informed Patient Institute
+          </a>
+          .
+        </li>
+        <li>
+          I'd like to recognize the patient advocates who have come before, such
+          as the creators of 4patientsafety.org.
+        </li>
+      </ul>
     </article>
   );
 }

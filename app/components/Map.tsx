@@ -212,7 +212,9 @@ export const Map = ({ data }: any) => {
           longitude={popupInfo.lngLat[0]}
           latitude={popupInfo.lngLat[1]}
           onClose={() => setPopupInfo(null)}
+          // Content needs to be styled in stylesheet class selector
           // className="popover"
+          // closeButton={false}
         >
           <ul className="flex flex-col gap-2">
             {popupInfo.results.map((r: any) => {
