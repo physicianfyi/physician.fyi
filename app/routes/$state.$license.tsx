@@ -16,6 +16,7 @@ import { ResponsiveContainer, PieChart, Pie, Cell, LabelList } from "recharts";
 import path from "path";
 import { usePostHog } from "posthog-js/react";
 import { useEffect } from "react";
+import { STATES } from "~/services/constants";
 
 export const links: LinksFunction = () => [
   {
@@ -29,6 +30,15 @@ export const loader = async ({
   context,
   params,
 }: DataFunctionArgs) => {
+  const state = params.state;
+  if (!state || !STATES.includes(state)) {
+    throw json(
+      { error: "Unknown physician" },
+      {
+        status: 404,
+      }
+    );
+  }
   const license = params.license;
   if (!license) {
     throw json(
@@ -40,17 +50,26 @@ export const loader = async ({
   }
 
   const data = JSON.parse(
-    fs.readFileSync(path.join(process.cwd(), "data/ca/clean.json"), "utf8")
+    fs.readFileSync(
+      path.join(process.cwd(), `data/${state}/clean.json`),
+      "utf8"
+    )
   );
   const profile = data.profiles[license];
 
-  const read = JSON.parse(
-    fs.readFileSync(path.join(process.cwd(), "data/ca/read.json"), "utf8")
-  ).results;
+  let read;
+  try {
+    read = JSON.parse(
+      fs.readFileSync(
+        path.join(process.cwd(), `data/${state}/read.json`),
+        "utf8"
+      )
+    ).results;
+  } catch {}
 
   for (let action of profile.actions ?? []) {
     const url = action.url;
-    if (!url) continue;
+    if (!url || state !== "ca") continue;
 
     const parsedUrl = new URL(url);
     const did = parsedUrl.searchParams.get("did");
@@ -61,7 +80,7 @@ export const loader = async ({
     }
   }
 
-  return { profile, license, baseUrl: data.baseUrl };
+  return { profile, license, state, baseUrl: data.baseUrl };
 };
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
@@ -100,7 +119,7 @@ export default function Route() {
   }, [posthog]);
 
   // const params = useParams()
-  const { profile, license, baseUrl } = useLoaderData<typeof loader>();
+  const { profile, license, state, baseUrl } = useLoaderData<typeof loader>();
 
   const pieData = Object.entries(profile.minActivities ?? {}).reduce<any>(
     (acc, [k, v]) => {
@@ -137,17 +156,13 @@ export default function Route() {
               }`}
               weight="bold"
             />
-            California License <span className="uppercase">{license}</span>
+            <span className="uppercase">{state}</span> License{" "}
+            <span className="uppercase">{license}</span>{" "}
+            <span>issued {profile.licenseIssuedAt}</span>{" "}
+            <span>({profile.licenseStatus})</span>
           </h4>
 
-          {profile.survey?.["PRIMARY AREA OF PRACTICE"] && (
-            <h4>
-              {profile.survey["PRIMARY AREA OF PRACTICE"]}
-              {profile.survey?.["SECONDARY AREA OF PRACTICE"]?.length > 0 &&
-                ", "}
-              {profile.survey?.["SECONDARY AREA OF PRACTICE"]?.join(", ")}
-            </h4>
-          )}
+          {profile.specialties && <h4>{profile.specialties.join(", ")}</h4>}
 
           <div className="flex gap-2">
             <h2>
@@ -161,6 +176,7 @@ export default function Route() {
               <div>{profile.county}</div>
               <div>{profile.state}</div>
               <div>{profile.zip}</div>
+              <div>{profile.country}</div>
             </div>
           </div>
         </div>
@@ -237,7 +253,8 @@ export default function Route() {
                             rel="noreferrer"
                             className="font-medium"
                           >
-                            View PDF ({r.numPages} pages)
+                            View PDF{" "}
+                            {r.numPages > 0 && <>({r.numPages} pages)</>}
                           </a>
                         </>
                       )}

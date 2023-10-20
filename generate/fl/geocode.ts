@@ -7,12 +7,12 @@ import NodeGeocoder from "node-geocoder";
 
 (async () => {
   const profiles = JSON.parse(
-    fs.readFileSync("data/ca/clean.json", "utf8")
+    fs.readFileSync("data/fl/clean.json", "utf8")
   ).profiles;
 
   let file = "{}";
   try {
-    file = fs.readFileSync("data/ca/geocode.json", "utf8");
+    file = fs.readFileSync("data/fl/geocode.json", "utf8");
   } catch {}
   const data = JSON.parse(file);
 
@@ -22,13 +22,11 @@ import NodeGeocoder from "node-geocoder";
 
   // const response = await geocoder.geocode(
   //   {
-  //     street: "2680 saturn ave",
-  //     city: "huntington park",
-  //     // county: null,
-  //     // state: null,
-  //     county: "los angeles",
-  //     state: "california",
-  //     postalcode: "90255",
+  //     // street: "2680 saturn ave",
+  //     city: "stuart",
+  //     county: "martin",
+  //     state: "fl",
+  //     postalcode: "34995",
   //     // country: undefined,
   //   }
   //   // "2680 saturn ave ste 210, huntington park, los angeles, california, 90255"
@@ -39,6 +37,7 @@ import NodeGeocoder from "node-geocoder";
   const arrayProfiles = Object.entries<any>(profiles)
     // Filter here because we index into batch later and indices get messed up if excluding things then
     .filter(([k, v]) => !data.hasOwnProperty(k));
+  // .slice(0, 1);
 
   while (arrayProfiles.length) {
     const batch = arrayProfiles.splice(0, 30);
@@ -46,16 +45,17 @@ import NodeGeocoder from "node-geocoder";
     const queries: any = {};
     for (let [k, v] of batch) {
       // Try with address
+      // TODO Florida stores countries in city field so need to check country list
       queries[k] = {
-        street: `${v.address}${v.address2 ? `, ${v.address2}` : ""}${
-          v.address3 ? `, ${v.address3}` : ""
-        }`,
-        city: v.city,
+        ...(v.address && {
+          street: `${v.address}${v.address2 ? `, ${v.address2}` : ""}`,
+        }),
+        ...(v.city && { city: v.city }),
         ...(v.county && { county: v.county }),
+        ...(v.zip && { postalcode: v.zip.split("-")[0] }),
         ...(v.state && { state: v.state }),
-        ...(v.zip && { postalcode: v.zip }),
         // Sending undefined breaks API
-        ...(v.country && { country: v.country }),
+        // ...(v.country && { country: v.country }),
       };
     }
 
@@ -78,7 +78,7 @@ import NodeGeocoder from "node-geocoder";
       }
     }
 
-    fs.writeFile("data/ca/geocode.json", JSON.stringify(data), (error) => {
+    fs.writeFile("data/fl/geocode.json", JSON.stringify(data), (error) => {
       if (error) throw error;
     });
 
@@ -87,12 +87,10 @@ import NodeGeocoder from "node-geocoder";
       const v = profiles[k];
       // Try without address if it didn't work
       const query = {
-        city: v.city,
+        ...(v.city && { city: v.city }),
         ...(v.county && { county: v.county }),
+        ...(v.zip && { postalcode: v.zip.split("-")[0] }),
         ...(v.state && { state: v.state }),
-        ...(v.zip && { postalcode: v.zip }),
-        // Sending undefined breaks API
-        ...(v.country && { country: v.country }),
       };
       queries[k] = query;
     }
@@ -113,7 +111,7 @@ import NodeGeocoder from "node-geocoder";
       }
     }
 
-    fs.writeFile("data/ca/geocode.json", JSON.stringify(data), (error) => {
+    fs.writeFile("data/fl/geocode.json", JSON.stringify(data), (error) => {
       if (error) throw error;
     });
   }

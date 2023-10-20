@@ -38,7 +38,13 @@ import fs from "fs";
   // Set screen size
   await page.setViewport({ width: 1080, height: 1024 });
 
+  // let startingLicenseSeen = false;
   for (let [license, profile] of Object.entries<any>(shallowProfiles)) {
+    //
+    // Rerunning for all due to missing countries
+    // if (license === "g 35657") {
+    //   startingLicenseSeen = true;
+    // }
     if (profile.fetch) {
       // Navigate the page to a URL
       await page.goto(`${shallowData.baseUrl}${profile.licenseUrl}`);
@@ -95,6 +101,16 @@ import fs from "fs";
             if (address3 && !address3.startsWith(shallowProfile.city)) {
               profile.address3 = address3;
             }
+          }
+          // country doesn't show in shallow search
+          const country = address?.at(-1)?.replace(/,\s*$/, "").trim();
+          if (
+            country &&
+            !country.startsWith(shallowProfile.city) &&
+            !country.startsWith(shallowProfile.county) &&
+            !country.endsWith(" county")
+          ) {
+            profile.country = country;
           }
 
           const probationSummary = (

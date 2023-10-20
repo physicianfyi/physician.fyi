@@ -7,14 +7,14 @@ import fs from "fs";
 
 (async () => {
   const profiles = JSON.parse(
-    fs.readFileSync("data/ca/clean.json", "utf8")
+    fs.readFileSync("data/fl/clean.json", "utf8")
   ).profiles;
 
-  const read = JSON.parse(fs.readFileSync("data/ca/read.json", "utf8")).results;
+  // const read = JSON.parse(fs.readFileSync("data/fl/read.json", "utf8")).results;
 
   let file = "{}";
   try {
-    file = fs.readFileSync("data/ca/summarize.json", "utf8");
+    file = fs.readFileSync("data/fl/summarize.json", "utf8");
   } catch {}
   const data = JSON.parse(file);
 
@@ -56,7 +56,7 @@ import fs from "fs";
     licenseStatusCounts[licenseStatus] =
       (licenseStatusCounts[licenseStatus] ?? 0) + 1;
 
-    const secondaryStatus = v.secondaryStatus;
+    const secondaryStatus = v.secondaryStatus ?? [];
     for (let s of secondaryStatus) {
       if (!secondaryStatuses.includes(s)) {
         secondaryStatuses.push(s);
@@ -91,22 +91,22 @@ import fs from "fs";
         currentActionTypes.add(a.actionType);
       }
 
-      const url = a.url;
-      if (!url) continue;
+      // const url = a.url;
+      // if (!url) continue;
 
-      const parsedUrl = new URL(url);
-      const did = parsedUrl.searchParams.get("did");
-      const path = `${did}.pdf.txt`;
-      const currentOffenses = new Set();
-      for (let o of read[path] ?? []) {
-        if (!offenses.includes(o)) {
-          offenses.push(o);
-        }
-        if (!currentOffenses.has(o)) {
-          offenseCounts[o] = (offenseCounts[o] ?? 0) + 1;
-          currentOffenses.add(o);
-        }
-      }
+      // const parsedUrl = new URL(url);
+      // const did = parsedUrl.searchParams.get("did");
+      // const path = `${did}.pdf.txt`;
+      // const currentOffenses = new Set();
+      // for (let o of read[path] ?? []) {
+      //   if (!offenses.includes(o)) {
+      //     offenses.push(o);
+      //   }
+      //   if (!currentOffenses.has(o)) {
+      //     offenseCounts[o] = (offenseCounts[o] ?? 0) + 1;
+      //     currentOffenses.add(o);
+      //   }
+      // }
     }
 
     let itemSpecialties = v.specialties ?? [];
@@ -121,7 +121,7 @@ import fs from "fs";
     }
 
     let state = v.state;
-    if (!state) {
+    if (state === "n/a" || !state) {
       state = null;
     }
     if (!states.includes(state)) {
@@ -197,7 +197,7 @@ import fs from "fs";
       ),
     },
   };
-  fs.writeFile("data/ca/summarize.json", JSON.stringify(json), (error) => {
+  fs.writeFile("data/fl/summarize.json", JSON.stringify(json), (error) => {
     if (error) throw error;
   });
 })();

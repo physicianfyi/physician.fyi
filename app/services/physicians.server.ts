@@ -1,6 +1,6 @@
 import fs from "fs";
 import Fuse from "fuse.js";
-import { PAGE_SIZE } from "./constants";
+import { PAGE_SIZE, STATES } from "./constants";
 import path from "path";
 
 /**
@@ -29,13 +29,21 @@ export const selectPhysicians = async ({
   beginning?: number;
   ending?: number;
 }) => {
-  const data = JSON.parse(fs.readFileSync("data/ca/clean.json", "utf8"));
+  let lastUpdated;
+  let results = [];
+  for (let S of STATES) {
+    const data = JSON.parse(fs.readFileSync(`data/${S}/clean.json`, "utf8"));
+    lastUpdated = data.cleanLastRun;
 
-  // TODO Also generate this as a new file like ca-grouped-flat.json
-  let results = Object.keys(data.profiles).map((key) => ({
-    license: key,
-    data: data.profiles[key],
-  }));
+    // TODO Also generate this as a new file like ca-grouped-flat.json
+    results.push(
+      ...Object.keys(data.profiles).map((key) => ({
+        license: key,
+        data: data.profiles[key],
+        state: S,
+      }))
+    );
+  }
 
   if (actionTypes.length) {
     results = results.filter((result) => {
@@ -80,12 +88,7 @@ export const selectPhysicians = async ({
   if (specialties.length) {
     results = results.filter((result) => {
       if (
-        specialties.includes(
-          result.data.survey?.["PRIMARY AREA OF PRACTICE"]
-        ) ||
-        result.data.survey?.["SECONDARY AREA OF PRACTICE"]?.some((a: string) =>
-          specialties.includes(a)
-        )
+        result.data.specialties?.some((a: string) => specialties.includes(a))
       ) {
         return true;
       }
@@ -120,7 +123,8 @@ export const selectPhysicians = async ({
     results = results.filter((result) => {
       if (
         result.data.actions?.some(
-          (action: any) => Number(action.date.split(",")[1].trim()) >= beginning
+          (action: any) =>
+            Number(action.date.split(/[,/]/).at(-1).trim()) >= beginning
         )
       ) {
         return true;
@@ -133,7 +137,8 @@ export const selectPhysicians = async ({
     results = results.filter((result) => {
       if (
         result.data.actions?.some(
-          (action: any) => Number(action.date.split(",")[1].trim()) <= ending
+          (action: any) =>
+            Number(action.date.split(/[,/]/).at(-1).trim()) <= ending
         )
       ) {
         return true;
@@ -163,7 +168,8 @@ export const selectPhysicians = async ({
     // Don't count multiple actions in the same year for number of physicians
     const currentYears = new Set();
     for (let i = 0; i < (curr.data.actions?.length ?? 0); i++) {
-      const year = curr.data.actions[i].date?.split(",")[1].trim();
+      // TODO Either clean FL to have same date format or handle other format here
+      const year = curr.data.actions[i].date?.split(/[,/]/).at(-1)?.trim();
       if (!year) {
         // console.error(curr);
         continue;
@@ -183,21 +189,33 @@ export const selectPhysicians = async ({
     return acc;
   }, {});
 
-  const geoData = JSON.parse(
-    fs.readFileSync(path.join(process.cwd(), "data/ca/geocode.json"), "utf8")
-  );
+  const geoData = STATES.reduce<any>((acc, curr) => {
+    acc[curr] = JSON.parse(
+      fs.readFileSync(
+        path.join(process.cwd(), `data/${curr}/geocode.json`),
+        "utf8"
+      )
+    );
+    return acc;
+  }, {});
+
   const geo = {
     type: "FeatureCollection",
-    features: results.reduce<any[]>((acc, { license, data }) => {
-      if (geoData[license]) {
+    features: results.reduce<any[]>((acc, { license, data, state }) => {
+      if (geoData[state][license]) {
         acc.push({
           type: "Feature",
           geometry: {
             type: "Point",
-            coordinates: [geoData[license].lon, geoData[license].lat, 0],
+            coordinates: [
+              geoData[state][license].lon,
+              geoData[state][license].lat,
+              0,
+            ],
           },
           properties: {
             id: license,
+            state,
             name: data.name,
             numActions: data.actions?.length ?? 0,
           },
@@ -211,7 +229,7 @@ export const selectPhysicians = async ({
     // Recalculated since this is for filtered results
     numResults: results.length,
     results: results.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE),
-    lastUpdated: data.deepLastRun,
+    lastUpdated,
     chartData: Object.keys(chartData)
       .sort()
       .map((k) => ({

@@ -168,6 +168,7 @@ export const DateChart = ({
 
   return (
     <div className="select-none w-full">
+      {/* TODO This doesn't work on initial load */}
       {beginning + ending > 0 && (
         <button type="button" className="" onClick={zoomOut}>
           Reset year range

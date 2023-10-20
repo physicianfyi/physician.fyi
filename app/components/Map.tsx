@@ -1,7 +1,48 @@
 import { Link } from "@remix-run/react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { GeoJSONSource, LayerProps, MapRef } from "react-map-gl";
 import MapGL, { Layer, Popup, Source } from "react-map-gl";
+
+function useMediaQuery(query: string): boolean {
+  const getMatches = (query: string): boolean => {
+    // Prevents SSR issues
+    if (typeof window !== "undefined") {
+      return window.matchMedia(query).matches;
+    }
+    return false;
+  };
+
+  const [matches, setMatches] = useState<boolean>(getMatches(query));
+
+  function handleChange() {
+    setMatches(getMatches(query));
+  }
+
+  useEffect(() => {
+    const matchMedia = window.matchMedia(query);
+
+    // Triggered at the first client-side load and if query changes
+    handleChange();
+
+    // Listen matchMedia
+    if (matchMedia.addListener) {
+      matchMedia.addListener(handleChange);
+    } else {
+      matchMedia.addEventListener("change", handleChange);
+    }
+
+    return () => {
+      if (matchMedia.removeListener) {
+        matchMedia.removeListener(handleChange);
+      } else {
+        matchMedia.removeEventListener("change", handleChange);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query]);
+
+  return matches;
+}
 
 const clusterLayer: LayerProps = {
   id: "clusters",
@@ -48,6 +89,7 @@ const unclusteredPointLayer: LayerProps = {
 };
 
 export const Map = ({ data }: any) => {
+  const isDark = useMediaQuery("(prefers-color-scheme: dark)");
   const mapRef = useRef<MapRef>(null);
   const [popupInfo, setPopupInfo] = useState<{
     lngLat: [number, number];
@@ -133,14 +175,18 @@ export const Map = ({ data }: any) => {
     <MapGL
       mapLib={import("mapbox-gl")}
       initialViewState={{
-        longitude: -120,
-        latitude: 37.5,
-        zoom: 4.5,
+        longitude: -100,
+        latitude: 40,
+        zoom: 2.5,
       }}
       onClick={onClick}
       ref={mapRef}
       style={{ width: "100%", height: 400 }}
-      mapStyle="mapbox://styles/mapbox/streets-v9"
+      mapStyle={
+        isDark
+          ? "mapbox://styles/mapbox/dark-v11"
+          : "mapbox://styles/mapbox/light-v11"
+      }
       interactiveLayerIds={[
         clusterLayer.id as string,
         unclusteredPointLayer.id as string,
@@ -172,10 +218,12 @@ export const Map = ({ data }: any) => {
             {popupInfo.results.map((r: any) => {
               return (
                 <li key={r.id}>
-                  <Link to={`/ca/${r.id}`} className="uppercase">
+                  <Link to={`/${r.state}/${r.id}`} className="uppercase">
                     {r.name}
                   </Link>
-                  <div className="uppercase">CA {r.id}</div>
+                  <div className="uppercase">
+                    <span className="uppercase">{r.state}</span> {r.id}
+                  </div>
                   <div>{r.numActions} actions</div>
 
                   <hr className="h-px mt-2 bg-gray-200 border-0 dark:bg-gray-700" />
