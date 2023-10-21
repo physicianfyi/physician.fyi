@@ -1,7 +1,8 @@
 import type { Dispatch, ReactNode, SetStateAction } from "react";
-import { startTransition, useMemo, useState } from "react";
+import { startTransition, useId, useMemo, useState } from "react";
 import * as Ariakit from "@ariakit/react";
 import Fuse from "fuse.js";
+import { SelectRenderer } from "@ariakit/react-core/select/select-renderer";
 
 interface Props {
   label: ReactNode;
@@ -15,8 +16,8 @@ interface Props {
 }
 
 /**
- * Multiselect component that allows filtering contents
- * https://ariakit.org/examples/select-combobox
+ * Virtualized multiselect component that allows filtering contents
+ * https://ariakit.org/examples/select-combobox and https://ariakit.org/examples/select-combobox-virtualized
  */
 export const FilterableMultiSelect = ({
   label,
@@ -26,6 +27,7 @@ export const FilterableMultiSelect = ({
   counts,
   nullFallback = "N/A",
 }: Props) => {
+  const id = useId();
   const [mounted, setMounted] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
@@ -100,7 +102,8 @@ export const FilterableMultiSelect = ({
               sameWidth
               className="popover pt-0"
             >
-              <div className="sticky top-0 mb-2 w-full bg-inherit pt-2">
+              {/* Needs z-20 when virtualized */}
+              <div className="sticky top-0 mb-2 w-full bg-inherit pt-2 z-20">
                 <Ariakit.Combobox
                   autoSelect
                   placeholder="Search..."
@@ -108,23 +111,27 @@ export const FilterableMultiSelect = ({
                 />
               </div>
               <Ariakit.ComboboxList>
-                {matches.map(({ item: key }) => (
-                  <Ariakit.SelectItem
-                    key={`action-${key}`}
-                    // @ts-ignore TODO File ticket with ariakit to allow number
-                    value={items.indexOf(key)}
-                    className="scroll-m-2 scroll-mt-14 p-1 flex items-center gap-2 cursor-pointer data-[active-item]:bg-accent rounded-sm aria-selected:bg-accent/50"
-                    render={<Ariakit.ComboboxItem />}
-                  >
-                    <Ariakit.SelectItemCheck />
-                    <div className="[&>*]:align-middle">
-                      <span>{key === "null" ? nullFallback : key} </span>
-                      <span className="bg-white rounded-full px-1 text-black text-xs">
-                        {counts[key]}
-                      </span>
-                    </div>
-                  </Ariakit.SelectItem>
-                ))}
+                <SelectRenderer items={matches} gap={8} overscan={1}>
+                  {({ item: key, ...item }) => (
+                    <Ariakit.SelectItem
+                      {...item}
+                      // For unique key across FilterableMultiSelects
+                      key={`${id}-${key}`}
+                      // @ts-ignore TODO File ticket with ariakit to allow number
+                      value={items.indexOf(key)}
+                      className="w-full scroll-m-2 scroll-mt-14 p-1 flex items-center gap-2 cursor-pointer data-[active-item]:bg-accent rounded-sm aria-selected:bg-accent/50"
+                      render={<Ariakit.ComboboxItem />}
+                    >
+                      <Ariakit.SelectItemCheck />
+                      <div className="[&>*]:align-middle">
+                        <span>{key === "null" ? nullFallback : key} </span>
+                        <span className="bg-white rounded-full px-1 text-black text-xs">
+                          {counts[key]}
+                        </span>
+                      </div>
+                    </Ariakit.SelectItem>
+                  )}
+                </SelectRenderer>
               </Ariakit.ComboboxList>
             </Ariakit.SelectPopover>
           )}
