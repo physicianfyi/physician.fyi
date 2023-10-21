@@ -215,8 +215,9 @@ export const Map = ({ data }: any) => {
           // Content needs to be styled in stylesheet class selector
           // className="popover"
           // closeButton={false}
+          // TODO Figure out how to make scrollable on overflow
         >
-          <ul className="flex flex-col gap-2">
+          <ul className="flex flex-col gap-2 last:[&>hr]:last:[&>li]:hidden">
             {popupInfo.results.map((r: any) => {
               return (
                 <li key={r.id}>
