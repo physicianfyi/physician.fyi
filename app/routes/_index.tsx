@@ -24,6 +24,7 @@ import {
 import { usePostHog } from "posthog-js/react";
 import { Map } from "~/components/Map";
 import { DateChart } from "~/components/DateChart";
+import { FilterableMultiSelect } from "~/components/FilterableMultiSelect";
 
 export const meta: MetaFunction = () => {
   return [
@@ -218,53 +219,13 @@ export default function Index() {
   } = useLoaderData<typeof loader>();
   const results = data.results;
 
-  const select = Ariakit.useSelectStore({
-    // @ts-ignore ariakit TS issue
-    defaultValue: types,
-    focusLoop: true,
-  });
-  const typeValues = select.useState("value");
-  const mounted = select.useState("mounted");
-
-  const licenseStatusSelect = Ariakit.useSelectStore({
-    // @ts-ignore ariakit TS issue
-    defaultValue: licenseStatuses,
-    focusLoop: true,
-  });
-  const licenseStatusValues = licenseStatusSelect.useState("value");
-  const licenseStatusMounted = licenseStatusSelect.useState("mounted");
-
-  const licenseTypeSelect = Ariakit.useSelectStore({
-    // @ts-ignore ariakit TS issue
-    defaultValue: licenseTypes,
-    focusLoop: true,
-  });
-  const licenseTypeValues = licenseTypeSelect.useState("value");
-  const licenseTypeMounted = licenseTypeSelect.useState("mounted");
-
-  const schoolSelect = Ariakit.useSelectStore({
-    // @ts-ignore ariakit TS issue
-    defaultValue: schools,
-    focusLoop: true,
-  });
-  const schoolValues = schoolSelect.useState("value");
-  const schoolMounted = schoolSelect.useState("mounted");
-
-  const specialtySelect = Ariakit.useSelectStore({
-    // @ts-ignore ariakit TS issue
-    defaultValue: specialties,
-    focusLoop: true,
-  });
-  const specialtyValues = specialtySelect.useState("value");
-  const specialtyMounted = specialtySelect.useState("mounted");
-
-  const offenseSelect = Ariakit.useSelectStore({
-    // @ts-ignore ariakit TS issue
-    defaultValue: offenses,
-    focusLoop: true,
-  });
-  const offenseValues = offenseSelect.useState("value");
-  const offenseMounted = offenseSelect.useState("mounted");
+  const [typeValues, setTypeValues] = useState(types);
+  const [licenseStatusValues, setLicenseStatusValues] =
+    useState(licenseStatuses);
+  const [licenseTypeValues, setLicenseTypeValues] = useState(licenseTypes);
+  const [schoolValues, setSchoolValues] = useState(schools);
+  const [specialtyValues, setSpecialtyValues] = useState(specialties);
+  const [offenseValues, setOffenseValues] = useState(offenses);
 
   const submit = useSubmit();
   const filterRef = useRef<HTMLFormElement>(null);
@@ -443,424 +404,61 @@ export default function Index() {
         <input name="b" value={beginning} hidden readOnly />
         <input name="e" value={ending} hidden readOnly />
 
-        <div className="flex flex-col gap-1">
-          <div className="flex items-end justify-between">
-            <Ariakit.SelectLabel className="select-label" store={select}>
-              Type of action
-            </Ariakit.SelectLabel>
-            {typeValues.length > 0 && (
-              <button
-                type="button"
-                className="text-xs hover:underline"
-                onClick={() => {
-                  select.setValue([]);
-                }}
-              >
-                Clear
-              </button>
-            )}
-          </div>
-          <Ariakit.Select
-            store={select}
-            className="flex justify-between items-center py-2.5 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-          >
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* @ts-ignore */}
-              {typeValues.map((v) => (
-                <div
-                  key={v}
-                  className="flex items-center gap-1 bg-blue-100 whitespace-nowrap text-blue-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"
-                >
-                  <div>{availableTypes[v]}</div>
-                  <div className="bg-white rounded-full px-1">
-                    {availableTypeCounts[availableTypes[v]]}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <Ariakit.SelectArrow />
-          </Ariakit.Select>
-          {mounted && (
-            <Ariakit.SelectPopover
-              store={select}
-              gutter={4}
-              sameWidth
-              className="popover"
-            >
-              {Object.keys(availableTypeCounts)
-                .sort((a, b) => availableTypeCounts[b] - availableTypeCounts[a])
-                .map((key: string) => (
-                  <Ariakit.SelectItem
-                    key={`action-${key}`}
-                    // @ts-ignore TODO File ticket with ariakit to allow number
-                    value={availableTypes.indexOf(key)}
-                    className="select-item"
-                  >
-                    <Ariakit.SelectItemCheck />
-                    <div className="[&>*]:align-middle">
-                      <span>{key} </span>
-                      <span className="bg-white rounded-full px-1 text-black text-xs">
-                        {availableTypeCounts[key]}
-                      </span>
-                    </div>
-                  </Ariakit.SelectItem>
-                ))}
-            </Ariakit.SelectPopover>
-          )}
-        </div>
+        <FilterableMultiSelect
+          label="Type of action"
+          values={typeValues}
+          setValues={setTypeValues}
+          items={availableTypes}
+          counts={availableTypeCounts}
+        />
 
-        <div className="flex flex-col gap-1">
-          <div className="flex items-end justify-between">
-            <Ariakit.SelectLabel
-              className="select-label"
-              store={licenseStatusSelect}
-            >
-              License status
-            </Ariakit.SelectLabel>
-            {licenseStatusValues.length > 0 && (
-              <button
-                type="button"
-                className="text-xs hover:underline"
-                onClick={() => {
-                  licenseStatusSelect.setValue([]);
-                }}
-              >
-                Clear
-              </button>
-            )}
-          </div>
-          <Ariakit.Select
-            store={licenseStatusSelect}
-            className="flex justify-between items-center py-2.5 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-          >
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* @ts-ignore */}
-              {licenseStatusValues.map((v) => (
-                <div
-                  key={v}
-                  className="flex items-center gap-1 bg-blue-100 whitespace-nowrap text-blue-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"
-                >
-                  <div className="uppercase">
-                    {availableLicenseStatuses[v] ?? "Unlicensed"}
-                  </div>
-                  <div className="bg-white rounded-full px-1">
-                    {availableLicenseStatusCounts[availableLicenseStatuses[v]]}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <Ariakit.SelectArrow />
-          </Ariakit.Select>
-          {licenseStatusMounted && (
-            <Ariakit.SelectPopover
-              store={licenseStatusSelect}
-              gutter={4}
-              sameWidth
-              className="popover"
-            >
-              {Object.keys(availableLicenseStatusCounts)
-                .sort(
-                  (a, b) =>
-                    availableLicenseStatusCounts[b] -
-                    availableLicenseStatusCounts[a]
-                )
-                .map((key: string) => (
-                  <Ariakit.SelectItem
-                    key={`status-${key}`}
-                    // @ts-ignore TODO File ticket with ariakit to allow number
-                    value={availableLicenseStatuses.indexOf(key)}
-                    className="select-item"
-                  >
-                    <Ariakit.SelectItemCheck />
-                    <div className="[&>*]:align-middle">
-                      <span className="uppercase">{key ?? "Unlicensed"} </span>
-                      <span className="bg-white rounded-full px-1 text-black text-xs">
-                        {availableLicenseStatusCounts[key]}
-                      </span>
-                    </div>
-                  </Ariakit.SelectItem>
-                ))}
-            </Ariakit.SelectPopover>
-          )}
-        </div>
+        <FilterableMultiSelect
+          label="License status"
+          values={licenseStatusValues}
+          setValues={setLicenseStatusValues}
+          items={availableLicenseStatuses}
+          counts={availableLicenseStatusCounts}
+        />
 
-        <div className="flex flex-col gap-1">
-          <div className="flex items-end justify-between">
-            <Ariakit.SelectLabel
-              className="select-label"
-              store={licenseTypeSelect}
-            >
-              Type of license
-            </Ariakit.SelectLabel>
-            {licenseTypeValues.length > 0 && (
-              <button
-                type="button"
-                className="text-xs hover:underline"
-                onClick={() => {
-                  licenseTypeSelect.setValue([]);
-                }}
-              >
-                Clear
-              </button>
-            )}
-          </div>
-          <Ariakit.Select
-            store={licenseTypeSelect}
-            className="flex justify-between items-center py-2.5 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-          >
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* @ts-ignore */}
-              {licenseTypeValues.map((v) => (
-                <div
-                  key={v}
-                  className="flex items-center gap-1 bg-blue-100 whitespace-nowrap text-blue-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"
-                >
-                  <div className="uppercase">
-                    {availableLicenseTypes[v] ?? "Unlicensed"}
-                  </div>
-                  <div className="bg-white rounded-full px-1">
-                    {availableLicenseTypeCounts[availableLicenseTypes[v]]}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <Ariakit.SelectArrow />
-          </Ariakit.Select>
-          {licenseTypeMounted && (
-            <Ariakit.SelectPopover
-              store={licenseTypeSelect}
-              gutter={4}
-              sameWidth
-              className="popover"
-            >
-              {Object.keys(availableLicenseTypeCounts).map((key: string) => (
-                <Ariakit.SelectItem
-                  key={`license-${key}`}
-                  // @ts-ignore TODO File ticket with ariakit to allow number
-                  value={availableLicenseTypes.indexOf(key)}
-                  className="select-item"
-                >
-                  <Ariakit.SelectItemCheck />
-                  <div className="[&>*]:align-middle">
-                    <span className="uppercase">{key ?? "Unlicensed"} </span>
-                    <span className="bg-white rounded-full px-1 text-black text-xs">
-                      {availableLicenseTypeCounts[key]}
-                    </span>
-                  </div>
-                </Ariakit.SelectItem>
-              ))}
-            </Ariakit.SelectPopover>
-          )}
-        </div>
+        <FilterableMultiSelect
+          label="License type"
+          values={licenseTypeValues}
+          setValues={setLicenseTypeValues}
+          items={availableLicenseTypes}
+          counts={availableLicenseTypeCounts}
+          nullFallback="Unlicensed"
+        />
 
-        <div className="flex flex-col gap-1">
-          <div className="flex items-end justify-between">
-            <Ariakit.SelectLabel className="select-label" store={schoolSelect}>
-              School
-            </Ariakit.SelectLabel>
-            {schoolValues.length > 0 && (
-              <button
-                type="button"
-                className="text-xs hover:underline"
-                onClick={() => {
-                  schoolSelect.setValue([]);
-                }}
-              >
-                Clear
-              </button>
-            )}
-          </div>
-          <Ariakit.Select
-            store={schoolSelect}
-            className="flex justify-between items-center py-2.5 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-          >
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* @ts-ignore */}
-              {schoolValues.map((v) => (
-                <div
-                  key={v}
-                  className="flex items-center gap-1 bg-blue-100 whitespace-nowrap text-blue-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"
-                >
-                  <div className="uppercase">{availableSchools[v]}</div>
-                  <div className="bg-white rounded-full px-1">
-                    {availableSchoolCounts[availableSchools[v]]}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <Ariakit.SelectArrow />
-          </Ariakit.Select>
-          {schoolMounted && (
-            <Ariakit.SelectPopover
-              store={schoolSelect}
-              gutter={4}
-              sameWidth
-              className="popover"
-            >
-              {Object.keys(availableSchoolCounts)
-                .sort(
-                  (a, b) => availableSchoolCounts[b] - availableSchoolCounts[a]
-                )
-                .map((key: string) => (
-                  <Ariakit.SelectItem
-                    key={`school-${key}`}
-                    // @ts-ignore TODO File ticket with ariakit to allow number
-                    value={availableSchools.indexOf(key)}
-                    className="select-item"
-                  >
-                    <Ariakit.SelectItemCheck />
-                    <div className="[&>*]:align-middle">
-                      <span className="uppercase">
-                        {key === "null" ? "N/A" : key}{" "}
-                      </span>
-                      <span className="bg-white rounded-full px-1 text-black text-xs">
-                        {availableSchoolCounts[key]}
-                      </span>
-                    </div>
-                  </Ariakit.SelectItem>
-                ))}
-            </Ariakit.SelectPopover>
-          )}
-        </div>
+        <FilterableMultiSelect
+          label="School"
+          values={schoolValues}
+          setValues={setSchoolValues}
+          items={availableSchools}
+          counts={availableSchoolCounts}
+        />
 
-        <div className="flex flex-col gap-1">
-          <div className="flex items-end justify-between">
-            <Ariakit.SelectLabel
-              className="select-label"
-              store={specialtySelect}
-            >
-              Specialty
-            </Ariakit.SelectLabel>
-            {specialtyValues.length > 0 && (
-              <button
-                type="button"
-                className="text-xs hover:underline"
-                onClick={() => {
-                  specialtySelect.setValue([]);
-                }}
-              >
-                Clear
-              </button>
-            )}
-          </div>
-          <Ariakit.Select
-            store={specialtySelect}
-            className="flex justify-between items-center py-2.5 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-          >
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* @ts-ignore */}
-              {specialtyValues.map((v) => (
-                <div
-                  key={v}
-                  className="flex items-center gap-1 bg-blue-100 whitespace-nowrap text-blue-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"
-                >
-                  <div>{availableSpecialties[v]}</div>
-                  <div className="bg-white rounded-full px-1">
-                    {availableSpecialtyCounts[availableSpecialties[v]]}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <Ariakit.SelectArrow />
-          </Ariakit.Select>
-          {specialtyMounted && (
-            <Ariakit.SelectPopover
-              store={specialtySelect}
-              gutter={4}
-              sameWidth
-              className="popover"
-            >
-              {Object.keys(availableSpecialtyCounts)
-                .sort(
-                  (a, b) =>
-                    availableSpecialtyCounts[b] - availableSpecialtyCounts[a]
-                )
-                .map((key: string) => (
-                  <Ariakit.SelectItem
-                    key={`specialty-${key}`}
-                    // @ts-ignore TODO File ticket with ariakit to allow number
-                    value={availableSpecialties.indexOf(key)}
-                    className="select-item"
-                  >
-                    <Ariakit.SelectItemCheck />
-                    <div className="[&>*]:align-middle">
-                      <span>{key === "null" ? "N/A" : key} </span>
-                      <span className="bg-white rounded-full px-1 text-black text-xs">
-                        {availableSpecialtyCounts[key]}
-                      </span>
-                    </div>
-                  </Ariakit.SelectItem>
-                ))}
-            </Ariakit.SelectPopover>
-          )}
-        </div>
+        <FilterableMultiSelect
+          label="Specialty"
+          values={specialtyValues}
+          setValues={setSpecialtyValues}
+          items={availableSpecialties}
+          counts={availableSpecialtyCounts}
+        />
 
-        <div className="flex flex-col gap-1">
-          <div className="flex items-end justify-between">
-            <Ariakit.SelectLabel className="select-label" store={offenseSelect}>
+        <FilterableMultiSelect
+          label={
+            <>
               Offense{" "}
               <span className="bg-indigo-400 text-white px-1.5 py-0.5 rounded text-xs font-semibold shadow-inner border border-indigo-500">
                 beta
               </span>
-            </Ariakit.SelectLabel>
-            {offenseValues.length > 0 && (
-              <button
-                type="button"
-                className="text-xs hover:underline"
-                onClick={() => {
-                  offenseSelect.setValue([]);
-                }}
-              >
-                Clear
-              </button>
-            )}
-          </div>
-          <Ariakit.Select
-            store={offenseSelect}
-            className="flex justify-between items-center py-2.5 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
-          >
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* @ts-ignore */}
-              {offenseValues.map((v) => (
-                <div
-                  key={v}
-                  className="flex items-center gap-1 bg-blue-100 whitespace-nowrap text-blue-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300"
-                >
-                  <div>{availableOffenses[v]}</div>
-                  <div className="bg-white rounded-full px-1">
-                    {availableOffenseCounts[availableOffenses[v]]}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <Ariakit.SelectArrow />
-          </Ariakit.Select>
-          {offenseMounted && (
-            <Ariakit.SelectPopover
-              store={offenseSelect}
-              gutter={4}
-              sameWidth
-              className="popover"
-            >
-              {Object.keys(availableOffenseCounts).map((key: string) => (
-                <Ariakit.SelectItem
-                  key={`offense-${key}`}
-                  // @ts-ignore TODO File ticket with ariakit to allow number
-                  value={availableOffenses.indexOf(key)}
-                  className="select-item"
-                >
-                  <Ariakit.SelectItemCheck />
-                  <div className="[&>*]:align-middle">
-                    <span>{key} </span>
-                    <span className="bg-white rounded-full px-1 text-black text-xs">
-                      {availableOffenseCounts[key]}
-                    </span>
-                  </div>
-                </Ariakit.SelectItem>
-              ))}
-            </Ariakit.SelectPopover>
-          )}
-        </div>
+            </>
+          }
+          values={offenseValues}
+          setValues={setOffenseValues}
+          items={availableOffenses}
+          counts={availableOffenseCounts}
+        />
       </Form>
 
       <Form method="GET" ref={queryRef} preventScrollReset>

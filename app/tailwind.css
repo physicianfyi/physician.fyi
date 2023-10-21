@@ -155,7 +155,7 @@
   focus-visible:outline-none focus-visible:bg-muted focus-visible:text-primary focus-visible:px-[0.3rem] focus-visible:py-[0.2rem] rounded-sm focus-visible:font-medium
   */
   a {
-    @apply underline-offset-4 hover:underline focus-visible:underline focus-visible:outline-none;
+    @apply underline underline-offset-4 hover:decoration-4 focus-visible:decoration-4 focus-visible:outline-none;
   }
   label {
     @apply text-sm font-medium;

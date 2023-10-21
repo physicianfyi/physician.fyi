@@ -48,7 +48,7 @@ import { delay } from "generate/util";
   const page = await browser.newPage();
 
   // Starts at 1 to skip column titles
-  for (let i = 2929; i < parsed.data.length; i++) {
+  for (let i = 8338; i < parsed.data.length; i++) {
     console.log(i);
     const entry = parsed.data[i] as string[];
     const license = entry[1];

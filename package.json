@@ -11,7 +11,7 @@
     "upgrade-remix": "npm i @remix-run/dev@latest @remix-run/eslint-config@latest @remix-run/css-bundle@latest @remix-run/node@latest @remix-run/react@latest @remix-run/serve@latest"
   },
   "dependencies": {
-    "@ariakit/react": "^0.3.3",
+    "@ariakit/react": "^0.3.5",
     "@phosphor-icons/react": "^2.0.10",
     "@remix-run/css-bundle": "^2.0.1",
     "@remix-run/node": "^2.0.1",
