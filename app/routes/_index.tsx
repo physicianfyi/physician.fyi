@@ -25,6 +25,7 @@ import { usePostHog } from "posthog-js/react";
 import { Map } from "~/components/Map";
 import { DateChart } from "~/components/DateChart";
 import { FilterableMultiSelect } from "~/components/FilterableMultiSelect";
+import { IntentIcon } from "~/components/ui/IntentIcon";
 
 export const meta: MetaFunction = () => {
   return [
@@ -347,10 +348,8 @@ export default function Index() {
         <Sliders className="inline-icon" weight="bold" /> Filters
         <Ariakit.TooltipProvider showTimeout={0}>
           <Ariakit.TooltipAnchor
-            className=""
-            render={
-              <Info weight="duotone" className="inline align-super text-lg" />
-            }
+            className="focus-visible:outline-none"
+            render={<IntentIcon Icon={Info} className="group" />}
           ></Ariakit.TooltipAnchor>
           <Ariakit.Tooltip className="text-xs font-semibold popover">
             Adding options within a filter "or"s them; adding options between
@@ -440,19 +439,8 @@ export default function Index() {
               Specialty
               <Ariakit.TooltipProvider showTimeout={0}>
                 <Ariakit.TooltipAnchor
-                  className=""
-                  render={
-                    <span className="group">
-                      <Info
-                        weight="duotone"
-                        className="inline align-baseline text-lg group-hover:hidden"
-                      />
-                      <Info
-                        weight="fill"
-                        className="hidden align-baseline text-lg group-hover:inline"
-                      />
-                    </span>
-                  }
+                  className="focus-visible:outline-none"
+                  render={<IntentIcon Icon={Info} className="group" />}
                 ></Ariakit.TooltipAnchor>
                 <Ariakit.Tooltip className="text-xs font-semibold popover">
                   Specialties are extracted from the doctor's self-reported

@@ -36,6 +36,8 @@ Follow the pattern for other states. Run scripts using something like `npx tsx g
 
 5. Now you geocode. Store the query that ended up being used for the geocode so that we can go back and check.
 
+- Also store the query when it's not successful so we can skip retrying the same query in subsequent runs.
+
 You want to produce several files in the directory `data/[state]`:
 
 - clean.json (required) with a schema like:

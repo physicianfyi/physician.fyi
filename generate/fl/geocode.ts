@@ -108,6 +108,12 @@ import NodeGeocoder from "node-geocoder";
         };
         // Can't delete when looking up, but since this is fallback case, just ignore failed ones
         // delete queries[key];
+      } else {
+        // Store query on last try to remember in future runs not to retry unless changing it
+        const key = Object.keys(queries)[i];
+        data[key] = {
+          query: queries[key],
+        };
       }
     }
 

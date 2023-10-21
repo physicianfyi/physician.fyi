@@ -202,7 +202,8 @@ export const selectPhysicians = async ({
   const geo = {
     type: "FeatureCollection",
     features: results.reduce<any[]>((acc, { license, data, state }) => {
-      if (geoData[state][license]) {
+      // Since we store queries even for failed ones
+      if (geoData[state][license]?.lat) {
         acc.push({
           type: "Feature",
           geometry: {

@@ -14,6 +14,13 @@ import { PostHogProvider } from "posthog-js/react";
 import posthog from "posthog-js";
 import styles from "./tailwind.css";
 import mapboxStyles from "mapbox-gl/dist/mapbox-gl.css";
+import { IntentIcon } from "./components/ui/IntentIcon";
+import {
+  Info,
+  Megaphone,
+  PaperPlaneTilt,
+  Question,
+} from "@phosphor-icons/react";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: mapboxStyles },
@@ -56,31 +63,44 @@ export default function App() {
               👨‍⚕️ physician.fyi 🔍
             </Link>
 
-            <Ariakit.MenuProvider>
+            <Ariakit.MenuProvider focusLoop>
               <Ariakit.MenuButton className="group flex flex-col h-12 w-12 justify-center items-center">
                 <div className="menu-line group-aria-expanded:rotate-45 group-aria-expanded:translate-y-2 group-aria-expanded:opacity-50 group-focus-visible:opacity-100 opacity-50 group-hover:opacity-100 group-aria-expanded:group-hover:opacity-100" />
                 <div className="menu-line group-aria-expanded:opacity-0 opacity-50 group-hover:opacity-100 group-focus-visible:opacity-100" />
                 <div className="menu-line group-aria-expanded:-rotate-45 group-aria-expanded:-translate-y-2 group-aria-expanded:opacity-50 group-focus-visible:opacity-100 opacity-50 group-hover:opacity-100 group-aria-expanded:group-hover:opacity-100" />
               </Ariakit.MenuButton>
-              <Ariakit.Menu gutter={8} className="popover">
+              <Ariakit.Menu gutter={8} className="popover gap-2">
                 <Ariakit.MenuItem
-                  className="text-md font-bold"
+                  className="text-md font-bold hover:bg-accent rounded p-2 group data-[active-item]:bg-accent"
                   render={<Link to="/about" />}
                 >
-                  About
+                  <IntentIcon Icon={Info} align="middle" /> About
                 </Ariakit.MenuItem>
                 <Ariakit.MenuItem
-                  className="text-md font-bold"
+                  className="text-md font-bold hover:bg-accent rounded p-2 group data-[active-item]:bg-accent"
                   render={<Link to="/what-to-do" />}
                 >
-                  What to do
+                  <IntentIcon Icon={Question} align="middle" /> What to do
                 </Ariakit.MenuItem>
                 <Ariakit.MenuSeparator className="separator" />
                 <Ariakit.MenuItem
-                  className="text-md font-bold"
+                  className="text-md font-bold hover:bg-accent rounded p-2 group data-[active-item]:bg-accent"
                   render={<Link to="/contact" />}
                 >
-                  Contact
+                  <IntentIcon Icon={PaperPlaneTilt} align="middle" /> Contact
+                </Ariakit.MenuItem>
+                <Ariakit.MenuItem
+                  className="text-md font-bold hover:bg-accent rounded p-2 group data-[active-item]:bg-accent"
+                  render={
+                    <a
+                      href="https://chng.it/vKhKQKx9T9"
+                      target="_blank"
+                      rel="noreferrer"
+                    />
+                  }
+                >
+                  <IntentIcon Icon={Megaphone} align="middle" /> Sign the
+                  petition
                 </Ariakit.MenuItem>
               </Ariakit.Menu>
             </Ariakit.MenuProvider>
