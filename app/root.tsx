@@ -72,64 +72,95 @@ export default function App() {
                 <div className="menu-line group-aria-expanded:-rotate-45 group-aria-expanded:-translate-y-2 group-aria-expanded:opacity-50 group-focus-visible:opacity-100 opacity-50 group-hover:opacity-100 group-aria-expanded:group-hover:opacity-100" />
               </Ariakit.MenuButton>
               <Ariakit.Menu gutter={8} className="popover gap-2">
-                <Ariakit.MenuItem
-                  className="text-md font-bold hover:bg-accent rounded p-2 group data-[active-item]:bg-accent"
-                  render={<Link to="/about" />}
-                >
-                  <IntentIcon Icon={Info} align="middle" /> About
-                </Ariakit.MenuItem>
-                <Ariakit.MenuItem
-                  className="text-md font-bold hover:bg-accent rounded p-2 group data-[active-item]:bg-accent"
-                  render={<Link to="/what-to-do" />}
-                >
-                  <IntentIcon Icon={Question} align="middle" /> What to do
-                </Ariakit.MenuItem>
-                <Ariakit.MenuSeparator className="separator" />
-                <Ariakit.MenuItem
-                  className="text-md font-bold hover:bg-accent rounded p-2 group data-[active-item]:bg-accent"
-                  render={<Link to="/contact" />}
-                >
-                  <IntentIcon Icon={PaperPlaneTilt} align="middle" /> Contact
-                </Ariakit.MenuItem>
-                <Ariakit.MenuItem
-                  className="text-md font-bold hover:bg-accent rounded p-2 group data-[active-item]:bg-accent"
-                  render={
-                    <a
-                      href="https://chng.it/vKhKQKx9T9"
-                      target="_blank"
-                      rel="noreferrer"
-                    />
+                {[
+                  {
+                    render: <Link to="/about" />,
+                    children: (
+                      <>
+                        <IntentIcon Icon={Info} align="middle" /> About
+                      </>
+                    ),
+                  },
+                  {
+                    render: <Link to="/what-to-do" />,
+                    children: (
+                      <>
+                        <IntentIcon Icon={Question} align="middle" /> What to do
+                      </>
+                    ),
+                  },
+                  {
+                    render: <Link to="/contact" />,
+                    children: (
+                      <>
+                        <IntentIcon Icon={PaperPlaneTilt} align="middle" />{" "}
+                        Contact
+                      </>
+                    ),
+                  },
+                  null,
+                  {
+                    render: (
+                      <a
+                        href="https://chng.it/vKhKQKx9T9"
+                        target="_blank"
+                        rel="noreferrer"
+                      />
+                    ),
+                    children: (
+                      <>
+                        <IntentIcon Icon={Megaphone} align="middle" /> Sign the
+                        petition
+                      </>
+                    ),
+                  },
+                  {
+                    render: (
+                      <a
+                        href="https://discord.gg/vKpkKcXagr"
+                        target="_blank"
+                        rel="noreferrer"
+                      />
+                    ),
+                    children: (
+                      <>
+                        <IntentIcon Icon={DiscordLogo} align="middle" /> Join
+                        the Discord
+                      </>
+                    ),
+                  },
+                  {
+                    render: (
+                      <a
+                        href="https://github.com/physicianfyi/physician.fyi"
+                        target="_blank"
+                        rel="noreferrer"
+                      />
+                    ),
+                    children: (
+                      <>
+                        <IntentIcon Icon={GithubLogo} align="middle" />{" "}
+                        Contribute
+                      </>
+                    ),
+                  },
+                ].map((item, i) => {
+                  if (!item) {
+                    return (
+                      <Ariakit.MenuSeparator key={i} className="separator" />
+                    );
                   }
-                >
-                  <IntentIcon Icon={Megaphone} align="middle" /> Sign the
-                  petition
-                </Ariakit.MenuItem>
-                <Ariakit.MenuSeparator className="separator" />
-                <Ariakit.MenuItem
-                  className="text-md font-bold hover:bg-accent rounded p-2 group data-[active-item]:bg-accent"
-                  render={
-                    <a
-                      href="https://discord.gg/vKpkKcXagr"
-                      target="_blank"
-                      rel="noreferrer"
-                    />
-                  }
-                >
-                  <IntentIcon Icon={DiscordLogo} align="middle" /> Join the
-                  Discord
-                </Ariakit.MenuItem>
-                <Ariakit.MenuItem
-                  className="text-md font-bold hover:bg-accent rounded p-2 group data-[active-item]:bg-accent"
-                  render={
-                    <a
-                      href="https://github.com/physicianfyi/physician.fyi"
-                      target="_blank"
-                      rel="noreferrer"
-                    />
-                  }
-                >
-                  <IntentIcon Icon={GithubLogo} align="middle" /> Contribute
-                </Ariakit.MenuItem>
+                  const { render, children } = item;
+                  return (
+                    <Ariakit.MenuItem
+                      key={i}
+                      className="text-md font-bold hover:bg-accent rounded p-2 group data-[active-item]:bg-accent scroll-m-2"
+                      render={render}
+                    >
+                      {children}
+                    </Ariakit.MenuItem>
+                  );
+                })}
               </Ariakit.Menu>
             </Ariakit.MenuProvider>
           </nav>
