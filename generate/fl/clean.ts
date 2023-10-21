@@ -186,11 +186,18 @@ import fs from "fs";
 
     if (v.school) {
       v.school = v.school.toLowerCase();
+      v.school =
+        {
+          "university of north caroliina": "university of north carolina",
+        }[v.school as string] ?? v.school;
+    }
+    if (["0", "other"].includes(v.school)) {
+      delete v.school;
     }
 
-    const specialties = v.specialties?.map((s: any) =>
-      s.certification.replace(/^.*-/, "").trim()
-    );
+    const specialties = v.specialties
+      ?.map((s: any) => s.certification.replace(/^.*-/, "").trim())
+      .filter((s: string) => !["OTHER"].includes(s));
     if (specialties) {
       v.specialties = specialties;
     }

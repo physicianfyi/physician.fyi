@@ -95,20 +95,26 @@ import fs from "fs";
     }
 
     // Remove medicine suffix since Florida data doesn't have it
-    const school = v.school
+    let school = v.school
       ?.replace(
         /((faculty|school|college) of (medicine( and surgery)?|physicians and surgeons))$/,
         ""
       )
       .trim();
+    if (school === "david geffen school of medicine at ucla") {
+      school = "university of california, los angeles";
+    }
     if (school) {
       v.school = school;
     }
 
     // Get specialties from various fields
-    const specialties = [];
+    let specialties = [];
     let primarySpecialty = v.survey?.["PRIMARY AREA OF PRACTICE"];
-    if (primarySpecialty === "DECLINE TO STATE" || !primarySpecialty) {
+    if (
+      ["OTHER - NOT LISTED", "DECLINE TO STATE"].includes(primarySpecialty) ||
+      !primarySpecialty
+    ) {
       primarySpecialty = null;
     }
     if (primarySpecialty) {
@@ -116,14 +122,17 @@ import fs from "fs";
     }
     delete v.survey?.["PRIMARY AREA OF PRACTICE"];
     const secondSpecialties = v.survey?.["SECONDARY AREA OF PRACTICE"]?.filter(
-      (p: string) => !["DECLINE TO STATE", "NOT APPLICABLE"].includes(p)
+      (p: string) =>
+        !["DECLINE TO STATE", "NOT APPLICABLE", "OTHER - NOT LISTED"].includes(
+          p
+        )
     );
     if (secondSpecialties) {
       specialties.push(...secondSpecialties);
     }
     delete v.survey?.["SECONDARY AREA OF PRACTICE"];
     const certifications = v.survey?.["ABMS CERTIFICATIONS"]?.filter(
-      (p: string) => !["OTHER - NONE"].includes(p)
+      (p: string) => !["OTHER - NONE", "OTHER - DECLINE TO STATE"].includes(p)
     );
     if (certifications) {
       for (let c of certifications.map((c: string) =>
@@ -135,7 +144,16 @@ import fs from "fs";
       }
     }
     delete v.survey?.["ABMS CERTIFICATIONS"];
-    // TODO Can't figure out why DECLINE TO STATE is ending up in data
+
+    specialties = specialties.map((s) => {
+      if (s === "ORTHOPEDIC SURGERY") {
+        // Florida uses this
+        return "ORTHOPAEDIC SURGERY";
+      }
+      return s;
+    });
+    specialties = Array.from(new Set(specialties));
+
     if (specialties.length) {
       v.specialties = specialties;
     }

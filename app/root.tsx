@@ -105,7 +105,7 @@ export default function App() {
             href="https://chng.it/vKhKQKx9T9"
             target="_blank"
             rel="noreferrer"
-            className="hover:font-bold focus-visible:font-bold underline"
+            className="underline"
           >
             Sign our petition
           </a>{" "}

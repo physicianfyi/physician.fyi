@@ -107,11 +107,11 @@ export const FilterableMultiSelect = ({
                 <Ariakit.Combobox
                   autoSelect
                   placeholder="Search..."
-                  className="w-full h-10 rounded border-none px-4 leading-4"
+                  className="input rounded h-10 px-4 leading-4"
                 />
               </div>
               <Ariakit.ComboboxList>
-                <SelectRenderer items={matches} gap={8} overscan={1}>
+                <SelectRenderer items={matches} gap={4} overscan={2}>
                   {({ item: key, ...item }) => (
                     <Ariakit.SelectItem
                       {...item}

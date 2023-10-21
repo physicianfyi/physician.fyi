@@ -108,11 +108,8 @@ export const loader = async ({ request, params }: DataFunctionArgs) => {
 
   // Don't show filtering for ones with just 1 match
   // Since we show options by count object now; this also has the benefit of not messing up indices if we include some later instead of filtering availableOffenses
-  availableSchoolCounts = Object.fromEntries(
-    Object.entries<any>(availableSchoolCounts).filter(([k, v]) => v > 4)
-  );
   availableOffenseCounts = Object.fromEntries(
-    Object.entries<any>(availableOffenseCounts).filter(([k, v]) => v > 4)
+    Object.entries<any>(availableOffenseCounts).filter(([k, v]) => v > 3)
   );
 
   const data = await selectPhysicians({
@@ -438,7 +435,32 @@ export default function Index() {
         />
 
         <FilterableMultiSelect
-          label="Specialty"
+          label={
+            <>
+              Specialty
+              <Ariakit.TooltipProvider showTimeout={0}>
+                <Ariakit.TooltipAnchor
+                  className=""
+                  render={
+                    <span className="group">
+                      <Info
+                        weight="duotone"
+                        className="inline align-baseline text-lg group-hover:hidden"
+                      />
+                      <Info
+                        weight="fill"
+                        className="hidden align-baseline text-lg group-hover:inline"
+                      />
+                    </span>
+                  }
+                ></Ariakit.TooltipAnchor>
+                <Ariakit.Tooltip className="text-xs font-semibold popover">
+                  Specialties are extracted from the doctor's self-reported
+                  specialties and board certifications on their state profile
+                </Ariakit.Tooltip>
+              </Ariakit.TooltipProvider>
+            </>
+          }
           values={specialtyValues}
           setValues={setSpecialtyValues}
           items={availableSpecialties}
@@ -469,7 +491,7 @@ export default function Index() {
           </label>
           <div className="relative w-full">
             <input
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              className="input"
               placeholder="e.g., 'Smith, John' or 'G 12345'"
               name="q"
               // TODO defaultValue doesn't get reset when clearing query, expected but weird
@@ -578,7 +600,7 @@ export default function Index() {
             <li key={license}>
               <Link to={`/${state}/${license}`} className="group">
                 <div className="group-hover:bg-card group-focus-visible:bg-card p-4 rounded flex flex-col gap-4">
-                  <div className="px-1 group-hover:font-medium group-focus-visible:font-medium">
+                  <div className="px-1">
                     <div>
                       <span className="uppercase">{data.name}</span>{" "}
                       {(data.actions?.length ?? 0) > 1 &&
