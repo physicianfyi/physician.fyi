@@ -16,6 +16,8 @@ import styles from "./tailwind.css";
 import mapboxStyles from "mapbox-gl/dist/mapbox-gl.css";
 import { IntentIcon } from "./components/ui/IntentIcon";
 import {
+  DiscordLogo,
+  GithubLogo,
   Info,
   Megaphone,
   PaperPlaneTilt,
@@ -101,6 +103,32 @@ export default function App() {
                 >
                   <IntentIcon Icon={Megaphone} align="middle" /> Sign the
                   petition
+                </Ariakit.MenuItem>
+                <Ariakit.MenuSeparator className="separator" />
+                <Ariakit.MenuItem
+                  className="text-md font-bold hover:bg-accent rounded p-2 group data-[active-item]:bg-accent"
+                  render={
+                    <a
+                      href="https://discord.gg/vKpkKcXagr"
+                      target="_blank"
+                      rel="noreferrer"
+                    />
+                  }
+                >
+                  <IntentIcon Icon={DiscordLogo} align="middle" /> Join the
+                  Discord
+                </Ariakit.MenuItem>
+                <Ariakit.MenuItem
+                  className="text-md font-bold hover:bg-accent rounded p-2 group data-[active-item]:bg-accent"
+                  render={
+                    <a
+                      href="https://github.com/physicianfyi/physician.fyi"
+                      target="_blank"
+                      rel="noreferrer"
+                    />
+                  }
+                >
+                  <IntentIcon Icon={GithubLogo} align="middle" /> Contribute
                 </Ariakit.MenuItem>
               </Ariakit.Menu>
             </Ariakit.MenuProvider>
