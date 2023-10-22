@@ -181,7 +181,11 @@ export const Map = ({ data }: any) => {
       }}
       onClick={onClick}
       ref={mapRef}
-      style={{ width: "100%", height: 400 }}
+      style={{
+        width: "100%",
+        height: 400,
+        borderRadius: "calc(var(--radius) + 4px)",
+      }}
       mapStyle={
         isDark
           ? "mapbox://styles/mapbox/dark-v11"

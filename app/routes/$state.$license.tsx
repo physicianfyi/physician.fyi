@@ -12,10 +12,10 @@ import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { DiscussionEmbed } from "disqus-react";
 import fs from "fs";
-import { ResponsiveContainer, PieChart, Pie, Cell, LabelList } from "recharts";
 import path from "path";
 import { usePostHog } from "posthog-js/react";
 import { useEffect } from "react";
+import { PieChart } from "~/components/PieChart";
 import { STATES } from "~/services/constants";
 
 export const links: LinksFunction = () => [
@@ -81,35 +81,6 @@ export const loader = async ({
   }
 
   return { profile, license, state, baseUrl: data.baseUrl };
-};
-
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
-
-const RADIAN = Math.PI / 180;
-const renderCustomLabel = ({
-  cx,
-  cy,
-  midAngle,
-  innerRadius,
-  outerRadius,
-  percent,
-  index,
-}: any) => {
-  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-  const x = cx + radius * Math.cos(-midAngle * RADIAN);
-  const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-  return (
-    <text
-      x={x}
-      y={y}
-      fill="white"
-      textAnchor={x > cx ? "start" : "end"}
-      dominantBaseline="central"
-    >
-      {`${(percent * 100).toFixed(0)}%`}
-    </text>
-  );
 };
 
 export default function Route() {
@@ -198,33 +169,8 @@ export default function Route() {
               />{" "}
               {profile.minHours} hours minimum per week
             </h4>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  dataKey="value"
-                  labelLine={false}
-                  data={pieData}
-                  fill="#8884d8"
-                  label={renderCustomLabel}
-                  outerRadius={80}
-                  cx="50%"
-                  cy="50%"
-                >
-                  <LabelList
-                    dataKey="name"
-                    position="outside"
-                    style={{ fontSize: "10px" }}
-                    className="stroke-primary"
-                  />
-                  {pieData.map((entry: any, index: number) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
+
+            <PieChart height={400} width={400} data={pieData} />
           </div>
         )}
 

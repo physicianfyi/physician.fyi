@@ -23,9 +23,9 @@ import {
 } from "@phosphor-icons/react";
 import { usePostHog } from "posthog-js/react";
 import { Map } from "~/components/Map";
-import { DateChart } from "~/components/DateChart";
 import { FilterableMultiSelect } from "~/components/FilterableMultiSelect";
 import { IntentIcon } from "~/components/ui/IntentIcon";
+import { BrushChart } from "~/components/BrushChart";
 
 export const meta: MetaFunction = () => {
   return [
@@ -323,25 +323,6 @@ export default function Index() {
         role="alert"
       >
         Just California and Florida for now—more states coming soon
-        <div>
-          If you'd like to help,{" "}
-          <a
-            href="https://discord.gg/vKpkKcXagr"
-            target="_blank"
-            rel="noreferrer"
-          >
-            join the Discord
-          </a>{" "}
-          and/or{" "}
-          <a
-            href="https://github.com/physicianfyi/physician.fyi"
-            target="_blank"
-            rel="noreferrer"
-          >
-            check out the repository
-          </a>
-          .
-        </div>
       </div>
 
       <h2 id="filters">
@@ -441,6 +422,12 @@ export default function Index() {
                 <Ariakit.TooltipAnchor
                   className="focus-visible:outline-none"
                   render={<IntentIcon Icon={Info} className="group" />}
+                  // TODO Stop event from bubbling https://stackoverflow.com/questions/38619981/how-can-i-prevent-event-bubbling-in-nested-react-components-on-click
+                  // onClick={(e) => {
+                  //   e.stopPropagation();
+                  //   e.nativeEvent.stopImmediatePropagation();
+                  //   e.preventDefault();
+                  // }}
                 ></Ariakit.TooltipAnchor>
                 <Ariakit.Tooltip className="text-xs font-semibold popover">
                   Specialties are extracted from the doctor's self-reported
@@ -545,6 +532,26 @@ export default function Index() {
         </div>
       </Form>
 
+      <div className="flex flex-col gap-1">
+        <label>
+          Actions over time{" "}
+          <span className="w-fit bg-indigo-400 text-white px-1.5 py-0.5 rounded text-xs font-semibold shadow-inner border border-indigo-500">
+            beta
+          </span>
+        </label>
+        <BrushChart data={data.chartData} />
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <label>
+          Physicians with actions by place{" "}
+          <span className="w-fit bg-indigo-400 text-white px-1.5 py-0.5 rounded text-xs font-semibold shadow-inner border border-indigo-500">
+            beta
+          </span>
+        </label>
+        <Map data={data.geo} />
+      </div>
+
       <div className="text-card-foreground rounded-lg bg-card p-4">
         <div className="flex items-center flex-wrap justify-between gap-2 text-sm">
           <div role="alert">
@@ -562,19 +569,6 @@ export default function Index() {
           <div className="text-xs">
             Last updated {data.lastUpdated.split("T")[0]}
           </div>
-        </div>
-
-        <DateChart
-          data={data.chartData}
-          setBeginning={setBeginning}
-          setEnding={setEnding}
-        />
-
-        <div className="w-full overflow-hidden flex flex-col gap-1">
-          <span className="w-fit bg-indigo-400 text-white px-1.5 py-0.5 rounded text-xs font-semibold shadow-inner border border-indigo-500">
-            beta
-          </span>
-          <Map data={data.geo} />
         </div>
       </div>
 

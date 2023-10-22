@@ -10,5 +10,6 @@ export default {
     "@phosphor-icons/react",
     "posthog-js/react",
     "react-map-gl",
+    "@visx/vendor/d3-array",
   ],
 };
