@@ -99,8 +99,6 @@ export function BrushChart({
     setFilteredStock(stockCopy);
   };
 
-  console.log(data);
-
   const innerHeight = height - margin.top - margin.bottom;
   const topChartBottomMargin = compact
     ? chartSeparation / 2
