@@ -11,3 +11,4 @@ data/fl/scrape-shallow.json filter=lfs diff=lfs merge=lfs -text
 data/fl/summarize.json filter=lfs diff=lfs merge=lfs -text
 data/fl/geocode.json filter=lfs diff=lfs merge=lfs -text
 data/ca/old/ca.json filter=lfs diff=lfs merge=lfs -text
+data/fl/archive.json filter=lfs diff=lfs merge=lfs -text
