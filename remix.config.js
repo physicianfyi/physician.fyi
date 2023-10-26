@@ -11,5 +11,7 @@ export default {
     "posthog-js/react",
     "react-map-gl",
     "@visx/vendor/d3-array",
+    "@visx/responsive",
+    "lodash/debounce",
   ],
 };

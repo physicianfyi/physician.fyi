@@ -26,6 +26,7 @@ import { Map } from "~/components/Map";
 import { FilterableMultiSelect } from "~/components/FilterableMultiSelect";
 import { IntentIcon } from "~/components/ui/IntentIcon";
 import { BrushChart } from "~/components/BrushChart";
+import { ParentSize } from "@visx/responsive";
 
 export const meta: MetaFunction = () => {
   return [
@@ -539,7 +540,11 @@ export default function Index() {
             beta
           </span>
         </label>
-        <BrushChart data={data.chartData} />
+        <ParentSize>
+          {({ width, height }) => (
+            <BrushChart data={data.chartData} width={width} />
+          )}
+        </ParentSize>
       </div>
 
       <div className="flex flex-col gap-1">

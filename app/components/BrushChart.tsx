@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo, useLayoutEffect, useEffect } from "react";
+import { useRef, useState, useMemo, useEffect } from "react";
 import { scaleLinear } from "@visx/scale";
 import { Brush } from "@visx/brush";
 import type { Bounds } from "@visx/brush/lib/types";
@@ -10,37 +10,6 @@ import { LinearGradient } from "@visx/gradient";
 import { max, extent } from "@visx/vendor/d3-array";
 import type { BrushHandleRenderProps } from "@visx/brush/lib/BrushHandle";
 import { AreaChart } from "./AreaChart";
-
-/**
- * https://github.com/uidotdev/usehooks/blob/main/index.js#L1323C1-L1346C2
- */
-export function useWindowSize() {
-  const [size, setSize] = useState<{
-    width: number;
-    height: number;
-  }>({
-    width: 0,
-    height: 0,
-  });
-
-  useLayoutEffect(() => {
-    const handleResize = () => {
-      setSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  return size;
-}
 
 // Initialize some variables
 
@@ -64,9 +33,11 @@ export type BrushProps = {
   margin?: { top: number; right: number; bottom: number; left: number };
   compact?: boolean;
   data: { year: number; actions: number }[];
+  width: number;
 };
 
 export function BrushChart({
+  width,
   compact = false,
   margin = {
     top: 20,
@@ -76,11 +47,6 @@ export function BrushChart({
   },
   data,
 }: BrushProps) {
-  const size = useWindowSize();
-  const width =
-    size.width -
-    (size.width >= 768 ? 64 : size.width >= 640 ? 32 : 16) * 2 -
-    16;
   const height = 400;
   const brushRef = useRef<BaseBrush | null>(null);
   const [filteredStock, setFilteredStock] = useState(data);
