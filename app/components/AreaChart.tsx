@@ -146,6 +146,15 @@ export function AreaChart({
           {...(tooltipData && {
             tickValues: [getXValue(tooltipData)],
           })}
+          tickComponent={({ formattedValue, ...props }) => (
+            <text
+              {...props}
+              fontSize={12}
+              className={`${tooltipData && "font-bold text-lg"}`}
+            >
+              {formattedValue}
+            </text>
+          )}
         />
       )}
       {!hideLeftAxis && (
