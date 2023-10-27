@@ -132,7 +132,10 @@ export function AreaChart({
         <AxisBottom
           top={yMax}
           scale={xScale}
-          numTicks={width > 520 ? 10 : 5}
+          numTicks={Math.min(
+            width > 520 ? 10 : 5,
+            xScale.domain()[1] - xScale.domain()[0]
+          )}
           stroke={axisColor}
           tickStroke={axisColor}
           tickLabelProps={axisBottomTickLabelProps}
@@ -148,10 +151,13 @@ export function AreaChart({
       {!hideLeftAxis && (
         <AxisLeft
           scale={yScale}
-          numTicks={5}
+          numTicks={Math.min(5, yScale.domain()[1] - yScale.domain()[0])}
           stroke={axisColor}
           tickStroke={axisColor}
           tickLabelProps={axisLeftTickLabelProps}
+          tickFormat={function tickFormat(d) {
+            return String(d);
+          }}
         />
       )}
 
