@@ -139,6 +139,10 @@ export function AreaChart({
           tickFormat={function tickFormat(d) {
             return String(d);
           }}
+          // Show hovered year when tooltip is shown
+          {...(tooltipData && {
+            tickValues: [getXValue(tooltipData)],
+          })}
         />
       )}
       {!hideLeftAxis && (
