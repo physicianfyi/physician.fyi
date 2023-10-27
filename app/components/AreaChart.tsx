@@ -208,8 +208,9 @@ export function AreaChart({
         <div>
           <TooltipInPortal
             key={Math.random()}
-            top={tooltipTop - 12}
-            left={tooltipLeft + 12}
+            // https://github.com/airbnb/visx/issues/1392
+            top={tooltipTop + 270}
+            left={tooltipLeft + 120}
             className="popover absolute"
             // Otherwise className is overriden
             style={{}}
