@@ -210,7 +210,9 @@ export function AreaChart({
             key={Math.random()}
             top={tooltipTop - 12}
             left={tooltipLeft + 12}
-            className="popover"
+            className="popover absolute"
+            // Otherwise className is overriden
+            style={{}}
           >
             {getYValue(tooltipData) || 0} actions
           </TooltipInPortal>
