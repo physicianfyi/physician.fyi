@@ -69,7 +69,7 @@ export function AreaChart({
     showTooltip,
     hideTooltip,
   } = useTooltip<Data>();
-  const { containerRef, TooltipInPortal } = useTooltipInPortal({
+  const { containerRef } = useTooltipInPortal({
     // use TooltipWithBounds
     detectBounds: true,
     // when tooltip containers are scrolled, this will correctly update the Tooltip position
@@ -150,7 +150,7 @@ export function AreaChart({
             <text
               {...props}
               fontSize={12}
-              className={`${tooltipData && "font-bold text-lg"}`}
+              className={`${tooltipData && "font-bold text-base"}`}
             >
               {formattedValue}
             </text>
@@ -167,6 +167,18 @@ export function AreaChart({
           tickFormat={function tickFormat(d) {
             return String(d);
           }}
+          {...(tooltipData && {
+            tickValues: [getYValue(tooltipData)],
+          })}
+          tickComponent={({ formattedValue, ...props }) => (
+            <text
+              {...props}
+              fontSize={12}
+              className={`${tooltipData && "font-bold text-base"}`}
+            >
+              {formattedValue}
+            </text>
+          )}
         />
       )}
 
@@ -223,7 +235,8 @@ export function AreaChart({
         </g>
       )}
       {/* Tooltip */}
-      {tooltipData && (
+      {/* Tooltip goes out of chart, also may not be needed with x and y axis modifications */}
+      {/* {tooltipData && (
         <div>
           <TooltipInPortal
             key={Math.random()}
@@ -237,7 +250,7 @@ export function AreaChart({
             {getYValue(tooltipData) || 0} actions
           </TooltipInPortal>
         </div>
-      )}
+      )} */}
       {children}
     </Group>
   );
