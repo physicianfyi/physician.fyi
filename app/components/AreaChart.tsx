@@ -212,6 +212,20 @@ export function AreaChart({
             pointerEvents="none"
             strokeDasharray="5,2"
           />
+          <Line
+            from={{
+              x: 0,
+              y: tooltipTop,
+            }}
+            to={{
+              x: width,
+              y: tooltipTop,
+            }}
+            stroke={axisColor}
+            strokeWidth={2}
+            pointerEvents="none"
+            strokeDasharray="5,2"
+          />
           <circle
             cx={tooltipLeft}
             cy={tooltipTop + 1}
