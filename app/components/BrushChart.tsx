@@ -11,8 +11,6 @@ import { max, extent } from "@visx/vendor/d3-array";
 import type { BrushHandleRenderProps } from "@visx/brush/lib/BrushHandle";
 import { AreaChart } from "./AreaChart";
 
-// Initialize some variables
-
 const brushMargin = { top: 10, bottom: 15, left: 50, right: 20 };
 const chartSeparation = 30;
 const PATTERN_ID = "brush_pattern";
@@ -25,20 +23,24 @@ const selectedBrushStyle = {
   stroke: "white",
 };
 
+type Data = { year: number; actions: number; physicians: number };
+
 // accessors
-const getDate = (d: any) => d?.year;
-const getStockValue = (d: any) => d.actions;
+const getXValue = (d: Data) => d?.year;
+const getYValue = (d: Data) => d.actions;
 
 export type BrushProps = {
   margin?: { top: number; right: number; bottom: number; left: number };
-  compact?: boolean;
-  data: { year: number; actions: number }[];
+  isCompact?: boolean;
+  data: Data[];
   width: number;
+  height: number;
 };
 
 export function BrushChart({
   width,
-  compact = false,
+  height,
+  isCompact = false,
   margin = {
     top: 20,
     left: 50,
@@ -47,114 +49,120 @@ export function BrushChart({
   },
   data,
 }: BrushProps) {
-  const height = 400;
-  const brushRef = useRef<BaseBrush | null>(null);
-  const [filteredStock, setFilteredStock] = useState(data);
+  const [filteredData, setFilteredData] = useState(data);
+  // Otherwise does not rerender when another filter changes the data
   useEffect(() => {
-    setFilteredStock(data);
+    setFilteredData(data);
   }, [data]);
 
-  const onBrushChange = (domain: Bounds | null) => {
-    if (!domain) return;
-    const { x0, x1, y0, y1 } = domain;
-    const stockCopy = data.filter((s) => {
-      const x = getDate(s);
-      const y = getStockValue(s);
-      return x > x0 && x < x1 && y > y0 && y < y1;
-    });
-    setFilteredStock(stockCopy);
-  };
-
+  // Top chart
+  const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
-  const topChartBottomMargin = compact
+  const topChartBottomMargin = isCompact
     ? chartSeparation / 2
     : chartSeparation + 10;
   // const topChartHeight = 0.8 * innerHeight - topChartBottomMargin;
   const topChartHeight = 0.95 * innerHeight;
-  const bottomChartHeight = innerHeight - topChartHeight - chartSeparation;
-  // const bottomChartHeight = 0;
-
-  // bounds
-  const xMax = Math.max(width - margin.left - margin.right, 0);
+  const xMax = Math.max(innerWidth, 0);
   const yMax = Math.max(topChartHeight, 0);
-  const xBrushMax = Math.max(width - brushMargin.left - brushMargin.right, 0);
-  const yBrushMax = Math.max(
-    bottomChartHeight - brushMargin.top - brushMargin.bottom,
-    0
-  );
-
-  // scales
-  const dateScale = useMemo(
+  const xScale = useMemo(
     () =>
       scaleLinear<number>({
         range: [0, xMax],
-        domain: extent(filteredStock, getDate) as [Date, Date],
+        domain: extent(filteredData, getXValue) as [number, number],
       }),
-    [xMax, filteredStock]
+    [xMax, filteredData]
   );
-  const stockScale = useMemo(
+  const yScale = useMemo(
     () =>
       scaleLinear<number>({
         range: [yMax, 0],
-        domain: [0, max(filteredStock, getStockValue) || 0],
+        domain: [0, max(filteredData, getYValue) || 0],
         nice: true,
       }),
-    [yMax, filteredStock]
-  );
-  const brushDateScale = useMemo(
-    () =>
-      scaleLinear<number>({
-        range: [0, xBrushMax],
-        domain: extent(data, getDate) as [Date, Date],
-      }),
-    [data, xBrushMax]
-  );
-  const brushStockScale = useMemo(
-    () =>
-      scaleLinear({
-        range: [yBrushMax, 0],
-        domain: [0, max(data, getStockValue) || 0],
-        nice: true,
-      }),
-    [data, yBrushMax]
+    [yMax, filteredData]
   );
 
-  const initialBrushPosition = useMemo(
-    () => ({
-      start: { x: brushDateScale(getDate(data[50])) },
-      end: { x: brushDateScale(getDate(data.at(-1))) },
-    }),
-    [brushDateScale, data]
-  );
+  // const bottomChartHeight = innerHeight - topChartHeight - chartSeparation;
+  // const bottomChartHeight = 0;
+
+  // bounds
+
+  // const xBrushMax = Math.max(width - brushMargin.left - brushMargin.right, 0);
+  // const yBrushMax = Math.max(
+  //   bottomChartHeight - brushMargin.top - brushMargin.bottom,
+  //   0
+  // );
+
+  // const brushRef = useRef<BaseBrush | null>(null);
+
+  // scales
+
+  // const brushDateScale = useMemo(
+  //   () =>
+  //     scaleLinear<number>({
+  //       range: [0, xBrushMax],
+  //       domain: extent(data, getXValue) as [Date, Date],
+  //     }),
+  //   [data, xBrushMax]
+  // );
+  // const brushStockScale = useMemo(
+  //   () =>
+  //     scaleLinear({
+  //       range: [yBrushMax, 0],
+  //       domain: [0, max(data, getYValue) || 0],
+  //       nice: true,
+  //     }),
+  //   [data, yBrushMax]
+  // );
+
+  // const initialBrushPosition = useMemo(
+  //   () => ({
+  //     start: { x: brushDateScale(getXValue(data[50])) },
+  //     end: { x: brushDateScale(getXValue(data.at(-1))) },
+  //   }),
+  //   [brushDateScale, data]
+  // );
 
   // event handlers
-  const handleClearClick = () => {
-    if (brushRef?.current) {
-      setFilteredStock(data);
-      brushRef.current.reset();
-    }
-  };
+  // const handleClearClick = () => {
+  //   if (brushRef?.current) {
+  //     setFilteredData(data);
+  //     brushRef.current.reset();
+  //   }
+  // };
 
-  const handleResetClick = () => {
-    if (brushRef?.current) {
-      const updater: UpdateBrush = (prevBrush) => {
-        const newExtent = brushRef.current!.getExtent(
-          initialBrushPosition.start,
-          initialBrushPosition.end
-        );
+  // const handleResetClick = () => {
+  //   if (brushRef?.current) {
+  //     const updater: UpdateBrush = (prevBrush) => {
+  //       const newExtent = brushRef.current!.getExtent(
+  //         initialBrushPosition.start,
+  //         initialBrushPosition.end
+  //       );
 
-        const newState: BaseBrushState = {
-          ...prevBrush,
-          start: { y: newExtent.y0, x: newExtent.x0 },
-          end: { y: newExtent.y1, x: newExtent.x1 },
-          extent: newExtent,
-        };
+  //       const newState: BaseBrushState = {
+  //         ...prevBrush,
+  //         start: { y: newExtent.y0, x: newExtent.x0 },
+  //         end: { y: newExtent.y1, x: newExtent.x1 },
+  //         extent: newExtent,
+  //       };
 
-        return newState;
-      };
-      brushRef.current.updateBrush(updater);
-    }
-  };
+  //       return newState;
+  //     };
+  //     brushRef.current.updateBrush(updater);
+  //   }
+  // };
+
+  // const onBrushChange = (domain: Bounds | null) => {
+  //   if (!domain) return;
+  //   const { x0, x1, y0, y1 } = domain;
+  //   const stockCopy = data.filter((s) => {
+  //     const x = getXValue(s);
+  //     const y = getYValue(s);
+  //     return x > x0 && x < x1 && y > y0 && y < y1;
+  //   });
+  //   setFilteredData(stockCopy);
+  // };
 
   return (
     <div>
@@ -174,13 +182,14 @@ export function BrushChart({
           rx={14}
         />
         <AreaChart
-          hideBottomAxis={compact}
-          data={filteredStock}
-          width={width}
+          hideBottomAxis={isCompact}
+          data={filteredData}
+          width={innerWidth}
+          height={topChartHeight}
           margin={{ ...margin, bottom: topChartBottomMargin }}
           yMax={yMax}
-          xScale={dateScale}
-          yScale={stockScale}
+          xScale={xScale}
+          yScale={yScale}
           gradientColor={background2}
         />
         {/* <AreaChart
@@ -215,7 +224,7 @@ export function BrushChart({
             brushDirection="horizontal"
             initialBrushPosition={initialBrushPosition}
             onChange={onBrushChange}
-            onClick={() => setFilteredStock(data)}
+            onClick={() => setFilteredData(data)}
             selectedBoxStyle={selectedBrushStyle}
             useWindowMoveEvents
             renderBrushHandle={(props) => <BrushHandle {...props} />}

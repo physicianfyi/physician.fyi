@@ -1,10 +1,15 @@
 import { Group } from "@visx/group";
-import { AreaClosed } from "@visx/shape";
-import type { AxisScale } from "@visx/axis";
+import { AreaClosed, Line, Bar } from "@visx/shape";
 import { AxisLeft, AxisBottom } from "@visx/axis";
 import { LinearGradient } from "@visx/gradient";
 import { curveMonotoneX } from "@visx/curve";
-import type { ReactNode } from "react";
+import { useCallback, type ReactNode } from "react";
+import { useTooltip, useTooltipInPortal } from "@visx/tooltip";
+import { localPoint } from "@visx/event";
+import type { ScaleLinear } from "@visx/vendor/d3-scale";
+import { bisector } from "@visx/vendor/d3-array";
+
+type Data = { year: number; physicians: number; actions: number };
 
 // Initialize some variables
 const axisColor = "#fff";
@@ -24,13 +29,15 @@ const axisLeftTickLabelProps = {
 };
 
 // accessors
-const getDate = (d: any) => d?.year;
-const getStockValue = (d: any) => d.actions;
+const getXValue = (d: Data) => d?.year;
+const getYValue = (d: Data) => d.actions;
+const bisectDate = bisector<Data, number>((d) => d?.year).left;
 
 export function AreaChart({
   data,
   gradientColor,
   width,
+  height,
   yMax,
   margin,
   xScale,
@@ -41,11 +48,12 @@ export function AreaChart({
   left,
   children,
 }: {
-  data: any[];
+  data: Data[];
   gradientColor: string;
-  xScale: AxisScale<number>;
-  yScale: AxisScale<number>;
+  xScale: ScaleLinear<number, number, never>;
+  yScale: ScaleLinear<number, number, never>;
   width: number;
+  height: number;
   yMax: number;
   margin: { top: number; right: number; bottom: number; left: number };
   hideBottomAxis?: boolean;
@@ -54,9 +62,55 @@ export function AreaChart({
   left?: number;
   children?: ReactNode;
 }) {
+  const {
+    tooltipData,
+    tooltipLeft = 0,
+    tooltipTop = 0,
+    showTooltip,
+    hideTooltip,
+  } = useTooltip<Data>();
+  const { containerRef, TooltipInPortal } = useTooltipInPortal({
+    // use TooltipWithBounds
+    detectBounds: true,
+    // when tooltip containers are scrolled, this will correctly update the Tooltip position
+    scroll: true,
+  });
+
+  const handleTooltip = useCallback(
+    (
+      event: React.TouchEvent<SVGRectElement> | React.MouseEvent<SVGRectElement>
+    ) => {
+      // Need to account for left margin
+      let { x } = localPoint(event) || { x: margin.left };
+      x -= margin.left;
+      const x0 = xScale.invert(x);
+      const index = bisectDate(data, x0, 1);
+      const d0 = data[index - 1];
+      const d1 = data[index];
+      let d = d0;
+      if (d1 && getXValue(d1)) {
+        d =
+          x0.valueOf() - getXValue(d0).valueOf() >
+          getXValue(d1).valueOf() - x0.valueOf()
+            ? d1
+            : d0;
+      }
+      showTooltip({
+        tooltipData: d,
+        tooltipLeft: x,
+        tooltipTop: yScale(getYValue(d)),
+      });
+    },
+    [data, margin.left, showTooltip, xScale, yScale]
+  );
+
   if (width < 10) return null;
   return (
-    <Group left={left || margin.left} top={top || margin.top}>
+    <Group
+      left={left || margin.left}
+      top={top || margin.top}
+      ref={containerRef}
+    >
       <LinearGradient
         id="gradient"
         from={gradientColor}
@@ -66,8 +120,8 @@ export function AreaChart({
       />
       <AreaClosed<any>
         data={data}
-        x={(d) => xScale(getDate(d)) || 0}
-        y={(d) => yScale(getStockValue(d)) || 0}
+        x={(d) => xScale(getXValue(d)) || 0}
+        y={(d) => yScale(getYValue(d)) || 0}
         yScale={yScale}
         strokeWidth={1}
         stroke="url(#gradient)"
@@ -95,6 +149,72 @@ export function AreaChart({
           tickStroke={axisColor}
           tickLabelProps={axisLeftTickLabelProps}
         />
+      )}
+
+      {/* Invisible box so tooltip shows even not over AreaClosed */}
+      <Bar
+        x={0}
+        y={0}
+        width={width}
+        height={height}
+        fill="transparent"
+        rx={14}
+        onTouchStart={handleTooltip}
+        onTouchMove={handleTooltip}
+        onMouseMove={handleTooltip}
+        onMouseLeave={() => hideTooltip()}
+      />
+      {/* Line and dot tooltip looks like it stems from */}
+      {tooltipData && (
+        <g>
+          <Line
+            from={{
+              x: tooltipLeft,
+              y: 0,
+            }}
+            to={{
+              x: tooltipLeft,
+              y: height,
+            }}
+            stroke={axisColor}
+            strokeWidth={2}
+            pointerEvents="none"
+            strokeDasharray="5,2"
+          />
+          <circle
+            cx={tooltipLeft}
+            cy={tooltipTop + 1}
+            r={4}
+            fill="black"
+            fillOpacity={0.1}
+            stroke="black"
+            strokeOpacity={0.1}
+            strokeWidth={2}
+            pointerEvents="none"
+          />
+          <circle
+            cx={tooltipLeft}
+            cy={tooltipTop}
+            r={4}
+            fill={gradientColor}
+            stroke="white"
+            strokeWidth={2}
+            pointerEvents="none"
+          />
+        </g>
+      )}
+      {/* Tooltip */}
+      {tooltipData && (
+        <div>
+          <TooltipInPortal
+            key={Math.random()}
+            top={tooltipTop - 12}
+            left={tooltipLeft + 12}
+            className="popover"
+          >
+            {getYValue(tooltipData) || 0} actions
+          </TooltipInPortal>
+        </div>
       )}
       {children}
     </Group>

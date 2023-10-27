@@ -198,7 +198,8 @@
   }
 
   .popover {
-    @apply z-50 flex flex-col bg-popover border-border border rounded p-2 overflow-auto overscroll-contain;
+    /* Important modifiers for visx tooltip, except positional ones since that makes all tooltips always show */
+    @apply z-50 flex flex-col !bg-popover !text-popover-foreground !border-border !border !rounded !p-2 !overflow-auto !overscroll-contain;
     max-height: min(var(--popover-available-height, 300px), 300px);
     max-width: max(var(--popover-available-width, 300px), 300px);
   }

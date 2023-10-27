@@ -541,8 +541,8 @@ export default function Index() {
           </span>
         </label>
         <ParentSize>
-          {({ width, height }) => (
-            <BrushChart data={data.chartData} width={width} />
+          {({ width }) => (
+            <BrushChart data={data.chartData} width={width} height={400} />
           )}
         </ParentSize>
       </div>
