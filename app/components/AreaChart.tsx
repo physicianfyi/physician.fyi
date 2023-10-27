@@ -193,7 +193,8 @@ export function AreaChart({
         onTouchStart={handleTooltip}
         onTouchMove={handleTooltip}
         onMouseMove={handleTooltip}
-        onMouseLeave={() => hideTooltip()}
+        onMouseLeave={hideTooltip}
+        onTouchEnd={hideTooltip}
       />
       {/* Line and dot tooltip looks like it stems from */}
       {tooltipData && (
