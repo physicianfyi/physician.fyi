@@ -1,7 +1,7 @@
 import { Group } from "@visx/group";
 import { AreaClosed, Line, Bar } from "@visx/shape";
 import { AxisLeft, AxisBottom } from "@visx/axis";
-import { LinearGradient } from "@visx/gradient";
+import { LinearGradient, GradientOrangeRed } from "@visx/gradient";
 import { curveMonotoneX } from "@visx/curve";
 import { useCallback, type ReactNode } from "react";
 import { useTooltip, useTooltipInPortal } from "@visx/tooltip";
@@ -29,8 +29,9 @@ const axisLeftTickLabelProps = {
 };
 
 // accessors
-const getXValue = (d: Data) => d?.year;
+const getXValue = (d: Data) => d.year;
 const getYValue = (d: Data) => d.actions;
+const getY2Value = (d: Data) => d.physicians;
 const bisectDate = bisector<Data, number>((d) => d?.year).left;
 
 export function AreaChart({
@@ -118,7 +119,7 @@ export function AreaChart({
         to={gradientColor}
         toOpacity={0.2}
       />
-      <AreaClosed<any>
+      <AreaClosed<Data>
         data={data}
         x={(d) => xScale(getXValue(d)) || 0}
         y={(d) => yScale(getYValue(d)) || 0}
@@ -126,6 +127,17 @@ export function AreaChart({
         strokeWidth={1}
         stroke="url(#gradient)"
         fill="url(#gradient)"
+        curve={curveMonotoneX}
+      />
+      <GradientOrangeRed id="gradient2" fromOpacity={1} toOpacity={0.2} />
+      <AreaClosed<Data>
+        data={data}
+        x={(d) => xScale(getXValue(d)) || 0}
+        y={(d) => yScale(getY2Value(d)) || 0}
+        yScale={yScale}
+        strokeWidth={1}
+        stroke="url(#gradient2)"
+        fill="url(#gradient2)"
         curve={curveMonotoneX}
       />
       {!hideBottomAxis && (
@@ -163,20 +175,35 @@ export function AreaChart({
           numTicks={Math.min(5, yScale.domain()[1] - yScale.domain()[0])}
           stroke={axisColor}
           tickStroke={axisColor}
-          tickLabelProps={axisLeftTickLabelProps}
+          tickLabelProps={{
+            ...axisLeftTickLabelProps,
+          }}
           tickFormat={function tickFormat(d) {
             return String(d);
           }}
           {...(tooltipData && {
-            tickValues: [getYValue(tooltipData)],
+            tickValues: [getYValue(tooltipData), getY2Value(tooltipData)],
           })}
           tickComponent={({ formattedValue, ...props }) => (
             <text
               {...props}
               fontSize={12}
               className={`${tooltipData && "font-bold text-base"}`}
+              {...(tooltipData && {
+                dy:
+                  Number(formattedValue) === getYValue(tooltipData)
+                    ? "-1em"
+                    : "1em",
+              })}
             >
-              {formattedValue}
+              <tspan x="-8">{formattedValue}</tspan>
+              {tooltipData && (
+                <tspan x="-8" dy=".9em" className="text-xs font-normal">
+                  {Number(formattedValue) === getYValue(tooltipData)
+                    ? "actions"
+                    : "doctors"}
+                </tspan>
+              )}
             </text>
           )}
         />
@@ -195,14 +222,17 @@ export function AreaChart({
         onMouseMove={handleTooltip}
         onMouseLeave={hideTooltip}
         onTouchEnd={hideTooltip}
+        // Attempt to fix mobile buggy case
+        onTouchCancel={hideTooltip}
       />
+
       {/* Line and dot tooltip looks like it stems from */}
       {tooltipData && (
         <g>
           <Line
             from={{
               x: tooltipLeft,
-              y: 0,
+              y: tooltipTop,
             }}
             to={{
               x: tooltipLeft,
@@ -213,13 +243,14 @@ export function AreaChart({
             pointerEvents="none"
             strokeDasharray="5,2"
           />
+
           <Line
             from={{
               x: 0,
               y: tooltipTop,
             }}
             to={{
-              x: width,
+              x: tooltipLeft,
               y: tooltipTop,
             }}
             stroke={axisColor}
@@ -243,6 +274,42 @@ export function AreaChart({
             cy={tooltipTop}
             r={4}
             fill={gradientColor}
+            stroke="white"
+            strokeWidth={2}
+            pointerEvents="none"
+          />
+
+          <Line
+            from={{
+              x: 0,
+              y: yScale(getY2Value(tooltipData)),
+            }}
+            to={{
+              x: tooltipLeft,
+              y: yScale(getY2Value(tooltipData)),
+            }}
+            stroke={axisColor}
+            strokeWidth={2}
+            pointerEvents="none"
+            strokeDasharray="5,2"
+          />
+          <circle
+            cx={tooltipLeft}
+            cy={yScale(getY2Value(tooltipData)) + 1}
+            r={4}
+            fill="black"
+            fillOpacity={0.1}
+            stroke="black"
+            strokeOpacity={0.1}
+            strokeWidth={2}
+            pointerEvents="none"
+          />
+          <circle
+            cx={tooltipLeft}
+            cy={yScale(getY2Value(tooltipData))}
+            r={4}
+            // https://airbnb.io/visx/docs/gradient#GradientOrangeRed
+            fill={"#FCE38A"}
             stroke="white"
             strokeWidth={2}
             pointerEvents="none"
