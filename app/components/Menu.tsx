@@ -128,7 +128,7 @@ export const Menu = () => {
           <Ariakit.Collection className="flex justify-end flex-wrap gap-2">
             {items.map((item, i) => {
               if (!item) {
-                return null;
+                return "|";
                 // return <Ariakit.Separator orientation="horizontal" key={i} />;
               }
               const { render, children } = item;
