@@ -40,7 +40,7 @@ if (typeof window !== "undefined") {
     capture_pageview: false, // Manually send because it doesn't work when client side routing
   });
 }
-
+const doctors= "👩🏻‍⚕️👩🏼‍⚕️👩🏽‍⚕️👩🏾‍⚕️👩🏿‍⚕️👨🏻‍⚕️👨🏼‍⚕️👨🏽‍⚕️👨🏾‍⚕️👨🏿‍⚕️🧑‍⚕️🧑🏻‍⚕️🧑🏼‍⚕️🧑🏽‍⚕️🧑🏾‍⚕️🧑🏿‍⚕️"
 export default function App() {
   return (
     <html lang="en">
@@ -57,7 +57,7 @@ export default function App() {
               to="/"
               className="text-lg font-bold font-serif whitespace-nowrap"
             >
-              👨‍⚕️ physician.fyi 🔍
+              {doctors[Math.floor(Math.random()*doctors.length)]} physician.fyi 🔍
             </Link>
 
             <Menu />
