@@ -191,7 +191,10 @@ export function AreaChart({
               className={`${tooltipData && "font-bold text-base"}`}
               {...(tooltipData && {
                 dy:
-                  Number(formattedValue) === getYValue(tooltipData)
+                  Number(formattedValue) === getYValue(tooltipData) &&
+                  Number(formattedValue) === getY2Value(tooltipData)
+                    ? axisLeftTickLabelProps.dy
+                    : Number(formattedValue) === getYValue(tooltipData)
                     ? "-1em"
                     : "1em",
               })}
@@ -199,7 +202,10 @@ export function AreaChart({
               <tspan x="-8">{formattedValue}</tspan>
               {tooltipData && (
                 <tspan x="-8" dy=".9em" className="text-xs font-normal">
-                  {Number(formattedValue) === getYValue(tooltipData)
+                  {Number(formattedValue) === getYValue(tooltipData) &&
+                  Number(formattedValue) === getY2Value(tooltipData)
+                    ? ""
+                    : Number(formattedValue) === getYValue(tooltipData)
                     ? "actions"
                     : "doctors"}
                 </tspan>
